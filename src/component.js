@@ -1,6 +1,7 @@
 import React from 'react'
+import Actions from './actions'
 
-let state, actions, dirtyTracker
+let state, dirtyTracker
 
 let areEqual = (var1, var2) => {
   if ( var1.equals ) {
@@ -88,14 +89,27 @@ class Component extends React.Component {
 
   //--------------------------------------------------
 
+  static actions () {
+    return this._actions
+  }
+
+  static setActions (actions) {
+    this._actions = actions
+  }
+
+  actions () {
+    return this.constructor.actions()
+  }
+
+
   action (name, payload) {
-    actions.call(name, payload)
+    this.actions().do(name, payload)
   }
 
 }
 
 Component.setAppState = (s) => { state = s }
-Component.setActions = (a) => { actions = a }
+
 Component.setDirtyTracker = (d) => { dirtyTracker = d }
 
 export default Component

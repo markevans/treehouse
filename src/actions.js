@@ -9,11 +9,11 @@ class Actions {
     this.state = state
   }
 
-  registerActions (actions) {
+  register(actions) {
     Object.assign(this.actions, actions)
   }
 
-  call (name, payload={}) {
+  do (name, payload={}) {
     if ( this.actions[name] ) {
       this.actions[name](this.state.at(), payload, this.state.commit.bind(this.state))
     } else {
