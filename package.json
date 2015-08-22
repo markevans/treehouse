@@ -1,0 +1,27 @@
+{
+  "name": "treehouse",
+  "version": "1.0.0",
+  "description": "Opinionated mini-framework for dealing with state in React applications",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/markevans/treehouse.git"
+  },
+  "keywords": [
+    "javascript",
+    "react",
+    "state",
+    "immutable",
+    "cursor",
+    "tree"
+  ],
+  "author": "Mark Evans",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/markevans/treehouse/issues"
+  },
+  "homepage": "https://github.com/markevans/treehouse"
+}
