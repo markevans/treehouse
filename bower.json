@@ -1,0 +1,31 @@
+{
+  "name": "treehouse",
+  "version": "0.0.0",
+  "homepage": "https://github.com/markevans/treehouse",
+  "authors": [
+    "Mark Evans"
+  ],
+  "description": "Opinionated mini-framework for javascript webapps using React and Immutable.js",
+  "main": "lib/treehouse.js",
+  "moduleType": [
+    "amd",
+    "es6",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "javascript",
+    "react",
+    "state",
+    "cursor",
+    "immutable",
+    "tree"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "spec"
+  ]
+}
