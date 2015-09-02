@@ -67,15 +67,12 @@ class Cursor {
     value = immutable.fromJS(value) // ensure it's immutable
     this.tree.setData(this.tree.getData().updateIn(pathToAttr, () => value), pathToAttr)
 
+    return this
   }
 
   commit () {
     this.tree.commit()
-  }
-
-  setAndCommit (...args) {
-    this.set(...args)
-    this.commit()
+    return this
   }
 }
 

@@ -27,6 +27,23 @@ let branchFromPath = (path) => {
   return path[0]
 }
 
+let branchesFrom = (cursors) => {
+  let key, branches = []
+  for (key in cursors) {
+    var branch = branchFromPath(cursors[key].path)
+    branches.push(branch)
+  }
+  return branches
+}
+
+let resolveCursors = (cursors) => {
+  let key, data = {}
+  for (key in cursors) {
+    data[key] = cursors[key].get()
+  }
+  return data
+}
+
 class Component extends React.Component {
 
   app () {
@@ -45,50 +62,38 @@ class Component extends React.Component {
     return this.app().tree
   }
 
-  treeCursors: {}
+  stateFromTree () {
+    return {}
+  }
 
-  appTreeCursors () {
-    var key, path, cursors = {}
-    for ( key in this.treeCursors ) {
-      path = this.treeCursors[key]
+  getCursors () {
+    var key, path, cursors = {},
+        paths = this.stateFromTree()
+    for ( key in paths ) {
+      path = paths[key]
       cursors[key] = this.tree().at(path)
     }
     return cursors
   }
 
-  appTreeData () {
-    let key, data = {}
-    for (key in this.cursors) {
-      data[key] = this.cursors[key].get()
-    }
-    return data
-  }
-
-  appTreeBranches () {
-    let key, branches = []
-    for (key in this.treeCursors) {
-      var branch = branchFromPath(this.treeCursors[key])
-      branches.push(branch)
-    }
-    return branches
+  syncWithTree () {
+    this.setState(resolveCursors(this.cursors))
   }
 
   componentWillMount () {
-    this.cursors = this.appTreeCursors()
-    this.currentAppTreeData = this.appTreeData()
-    this.relevantAppTreeBranches = this.appTreeBranches()
+    this.cursors = this.getCursors()
+    this.relevantAppTreeBranches = branchesFrom(this.cursors)
     this.dirtyTracker().register(this, this.relevantAppTreeBranches)
+    this.syncWithTree()
   }
 
-  shouldComponentUpdate (nextProps, nextTree) {
+  shouldComponentUpdate (nextProps, nextState) {
     console.log('shouldComponentUpdate', this.componentName, this._reactInternalInstance._rootNodeID)
-    return !elementsAreEqual(this.tree, nextTree) ||
-      !elementsAreEqual(this.props, nextProps) ||
-      !elementsAreEqual(this.currentAppTreeData, this.appTreeData())
+    return !elementsAreEqual(this.state, nextState) ||
+      !elementsAreEqual(this.props, nextProps)
   }
 
   componentWillUpdate () {
-    this.currentAppTreeData = this.appTreeData()
     console.log('render', this.componentName, this._reactInternalInstance._rootNodeID)
   }
 
