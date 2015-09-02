@@ -2,11 +2,11 @@ class Actions {
 
   constructor () {
     this.actions = {}
-    this.state = null
+    this.tree = null
   }
 
-  setState (state) {
-    this.state = state
+  setTree (tree) {
+    this.tree = tree
   }
 
   register(actions) {
@@ -15,7 +15,7 @@ class Actions {
 
   do (name, payload={}) {
     if ( this.actions[name] ) {
-      this.actions[name](this.state.at(), payload, this.state.commit.bind(this.state))
+      this.actions[name](this.tree.at(), payload, this.tree.commit.bind(this.tree))
     } else {
       console.log(`Action '${name}' not found`)
     }

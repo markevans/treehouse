@@ -1,7 +1,4 @@
 import React from 'react'
-import Actions from './actions'
-
-let state, dirtyTracker
 
 let areEqual = (var1, var2) => {
   if ( var1.equals ) {
@@ -32,18 +29,34 @@ let branchFromPath = (path) => {
 
 class Component extends React.Component {
 
-  stateCursors: {}
+  app () {
+    throw new Error("Override me!")
+  }
 
-  appStateCursors () {
+  actions () {
+    return this.app().actions
+  }
+
+  dirtyTracker () {
+    return this.app().dirtyTracker
+  }
+
+  tree () {
+    return this.app().tree
+  }
+
+  treeCursors: {}
+
+  appTreeCursors () {
     var key, path, cursors = {}
-    for ( key in this.stateCursors ) {
-      path = this.stateCursors[key]
-      cursors[key] = state.at(path)
+    for ( key in this.treeCursors ) {
+      path = this.treeCursors[key]
+      cursors[key] = this.tree().at(path)
     }
     return cursors
   }
 
-  appStateData () {
+  appTreeData () {
     let key, data = {}
     for (key in this.cursors) {
       data[key] = this.cursors[key].get()
@@ -51,65 +64,48 @@ class Component extends React.Component {
     return data
   }
 
-  appStateBranches () {
+  appTreeBranches () {
     let key, branches = []
-    for (key in this.stateCursors) {
-      var branch = branchFromPath(this.stateCursors[key])
+    for (key in this.treeCursors) {
+      var branch = branchFromPath(this.treeCursors[key])
       branches.push(branch)
     }
     return branches
   }
 
   componentWillMount () {
-    this.cursors = this.appStateCursors()
-    this.currentAppStateData = this.appStateData()
-    this.relevantAppStateBranches = this.appStateBranches()
-    dirtyTracker.register(this, this.relevantAppStateBranches)
+    this.cursors = this.appTreeCursors()
+    this.currentAppTreeData = this.appTreeData()
+    this.relevantAppTreeBranches = this.appTreeBranches()
+    this.dirtyTracker().register(this, this.relevantAppTreeBranches)
   }
 
-  shouldComponentUpdate (nextProps, nextState) {
+  shouldComponentUpdate (nextProps, nextTree) {
     console.log('shouldComponentUpdate', this.componentName, this._reactInternalInstance._rootNodeID)
-    return !elementsAreEqual(this.state, nextState) ||
+    return !elementsAreEqual(this.tree, nextTree) ||
       !elementsAreEqual(this.props, nextProps) ||
-      !elementsAreEqual(this.currentAppStateData, this.appStateData())
+      !elementsAreEqual(this.currentAppTreeData, this.appTreeData())
   }
 
   componentWillUpdate () {
-    this.currentAppStateData = this.appStateData()
+    this.currentAppTreeData = this.appTreeData()
     console.log('render', this.componentName, this._reactInternalInstance._rootNodeID)
   }
 
   componentDidUpdate () {
-    dirtyTracker.markComponentClean(this)
+    this.dirtyTracker().markComponentClean(this)
   }
 
   componentWillUnmount () {
-    dirtyTracker.unregister(this, this.relevantAppStateBranches)
+    this.dirtyTracker().unregister(this, this.relevantAppTreeBranches)
   }
 
   //--------------------------------------------------
-
-  static actions () {
-    return this._actions
-  }
-
-  static setActions (actions) {
-    this._actions = actions
-  }
-
-  actions () {
-    return this.constructor.actions()
-  }
-
 
   action (name, payload) {
     this.actions().do(name, payload)
   }
 
 }
-
-Component.setAppState = (s) => { state = s }
-
-Component.setDirtyTracker = (d) => { dirtyTracker = d }
 
 export default Component

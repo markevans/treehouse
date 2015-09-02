@@ -2,7 +2,7 @@ import immutable from 'immutable'
 import Cursor from './cursor'
 import EventEmitter from './event_emitter'
 
-class State {
+class Tree {
 
   constructor (data = {}) {
     this.data = immutable.fromJS(data)
@@ -44,4 +44,4 @@ class State {
 
 }
 
-export default State
+export default Tree

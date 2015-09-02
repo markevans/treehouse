@@ -1,28 +1,30 @@
 import React from 'react'
 let utils = require('react/addons').addons.TestUtils
-import Component from '../src/component'
-import Actions from '../src/actions'
-
+import App from '../src/app'
 
 describe("Component", () => {
 
+  let app
+
+  beforeEach(() => {
+    app = new App()
+  })
+
   describe("actions", () => {
 
-    let Widget = class Widget extends Component {
-      render () { return <div/> }
-    }
-    let actions, jumpAction
+    let Widget
 
     beforeEach(() => {
-      actions = new Actions()
-      Component.setActions(actions)
+      Widget = class Widget extends app.Component {
+        render () { return <div/> }
+      }
     })
 
     it("calls an action", () => {
-      spyOn(actions, 'do')
+      spyOn(app.actions, 'do')
       let widget = new Widget()
       widget.action('jump', {height: 7})
-      expect(actions.do).toHaveBeenCalledWith('jump', {height: 7})
+      expect(app.actions.do).toHaveBeenCalledWith('jump', {height: 7})
     })
   })
 
