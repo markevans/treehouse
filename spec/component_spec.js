@@ -1,24 +1,17 @@
 import fs from 'fs'
-import React from 'react'
-let utils = require('react/addons').addons.TestUtils
-import App from '../src/app'
-
-let jsdom = require('jsdom')
-let jquery = fs.readFileSync('./node_modules/jquery/dist/jquery.min.js').toString()
-let $
-
-let render = (element) => {
-  return React.render(element, $('body')[0])
-}
 
 describe("Component", () => {
 
-  let app, tree
+  // Set up DOM
 
-  beforeEach(() => {
-    app = new App()
-    tree = app.tree.at()
-  })
+  let jsdom = require('jsdom')
+  let jquery = fs.readFileSync('./node_modules/jquery/dist/jquery.min.js').toString()
+  let $
+  let React, utils
+
+  let render = (element) => {
+    return React.render(element, document.body)
+  }
 
   beforeEach((done) => {
     jsdom.env({
@@ -28,7 +21,10 @@ describe("Component", () => {
         if (error) { console.log("Error:", error) }
         global.window = window
         global.document = window.document
+        global.navigator = window.navigator
         $ = window.jQuery
+        React = require('react')
+        utils = require('react/addons').addons.TestUtils
         done()
       }
     })
@@ -40,6 +36,15 @@ describe("Component", () => {
     setTimeout(done)
   })
 
+  //---------------
+
+  let app, tree
+
+  beforeEach(() => {
+    let App = require('../src/app')
+    app = new App()
+    tree = app.tree.at()
+  })
 
   describe("actions", () => {
 
@@ -95,8 +100,9 @@ describe("Component", () => {
       })
 
       it("updates when the relevant branch has been touched", () => {
-        // tree.set({fruit: 'apple'}).commit()
-        // expect(widgetRenderCount).toEqual(1)
+        tree.set({fruit: 'apple'}).commit()
+        expect($('.widget').html()).toEqual('apple')
+        expect(widgetRenderCount).toEqual(1)
       })
 
       it("doesn't update when the relevant branch hasn't been touched", () => {
