@@ -25,7 +25,9 @@
   },
   "homepage": "https://github.com/markevans/treehouse",
   "devDependencies": {
-    "jasmine-es6": "0.0.17"
+    "jasmine-es6": "0.0.17",
+    "jquery": "^2.1.4",
+    "jsdom": "^3.1.2"
   },
   "dependencies": {
     "immutable": "^3.7.4",
