@@ -99,9 +99,10 @@ export default class Egg extends React.Component {
   }
 
   render () {
+    // remember that objects are immutable.js maps, hence "egg.get('name')"
     return (<div onClick={this.handleClick}>
       I'm a {this.state.egg.get('name')} egg
-    </div>)    // remember objects are immutable.js maps, hence ".get('name')"
+    </div>)
   }
 }
 ```
