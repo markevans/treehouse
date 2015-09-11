@@ -16,7 +16,7 @@ class App {
 
     this.tree = new Tree()
 
-    this.actions = new Actions()
+    this.actions = new Actions(this.tree)
 
     this.dirtyTracker = new DirtyTracker()
 

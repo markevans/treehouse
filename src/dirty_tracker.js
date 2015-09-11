@@ -35,14 +35,6 @@ class DirtyTracker {
   eachDirtyComponent (callback) {
     this.dirty.forEach(callback)
   }
-
-  clear () {
-    this.dirty.clear()
-  }
-
-  log () {
-    this.eachDirtyComponent(c => console.log(c.componentName))
-  }
 }
 
 export default DirtyTracker

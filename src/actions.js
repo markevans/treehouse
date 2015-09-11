@@ -1,11 +1,7 @@
 class Actions {
 
-  constructor () {
+  constructor (tree) {
     this.actions = {}
-    this.tree = null
-  }
-
-  setTree (tree) {
     this.tree = tree
   }
 
