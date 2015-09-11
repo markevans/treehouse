@@ -17,22 +17,6 @@ let elementsAreEqual = (obj1, obj2) => {
   return true
 }
 
-// "a.b.c" -> "a" or ["a", "b", "c" ] -> "a"
-let branchFromPath = (path) => {
-  if (typeof path === 'string') {
-    path = path.split('.')
-  }
-  return path[0]
-}
-
-let resolveCursors = (cursors) => {
-  let key, data = {}
-  for (key in cursors) {
-    data[key] = cursors[key].get()
-  }
-  return data
-}
-
 let componentMethods = (app) => {
   return {
 
@@ -71,12 +55,21 @@ let componentMethods = (app) => {
       if (!this._relevantBranches) {
         let key, branches = [], cursors = this.cursors()
         for (key in cursors) {
-          var branch = branchFromPath(cursors[key].path)
-          branches.push(branch)
+          let path = cursors[key].path,
+              normalizedPath = (typeof path === 'string') ? path.split('.') : path
+          branches.push(normalizedPath[0])
         }
         this._relevantBranches = branches
       }
       return this._relevantBranches
+    },
+
+    currentTreeState () {
+      let key, data = {}, cursors = this.cursors()
+      for (key in cursors) {
+        data[key] = cursors[key].get()
+      }
+      return data
     },
 
     //-------------------------------------------------
@@ -107,7 +100,7 @@ let componentMethods = (app) => {
     //-------------------------------------------------
 
     syncWithTree () {
-      this.setState(resolveCursors(this.cursors()))
+      this.setState(this.currentTreeState())
     },
 
     componentWillMount () {
