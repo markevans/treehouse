@@ -2,10 +2,12 @@
   "name": "treehouse",
   "version": "1.0.2",
   "description": "Opinionated mini-framework for dealing with state in React applications",
-  "main": "src/treehouse.js",
+  "main": "lib/treehouse.js",
   "scripts": {
     "test": "node_modules/jasmine-es6/bin/jasmine.js",
-    "build": "node_modules/webpack/bin/webpack.js"
+    "build": "node_modules/webpack/bin/webpack.js",
+    "compile": "node_modules/babel/bin/babel.js -d lib/ src/",
+    "prepublish": "npm run compile"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,7 @@
   },
   "homepage": "https://github.com/markevans/treehouse",
   "devDependencies": {
+    "babel": "^5.8.23",
     "babel-loader": "^5.3.2",
     "jasmine-es6": "0.0.17",
     "jquery": "^2.1.4",
