@@ -1,6 +1,6 @@
 {
   "name": "treehouse",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Opinionated mini-framework for dealing with state in React applications",
   "main": "dist/treehouse.js",
   "scripts": {
