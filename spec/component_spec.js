@@ -85,7 +85,6 @@ describe("Component", () => {
 
     it("renders from the tree", () => {
       tree.set({fruit: 'orange', animal: 'sheep'}).commit()
-      let widget = new Widget()
       render(<Widget/>)
       expect($('.widget').html()).toEqual('orange')
     })
@@ -94,21 +93,26 @@ describe("Component", () => {
 
       beforeEach(() => {
         tree.set({fruit: 'orange', animal: 'sheep'}).commit()
-        let widget = new Widget()
         render(<Widget/>)
         widgetRenderCount = 0
       })
 
       it("updates when the relevant branch has been touched", () => {
-        tree.set({fruit: 'apple'}).commit()
+        tree.set('fruit', 'apple').commit()
         expect($('.widget').html()).toEqual('apple')
         expect(widgetRenderCount).toEqual(1)
       })
 
       it("doesn't update when the relevant branch hasn't been touched", () => {
+        tree.set('animal', 'sloth').commit()
+        expect($('.widget').html()).toEqual('orange')
+        expect(widgetRenderCount).toEqual(0)
       })
 
       it("doesn't call render if the state from tree is the same", () => {
+        tree.set('fruit', 'orange').commit()
+        expect($('.widget').html()).toEqual('orange')
+        expect(widgetRenderCount).toEqual(0)
       })
 
     })
