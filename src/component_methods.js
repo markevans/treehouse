@@ -25,15 +25,6 @@ let branchFromPath = (path) => {
   return path[0]
 }
 
-let branchesFrom = (cursors) => {
-  let key, branches = []
-  for (key in cursors) {
-    var branch = branchFromPath(cursors[key].path)
-    branches.push(branch)
-  }
-  return branches
-}
-
 let resolveCursors = (cursors) => {
   let key, data = {}
   for (key in cursors) {
@@ -44,53 +35,65 @@ let resolveCursors = (cursors) => {
 
 let componentMethods = (app) => {
   return {
+
     actions () {
       return app.actions
-    },
-
-    dirtyTracker () {
-      return app.dirtyTracker
-    },
-
-    tree () {
-      return app.tree
     },
 
     action (name, payload) {
       this.actions().do(name, payload)
     },
 
+    //-------------------------------------------------
+
+    tree () {
+      return app.tree
+    },
+
     stateFromTree () {
       return {}
     },
 
-    getCursors () {
-      var key, path, cursors = {},
-          paths = this.stateFromTree()
-      for ( key in paths ) {
-        path = paths[key]
-        cursors[key] = this.tree().at(path)
+    cursors () {
+      if (!this._cursors) {
+        var key, path, cursors = {},
+            paths = this.stateFromTree()
+        for ( key in paths ) {
+          path = paths[key]
+          cursors[key] = this.tree().at(path)
+        }
+        this._cursors = cursors
       }
-      return cursors
+      return this._cursors
     },
 
-    syncWithTree () {
-      this.setState(resolveCursors(this.cursors))
+    relevantBranches () {
+      if (!this._relevantBranches) {
+        let key, branches = [], cursors = this.cursors()
+        for (key in cursors) {
+          var branch = branchFromPath(cursors[key].path)
+          branches.push(branch)
+        }
+        this._relevantBranches = branches
+      }
+      return this._relevantBranches
     },
 
     //-------------------------------------------------
 
     initForTreehouse () {
-      this.cursors = this.getCursors()
       this.registerWithDirtyTracker()
       this.syncWithTree()
     },
 
     //-------------------------------------------------
 
+    dirtyTracker () {
+      return app.dirtyTracker
+    },
+
     registerWithDirtyTracker () {
-      this.relevantAppTreeBranches = branchesFrom(this.cursors)
-      this.dirtyTracker().register(this, this.relevantAppTreeBranches)
+      this.dirtyTracker().register(this, this.relevantBranches())
     },
 
     markCleanWithDirtyTracker () {
@@ -98,10 +101,14 @@ let componentMethods = (app) => {
     },
 
     unregisterWithDirtyTracker () {
-      this.dirtyTracker().unregister(this, this.relevantAppTreeBranches)
+      this.dirtyTracker().unregister(this)
     },
 
     //-------------------------------------------------
+
+    syncWithTree () {
+      this.setState(resolveCursors(this.cursors()))
+    },
 
     componentWillMount () {
       this.initForTreehouse()

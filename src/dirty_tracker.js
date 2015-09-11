@@ -3,6 +3,7 @@ class DirtyTracker {
     this.all = new Set()
     this.branches = {}
     this.dirty = new Set()
+    this.branchesEachObjectCaresAbout = new Map()
   }
 
   branch (name) {
@@ -12,24 +13,28 @@ class DirtyTracker {
     return this.branches[name]
   }
 
-  register (component, branches) {
-    this.all.add(component)
-    branches.forEach(b => this.branch(b).add(component))
+  register (object, branches) {
+    this.all.add(object)
+    branches.forEach(b => this.branch(b).add(object))
+    this.branchesEachObjectCaresAbout.set(object, branches)
   }
 
-  unregister (component, branches) {
-    this.all.delete(component)
-    this.dirty.delete(component)
-    branches.forEach(b => this.branch(b).delete(component))
+  unregister (object) {
+    this.all.delete(object)
+    this.dirty.delete(object)
+    this.branchesEachObjectCaresAbout.get(object).forEach((b) => {
+      this.branch(b).delete(object)
+    })
+    this.branchesEachObjectCaresAbout.delete(object)
   }
 
   markBranchDirty (branch) {
-    let components = branch ? this.branch(branch) : this.all
-    components.forEach(c => this.dirty.add(c))
+    let objects = branch ? this.branch(branch) : this.all
+    objects.forEach(c => this.dirty.add(c))
   }
 
-  markComponentClean (component) {
-    this.dirty.delete(component)
+  markComponentClean (object) {
+    this.dirty.delete(object)
   }
 
   eachDirtyComponent (callback) {
