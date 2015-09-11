@@ -1,19 +1,12 @@
 import Tree from './tree'
 import Actions from './actions'
 import DirtyTracker from './dirty_tracker'
-import ComponentBaseClass from './component'
+import componentMethods from './component_methods'
 
 
 class App {
 
   constructor () {
-    let app = this
-    this.Component = class Component extends ComponentBaseClass {
-      app () {
-        return app
-      }
-    }
-
     this.tree = new Tree()
 
     this.actions = new Actions(this.tree)
@@ -21,12 +14,18 @@ class App {
     this.dirtyTracker = new DirtyTracker()
 
     this.tree.onChange(({path}) => {
-      app.dirtyTracker.markBranchDirty(path[0])
+      this.dirtyTracker.markBranchDirty(path[0])
     })
     this.tree.onCommit(() => {
-      app.dirtyTracker.eachDirtyComponent(c => c.syncWithTree())
+      this.dirtyTracker.eachDirtyComponent((c) => {
+        c.syncWithTree()
+      })
     })
 
+  }
+
+  addComponentMethods (object) {
+    Object.assign(object, componentMethods(this))
   }
 
 }

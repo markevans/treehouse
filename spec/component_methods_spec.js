@@ -43,6 +43,7 @@ describe("Component", () => {
   beforeEach(() => {
     let App = require('../src/app')
     app = new App()
+    app.addComponentMethods(React.Component.prototype)
     tree = app.tree.at()
   })
 
@@ -51,7 +52,7 @@ describe("Component", () => {
     let Widget
 
     beforeEach(() => {
-      Widget = class Widget extends app.Component {
+      Widget = class Widget extends React.Component {
         render () { return <div/> }
       }
     })
@@ -70,7 +71,7 @@ describe("Component", () => {
 
     beforeEach(() => {
       widgetRenderCount = 0
-      Widget = class Widget extends app.Component {
+      Widget = class Widget extends React.Component {
         stateFromTree () {
           return {
             theFruit: 'fruit'
@@ -122,7 +123,7 @@ describe("Component", () => {
       let Container
 
       beforeEach(() => {
-        Container = class Container extends app.Component {
+        Container = class Container extends React.Component {
           stateFromTree () {
             return {
 

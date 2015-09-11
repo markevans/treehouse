@@ -54,10 +54,10 @@ export default {
 Write some components
 ```javascript
 # components/app.js
-import treehouse from 'treehouse'
+import React from 'react'
 import Egg from './egg'
 
-export default class App extends treehouse.Component {
+export default class App extends React.Component {
 
   // Declare which parts of the tree you care about
   stateFromTree () {
@@ -83,9 +83,9 @@ export default class App extends treehouse.Component {
 
 ```javascript
 # components/egg.js
-import treehouse from 'treehouse'
+import React from 'react'
 
-export default class Egg extends treehouse.Component {
+export default class Egg extends React.Component {
 
   stateFromTree (props) {
     return {
@@ -95,13 +95,13 @@ export default class Egg extends treehouse.Component {
   }
 
   handleClick () {
-    treehouse.actions.do('selectEgg', {eggID: this.props.eggID})
+    this.action('selectEgg', {eggID: this.props.eggID})
   }
 
   render () {
     return (<div onClick={this.handleClick}>
-      I'm a {this.state.egg.get('name')} egg    // remember objects are immutable.js maps, hence ".get('name')"
-    </div>)
+      I'm a {this.state.egg.get('name')} egg
+    </div>)    // remember objects are immutable.js maps, hence ".get('name')"
   }
 }
 ```
@@ -114,6 +114,7 @@ import React from 'react'
 import treehouse from 'treehouse'
 import App from './components/app'
 
+treehouse.addComponentMethods(React.Component.prototype)
 treehouse.actions.register(require('./actions/egg_actions'))
 treehouse.actions.do('init')
 React.render(<App/>, document.body)
