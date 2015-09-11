@@ -1,6 +1,6 @@
 module.exports = {
   context: __dirname + "/src",
-  entry: "./treehouse.js",
+  entry: "./treehouse_for_browser.js",
 
   output: {
     filename: "treehouse.js",

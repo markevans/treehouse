@@ -1,8 +1,8 @@
 {
   "name": "treehouse",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Opinionated mini-framework for dealing with state in React applications",
-  "main": "dist/treehouse.js",
+  "main": "src/treehouse.js",
   "scripts": {
     "test": "node_modules/jasmine-es6/bin/jasmine.js",
     "build": "node_modules/webpack/bin/webpack.js"
