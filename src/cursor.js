@@ -30,20 +30,6 @@ class Cursor {
     return this.tree.getData().getIn(normalizePath(this.path.concat(path)))
   }
 
-  map (callback) {
-    return this.get().map( (item, i) => {
-      return callback(this.at(i), i)
-    })
-  }
-
-  equals (other) {
-    if (other.equals) {
-      return other.equals(this.get())
-    } else {
-      return false
-    }
-  }
-
   set (...args) {
     let pathToAttr, valueArg
     if (args.length == 2) { // set(attr, value)
