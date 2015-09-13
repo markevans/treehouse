@@ -27,4 +27,15 @@ describe("DirtyTracker", () => {
     dirtyTracker.markBranchDirty('dogs')
     expect(dirtyTracker.dirty.has(object)).toEqual(false)
   })
+
+  it("cleans each object", () => {
+    dirtyTracker.register(object, ['dogs'])
+    dirtyTracker.markBranchDirty('dogs')
+    let cleanedObjects = []
+    dirtyTracker.cleanAllDirty((obj) => {
+      cleanedObjects.push(obj)
+    })
+    expect(dirtyTracker.dirty.has(object)).toEqual(false)
+    expect(cleanedObjects).toEqual([object])
+  })
 })

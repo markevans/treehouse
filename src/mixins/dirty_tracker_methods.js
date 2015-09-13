@@ -24,7 +24,7 @@ export default (app) => {
     },
 
     markCleanWithDirtyTracker () {
-      this.dirtyTracker().markComponentClean(this)
+      this.dirtyTracker().markClean(this)
     },
 
     unregisterWithDirtyTracker () {

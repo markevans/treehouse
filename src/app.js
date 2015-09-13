@@ -20,7 +20,7 @@ class App {
       this.dirtyTracker.markBranchDirty(path[0])
     })
     this.tree.onCommit(() => {
-      this.dirtyTracker.eachDirtyComponent((c) => {
+      this.dirtyTracker.cleanAllDirty((c) => {
         c.syncWithTree()
       })
     })

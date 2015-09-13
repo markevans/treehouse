@@ -33,12 +33,15 @@ class DirtyTracker {
     objects.forEach(c => this.dirty.add(c))
   }
 
-  markComponentClean (object) {
+  markClean (object) {
     this.dirty.delete(object)
   }
 
-  eachDirtyComponent (callback) {
-    this.dirty.forEach(callback)
+  cleanAllDirty (callback) {
+    this.dirty.forEach((object) => {
+      callback(object)
+      this.markClean(object)
+    })
   }
 }
 
