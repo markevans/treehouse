@@ -7,8 +7,7 @@ export default {
   },
 
   componentWillMount () {
-    this.registerWithDirtyTracker()
-    this.syncWithTree()
+    this.watchTree()
   },
 
   shouldComponentUpdate (nextProps, nextState) {

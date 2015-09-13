@@ -29,6 +29,11 @@ export default (app) => {
 
     unregisterWithDirtyTracker () {
       this.dirtyTracker().unregister(this)
+    },
+
+    watchTree () {
+      this.registerWithDirtyTracker()
+      this.syncWithTree()
     }
 
   }
