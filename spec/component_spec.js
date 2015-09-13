@@ -67,7 +67,7 @@ describe("Component", () => {
 
   describe("rendering", () => {
 
-    let Widget, widgetRenderCount
+    let Widget, widgetRenderCount, widgetSyncCount
 
     beforeEach(() => {
       widgetRenderCount = 0
@@ -77,6 +77,12 @@ describe("Component", () => {
             theFruit: 'fruit'
           }
         }
+
+        syncWithTree () {
+          widgetSyncCount++
+          super.syncWithTree()
+        }
+
         render () {
           widgetRenderCount++
           return <div className="widget">{this.state.theFruit}</div>
@@ -95,24 +101,28 @@ describe("Component", () => {
       beforeEach(() => {
         tree.set({fruit: 'orange', animal: 'sheep'}).commit()
         render(<Widget/>)
+        widgetSyncCount = 0
         widgetRenderCount = 0
       })
 
       it("updates when the relevant branch has been touched", () => {
         tree.set('fruit', 'apple').commit()
         expect($('.widget').html()).toEqual('apple')
+        expect(widgetSyncCount).toEqual(1)
         expect(widgetRenderCount).toEqual(1)
       })
 
       it("doesn't update when the relevant branch hasn't been touched", () => {
         tree.set('animal', 'sloth').commit()
         expect($('.widget').html()).toEqual('orange')
+        expect(widgetSyncCount).toEqual(0)
         expect(widgetRenderCount).toEqual(0)
       })
 
       it("doesn't call render if the state from tree is the same", () => {
         tree.set('fruit', 'orange').commit()
         expect($('.widget').html()).toEqual('orange')
+        expect(widgetSyncCount).toEqual(1)
         expect(widgetRenderCount).toEqual(0)
       })
 
