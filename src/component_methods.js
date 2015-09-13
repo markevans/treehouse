@@ -1,23 +1,6 @@
-let areEqual = (var1, var2) => {
-  if ( var1.equals ) {
-    return var1.equals(var2)
-  } else {
-    return var1 == var2
-  }
-}
+import shallowCompare from './shallow_compare'
 
-// assumes objects are the same length
-let elementsAreEqual = (obj1, obj2) => {
-  let key
-  for ( key in obj1 ) {
-    if ( !areEqual(obj1[key], obj2[key]) ) {
-      return false
-    }
-  }
-  return true
-}
-
-let componentMethods = (app) => {
+export default (app) => {
   return {
 
     actions () {
@@ -108,8 +91,7 @@ let componentMethods = (app) => {
     },
 
     shouldComponentUpdate (nextProps, nextState) {
-      return !elementsAreEqual(this.state, nextState) ||
-        !elementsAreEqual(this.props, nextProps)
+      return !shallowCompare(this.state, nextState) || !shallowCompare(this.props, nextProps)
     },
 
     componentDidUpdate () {
@@ -121,5 +103,3 @@ let componentMethods = (app) => {
     }
   }
 }
-
-export default componentMethods
