@@ -10,6 +10,10 @@ export default {
     this.watchTree()
   },
 
+  componentWillReceiveProps () {
+    this.syncWithTree()
+  },
+
   shouldComponentUpdate (nextProps, nextState) {
     return !shallowCompare(this.state, nextState) || !shallowCompare(this.props, nextProps)
   },

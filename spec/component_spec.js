@@ -67,7 +67,7 @@ describe("Component", () => {
 
   describe("rendering", () => {
 
-    let Widget, widgetRenderCount, widgetSyncCount
+    let Widget, widgetRenderCount, widgetShouldUpdateCount
 
     beforeEach(() => {
       widgetRenderCount = 0
@@ -78,9 +78,9 @@ describe("Component", () => {
           }
         }
 
-        syncWithTree () {
-          widgetSyncCount++
-          super.syncWithTree()
+        shouldComponentUpdate (...args) {
+          widgetShouldUpdateCount++
+          return super.shouldComponentUpdate(...args)
         }
 
         render () {
@@ -101,28 +101,28 @@ describe("Component", () => {
       beforeEach(() => {
         tree.set({fruit: 'orange', animal: 'sheep'}).commit()
         render(<Widget/>)
-        widgetSyncCount = 0
+        widgetShouldUpdateCount = 0
         widgetRenderCount = 0
       })
 
       it("updates when the relevant branch has been touched", () => {
         tree.set('fruit', 'apple').commit()
         expect($('.widget').html()).toEqual('apple')
-        expect(widgetSyncCount).toEqual(1)
+        expect(widgetShouldUpdateCount).toEqual(1)
         expect(widgetRenderCount).toEqual(1)
       })
 
       it("doesn't update when the relevant branch hasn't been touched", () => {
         tree.set('animal', 'sloth').commit()
         expect($('.widget').html()).toEqual('orange')
-        expect(widgetSyncCount).toEqual(0)
+        expect(widgetShouldUpdateCount).toEqual(0)
         expect(widgetRenderCount).toEqual(0)
       })
 
       it("doesn't call render if the state from tree is the same", () => {
         tree.set('fruit', 'orange').commit()
         expect($('.widget').html()).toEqual('orange')
-        expect(widgetSyncCount).toEqual(1)
+        expect(widgetShouldUpdateCount).toEqual(1)
         expect(widgetRenderCount).toEqual(0)
       })
 
@@ -130,20 +130,43 @@ describe("Component", () => {
 
     describe("parent-child relationships", () => {
 
-      let Container
+      let Container, containerShouldUpdateCount, containerRenderCount
 
       beforeEach(() => {
         Container = class Container extends React.Component {
           stateFromTree () {
             return {
-
+              fruit: 'fruit'
             }
           }
-          render () { return <div><Widget/></div> }
+
+          shouldComponentUpdate (...args) {
+            containerShouldUpdateCount++
+            return super.shouldComponentUpdate(...args)
+          }
+
+          render () {
+            containerRenderCount++
+            return <div className="container"><Widget/></div>
+          }
         }
+        tree.set({fruit: 'orange'}).commit()
+
+        render(<Container/>)
+
+        containerShouldUpdateCount = 0
+        containerRenderCount = 0
+        widgetShouldUpdateCount = 0
+        widgetRenderCount = 0
       })
 
       it("only updates once even though its parent wants to update it as well as itself", () => {
+        tree.set('fruit', 'apple').commit()
+        expect($('.container').text()).toEqual('apple')
+        expect(containerShouldUpdateCount).toEqual(1)
+        expect(containerRenderCount).toEqual(1)
+        expect(widgetShouldUpdateCount).toEqual(1)
+        expect(widgetRenderCount).toEqual(1)
       })
     })
 
