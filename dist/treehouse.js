@@ -52,29 +52,17 @@
 
 	var _app2 = _interopRequireDefault(_app);
 
-	var makeTreehouse = function makeTreehouse() {
-	  var treehouse = {
-	    // The default treehouse app
-	    app: new _app2['default']()
-	  };
-
-	  // Make things easy to reach for the default app
-	  treehouse.actions = treehouse.app.actions, treehouse.Component = treehouse.app.Component;
-
-	  return treehouse;
-	};
-
 	// AMD
-	if (global.define && __webpack_require__(10)) {
+	if (global.define && __webpack_require__(13)) {
 	  !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-	    return makeTreehouse();
+	    return new _app2['default']();
 	  }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	  // CommonJS
 	} else if (global.module && module.exports) {
-	    module.exports = makeTreehouse();
+	    module.exports = new _app2['default']();
 	    // Global
 	  } else {
-	      global.treehouse = makeTreehouse();
+	      global.treehouse = new _app2['default']();
 	    }
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
@@ -106,9 +94,21 @@
 
 	var _dirty_tracker2 = _interopRequireDefault(_dirty_tracker);
 
-	var _component_methods = __webpack_require__(8);
+	var _mixinsAction_methods = __webpack_require__(8);
 
-	var _component_methods2 = _interopRequireDefault(_component_methods);
+	var _mixinsAction_methods2 = _interopRequireDefault(_mixinsAction_methods);
+
+	var _mixinsTree_methods = __webpack_require__(9);
+
+	var _mixinsTree_methods2 = _interopRequireDefault(_mixinsTree_methods);
+
+	var _mixinsDirty_tracker_methods = __webpack_require__(10);
+
+	var _mixinsDirty_tracker_methods2 = _interopRequireDefault(_mixinsDirty_tracker_methods);
+
+	var _mixinsReact_component_methods = __webpack_require__(11);
+
+	var _mixinsReact_component_methods2 = _interopRequireDefault(_mixinsReact_component_methods);
 
 	var App = (function () {
 	  function App() {
@@ -128,16 +128,24 @@
 	      _this.dirtyTracker.markBranchDirty(path[0]);
 	    });
 	    this.tree.onCommit(function () {
-	      _this.dirtyTracker.eachDirtyComponent(function (c) {
+	      _this.dirtyTracker.cleanAllDirty(function (c) {
 	        c.syncWithTree();
 	      });
 	    });
 	  }
 
 	  _createClass(App, [{
-	    key: 'addComponentMethods',
-	    value: function addComponentMethods(object) {
-	      Object.assign(object, (0, _component_methods2['default'])(this));
+	    key: 'extend',
+	    value: function extend(object) {
+	      Object.assign(object, (0, _mixinsAction_methods2['default'])(this));
+	      Object.assign(object, (0, _mixinsTree_methods2['default'])(this));
+	      Object.assign(object, (0, _mixinsDirty_tracker_methods2['default'])(this));
+	    }
+	  }, {
+	    key: 'extendReact',
+	    value: function extendReact(object) {
+	      this.extend(object);
+	      Object.assign(object, _mixinsReact_component_methods2['default']);
 	    }
 	  }]);
 
@@ -5505,14 +5513,19 @@
 	      });
 	    }
 	  }, {
-	    key: "markComponentClean",
-	    value: function markComponentClean(object) {
+	    key: "markClean",
+	    value: function markClean(object) {
 	      this.dirty["delete"](object);
 	    }
 	  }, {
-	    key: "eachDirtyComponent",
-	    value: function eachDirtyComponent(callback) {
-	      this.dirty.forEach(callback);
+	    key: "cleanAllDirty",
+	    value: function cleanAllDirty(callback) {
+	      var _this4 = this;
+
+	      this.dirty.forEach(function (object) {
+	        callback(object);
+	        _this4.markClean(object);
+	      });
 	    }
 	  }]);
 
@@ -5524,21 +5537,15 @@
 
 /***/ },
 /* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _shallow_compare = __webpack_require__(9);
-
-	var _shallow_compare2 = _interopRequireDefault(_shallow_compare);
-
-	exports['default'] = function (app) {
+	exports["default"] = function (app) {
 	  return {
 
 	    actions: function actions() {
@@ -5546,10 +5553,26 @@
 	    },
 
 	    action: function action(name, payload) {
-	      this.actions()['do'](name, payload);
-	    },
+	      this.actions()["do"](name, payload);
+	    }
 
-	    //-------------------------------------------------
+	  };
+	};
+
+	module.exports = exports["default"];
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	exports["default"] = function (app) {
+	  return {
 
 	    tree: function tree() {
 	      return app.tree;
@@ -5574,6 +5597,43 @@
 	      return this._cursors;
 	    },
 
+	    currentTreeState: function currentTreeState() {
+	      var key = undefined,
+	          data = {},
+	          cursors = this.cursors();
+	      for (key in cursors) {
+	        data[key] = cursors[key].get();
+	      }
+	      return data;
+	    },
+
+	    syncWithTree: function syncWithTree() {
+	      console.log("You need to define syncWithTree. In it you can make use of this.currentTreeState()", this);
+	    }
+
+	  };
+	};
+
+	module.exports = exports["default"];
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	exports['default'] = function (app) {
+	  return {
+
+	    dirtyTracker: function dirtyTracker() {
+	      return app.dirtyTracker;
+	    },
+
+	    // needs this.cursors() to work
 	    relevantBranches: function relevantBranches() {
 	      if (!this._relevantBranches) {
 	        var key = undefined,
@@ -5589,69 +5649,75 @@
 	      return this._relevantBranches;
 	    },
 
-	    currentTreeState: function currentTreeState() {
-	      var key = undefined,
-	          data = {},
-	          cursors = this.cursors();
-	      for (key in cursors) {
-	        data[key] = cursors[key].get();
-	      }
-	      return data;
-	    },
-
-	    //-------------------------------------------------
-
-	    initForTreehouse: function initForTreehouse() {
-	      this.registerWithDirtyTracker();
-	      this.syncWithTree();
-	    },
-
-	    //-------------------------------------------------
-
-	    dirtyTracker: function dirtyTracker() {
-	      return app.dirtyTracker;
-	    },
-
 	    registerWithDirtyTracker: function registerWithDirtyTracker() {
 	      this.dirtyTracker().register(this, this.relevantBranches());
 	    },
 
 	    markCleanWithDirtyTracker: function markCleanWithDirtyTracker() {
-	      this.dirtyTracker().markComponentClean(this);
+	      this.dirtyTracker().markClean(this);
 	    },
 
 	    unregisterWithDirtyTracker: function unregisterWithDirtyTracker() {
 	      this.dirtyTracker().unregister(this);
 	    },
 
-	    //-------------------------------------------------
-
-	    syncWithTree: function syncWithTree() {
-	      this.setState(this.currentTreeState());
-	    },
-
-	    componentWillMount: function componentWillMount() {
-	      this.initForTreehouse();
-	    },
-
-	    shouldComponentUpdate: function shouldComponentUpdate(nextProps, nextState) {
-	      return !(0, _shallow_compare2['default'])(this.state, nextState) || !(0, _shallow_compare2['default'])(this.props, nextProps);
-	    },
-
-	    componentDidUpdate: function componentDidUpdate() {
-	      this.markCleanWithDirtyTracker();
-	    },
-
-	    componentWillUnmount: function componentWillUnmount() {
-	      this.unregisterWithDirtyTracker();
+	    watchTree: function watchTree() {
+	      this.registerWithDirtyTracker();
+	      this.syncWithTree();
 	    }
+
 	  };
 	};
 
 	module.exports = exports['default'];
 
 /***/ },
-/* 9 */
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _shallow_compare = __webpack_require__(12);
+
+	var _shallow_compare2 = _interopRequireDefault(_shallow_compare);
+
+	exports['default'] = {
+
+	  syncWithTree: function syncWithTree() {
+	    this.setState(this.currentTreeState());
+	  },
+
+	  componentWillMount: function componentWillMount() {
+	    this.watchTree();
+	  },
+
+	  componentWillReceiveProps: function componentWillReceiveProps() {
+	    this.syncWithTree();
+	  },
+
+	  shouldComponentUpdate: function shouldComponentUpdate(nextProps, nextState) {
+	    return !(0, _shallow_compare2['default'])(this.state, nextState) || !(0, _shallow_compare2['default'])(this.props, nextProps);
+	  },
+
+	  componentDidUpdate: function componentDidUpdate() {
+	    this.markCleanWithDirtyTracker();
+	  },
+
+	  componentWillUnmount: function componentWillUnmount() {
+	    this.unregisterWithDirtyTracker();
+	  }
+
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 12 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -5680,7 +5746,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 10 */
+/* 13 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
