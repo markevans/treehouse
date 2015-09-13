@@ -132,3 +132,26 @@ then inside the server object you have access to
 ```javascript
 this.action('someAction', {some: 'payload'})
 ```
+
+Now supposing the server object needs to access a piece of the tree. It can declare what it needs with `stateFromTree`, just like components do, and it can make use of the `watchTree`, `syncWithTree`, and `currentTreeState` methods:
+
+```javascript
+class Server {
+
+  constructor () {
+    this.watchTree() // ensures syncWithTree gets called when authToken changes
+  }
+
+  stateFromTree () {
+    return {token: 'authToken'}
+  }
+
+  syncWithTree () {
+    this.token = this.currentTreeState().token
+  }
+
+  //...
+}
+
+treehouse.extend(Server.prototype)
+```
