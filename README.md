@@ -115,8 +115,20 @@ import React from 'react'
 import treehouse from 'treehouse'
 import App from './components/app'
 
-treehouse.addComponentMethods(React.Component.prototype)
+treehouse.extendReact(React.Component.prototype)
 treehouse.actions.register(require('./actions/egg_actions'))
 treehouse.actions.do('init')
 React.render(<App/>, document.body)
+```
+
+### Extending other components
+Supposing you have a singleton `server` object that you want to have access to actions. You can do
+
+```javascript
+treehouse.extend(server)
+```
+
+then inside the server object you have access to
+```javascript
+this.action('someAction', {some: 'payload'})
 ```

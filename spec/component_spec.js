@@ -43,7 +43,7 @@ describe("Component", () => {
   beforeEach(() => {
     let App = require('../src/app')
     app = new App()
-    app.addComponentMethods(React.Component.prototype)
+    app.extendReact(React.Component.prototype)
     tree = app.tree.at()
   })
 

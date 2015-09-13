@@ -1,7 +1,10 @@
 import Tree from './tree'
 import Actions from './actions'
 import DirtyTracker from './dirty_tracker'
-import componentMethods from './component_methods'
+import actionMethods from './mixins/action_methods'
+import treeMethods from './mixins/tree_methods'
+import dirtyTrackerMethods from './mixins/dirty_tracker_methods'
+import reactComponentMethods from './mixins/react_component_methods'
 
 
 class App {
@@ -21,11 +24,17 @@ class App {
         c.syncWithTree()
       })
     })
-
   }
 
-  addComponentMethods (object) {
-    Object.assign(object, componentMethods(this))
+  extend (object) {
+    Object.assign(object, actionMethods(this))
+    Object.assign(object, treeMethods(this))
+    Object.assign(object, dirtyTrackerMethods(this))
+  }
+
+  extendReact (object) {
+    this.extend(object)
+    Object.assign(object, reactComponentMethods)
   }
 
 }
