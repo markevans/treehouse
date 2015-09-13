@@ -87,10 +87,10 @@ import React from 'react'
 
 export default class Egg extends React.Component {
 
-  stateFromTree (props) {
+  stateFromTree () {
     return {
       selectedEgg: 'selectedEgg',
-      egg: ['eggs', props.eggID]
+      egg: ['eggs', this.props.eggID]
     }
   }
 
