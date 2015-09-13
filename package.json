@@ -33,10 +33,10 @@
     "jasmine-es6": "0.0.17",
     "jquery": "^2.1.4",
     "jsdom": "^3.1.2",
+    "react": "^0.13.3",
     "webpack": "^1.12.1"
   },
   "dependencies": {
-    "immutable": "^3.7.4",
-    "react": "^0.13.3"
+    "immutable": "^3.7.4"
   }
 }
