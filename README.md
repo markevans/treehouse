@@ -19,7 +19,7 @@ The basic flow as as follows:
     - etc. etc.
     The actions simply update the state, at the relevant points on the tree, and then call "commit", which is a way of saying "I'm done, anything that cares about the changes can update yourselves now"
 
-  - Treehouse components inherit from React components. They:
+  - Treehouse extends React components to be aware of the tree and of actions. The components:
     - declare which parts of the tree they care about
     - ensure that `this.state` includes the relevant parts picked from the tree
     - already get updated efficiently, i.e. when the part of the tree they care about changes
@@ -31,7 +31,7 @@ A typical small app might look like this:
 
 Define the actions
 ```javascript
-# actions/egg_actions.js
+// actions/egg_actions.js
 
 export default {
 
@@ -53,7 +53,7 @@ export default {
 
 Write some components
 ```javascript
-# components/app.js
+// components/app.js
 import React from 'react'
 import Egg from './egg'
 
@@ -82,7 +82,7 @@ export default class App extends React.Component {
 ```
 
 ```javascript
-# components/egg.js
+// components/egg.js
 import React from 'react'
 
 export default class Egg extends React.Component {
@@ -101,7 +101,7 @@ export default class Egg extends React.Component {
   render () {
     // remember that objects are immutable.js maps, hence "egg.get('name')"
     return (<div onClick={this.handleClick}>
-      I'm a {this.state.egg.get('name')} egg
+      I am a {this.state.egg.get('name')} egg
     </div>)
   }
 }
@@ -110,7 +110,7 @@ export default class Egg extends React.Component {
 Then start the app and call the 'init' action.
 
 ```javascript
-# app.js
+// app.js
 import React from 'react'
 import treehouse from 'treehouse'
 import App from './components/app'
