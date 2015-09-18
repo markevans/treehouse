@@ -28,10 +28,6 @@ export default (app) => {
         data[key] = cursors[key].get()
       }
       return data
-    },
-
-    syncWithTree () {
-      console.log("You need to define syncWithTree. In it you can make use of this.currentTreeState()", this)
     }
 
   }

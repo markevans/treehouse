@@ -1,3 +1,18 @@
+class Subscription {
+  constructor (dirtyTracker, callback) {
+    this.dirtyTracker = dirtyTracker
+    this.callback = callback
+  }
+
+  markClean () {
+    this.dirtyTracker.markClean(this.callback)
+  }
+
+  cancel () {
+    this.dirtyTracker.unwatch(this.callback)
+  }
+}
+
 class DirtyTracker {
   constructor () {
     this.all = new Set()
@@ -13,34 +28,35 @@ class DirtyTracker {
     return this.branches[name]
   }
 
-  register (object, branches) {
-    this.all.add(object)
-    branches.forEach(b => this.branch(b).add(object))
-    this.branchesEachObjectCaresAbout.set(object, branches)
+  watch (branches, callback) {
+    this.all.add(callback)
+    branches.forEach(b => this.branch(b).add(callback))
+    this.branchesEachObjectCaresAbout.set(callback, branches)
+    return new Subscription(this, callback)
   }
 
-  unregister (object) {
-    this.all.delete(object)
-    this.dirty.delete(object)
-    this.branchesEachObjectCaresAbout.get(object).forEach((b) => {
-      this.branch(b).delete(object)
+  unwatch (callback) {
+    this.all.delete(callback)
+    this.dirty.delete(callback)
+    this.branchesEachObjectCaresAbout.get(callback).forEach((b) => {
+      this.branch(b).delete(callback)
     })
-    this.branchesEachObjectCaresAbout.delete(object)
+    this.branchesEachObjectCaresAbout.delete(callback)
   }
 
   markBranchDirty (branch) {
-    let objects = branch ? this.branch(branch) : this.all
-    objects.forEach(c => this.dirty.add(c))
+    let callbacks = branch ? this.branch(branch) : this.all
+    callbacks.forEach(c => this.dirty.add(c))
   }
 
-  markClean (object) {
-    this.dirty.delete(object)
+  markClean (callback) {
+    this.dirty.delete(callback)
   }
 
-  cleanAllDirty (callback) {
-    this.dirty.forEach((object) => {
-      callback(object)
-      this.markClean(object)
+  cleanAllDirty () {
+    this.dirty.forEach((callback) => {
+      callback()
+      this.markClean(callback)
     })
   }
 }

@@ -19,16 +19,24 @@ export default (app) => {
       return this._relevantBranches
     },
 
+    syncWithTree () {
+      console.log("You need to define syncWithTree. In it you can make use of this.currentTreeState()", this)
+    },
+
     registerWithDirtyTracker () {
-      this.dirtyTracker().register(this, this.relevantBranches())
+      this.dirtyTrackerSubscription = this.dirtyTracker().watch(this.relevantBranches(), this.syncWithTree.bind(this))
     },
 
     markCleanWithDirtyTracker () {
-      this.dirtyTracker().markClean(this)
+      if (this.dirtyTrackerSubscription) {
+        this.dirtyTrackerSubscription.markClean()
+      }
     },
 
     unregisterWithDirtyTracker () {
-      this.dirtyTracker().unregister(this)
+      if (this.dirtyTrackerSubscription) {
+        this.dirtyTrackerSubscription.cancel()
+      }
     },
 
     watchTree () {

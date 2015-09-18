@@ -20,9 +20,13 @@ class App {
       this.dirtyTracker.markBranchDirty(path[0])
     })
     this.tree.onCommit(() => {
-      this.dirtyTracker.cleanAllDirty((c) => {
-        c.syncWithTree()
-      })
+      this.dirtyTracker.cleanAllDirty()
+    })
+  }
+
+  watch (branches, callback) {
+    return this.dirtyTracker.watch(branches, () => {
+      callback(this.tree)
     })
   }
 

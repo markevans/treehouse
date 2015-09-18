@@ -155,3 +155,14 @@ class Server {
 
 treehouse.extend(Server.prototype)
 ```
+
+If you don't want to extend objects in this way you can still do actions with
+```javascript
+treehouse.actions.do('someAction', {some: 'payload'})
+```
+and watch for tree changes with
+```javascript
+treehouse.watch(['someBranch', 'anotherBranch'], (tree) => {
+  // do something with tree.get('someBranch') or tree.get('anotherBranch.something.nested')
+})
+```
