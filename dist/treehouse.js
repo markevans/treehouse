@@ -128,13 +128,20 @@
 	      _this.dirtyTracker.markBranchDirty(path[0]);
 	    });
 	    this.tree.onCommit(function () {
-	      _this.dirtyTracker.cleanAllDirty(function (c) {
-	        c.syncWithTree();
-	      });
+	      _this.dirtyTracker.cleanAllDirty();
 	    });
 	  }
 
 	  _createClass(App, [{
+	    key: 'watch',
+	    value: function watch(branches, callback) {
+	      var _this2 = this;
+
+	      return this.dirtyTracker.watch(branches, function () {
+	        callback(_this2.tree);
+	      });
+	    }
+	  }, {
 	    key: 'extend',
 	    value: function extend(object) {
 	      Object.assign(object, (0, _mixinsAction_methods2['default'])(this));
@@ -320,21 +327,7 @@
 	  }
 
 	  function wrapIndex(iter, index) {
-	    // This implements "is array index" which the ECMAString spec defines as:
-	    //     A String property name P is an array index if and only if
-	    //     ToString(ToUint32(P)) is equal to P and ToUint32(P) is not equal
-	    //     to 2^32−1.
-	    // However note that we're currently calling ToNumber() instead of ToUint32()
-	    // which should be improved in the future, as floating point numbers should
-	    // not be accepted as an array index.
-	    if (typeof index !== 'number') {
-	      var numIndex = +index;
-	      if ('' + numIndex !== index) {
-	        return NaN;
-	      }
-	      index = numIndex;
-	    }
-	    return index < 0 ? ensureSize(iter) + index : index;
+	    return index >= 0 ? (+index) : ensureSize(iter) + (+index);
 	  }
 
 	  function returnTrue() {
@@ -1004,7 +997,7 @@
 	  var src_Math__imul =
 	    typeof Math.imul === 'function' && Math.imul(0xffffffff, 2) === -2 ?
 	    Math.imul :
-	    function imul(a, b) {
+	    function src_Math__imul(a, b) {
 	      a = a | 0; // int
 	      b = b | 0; // int
 	      var c = a & 0xffff;
@@ -1555,15 +1548,6 @@
 	  function sliceFactory(iterable, begin, end, useKeys) {
 	    var originalSize = iterable.size;
 
-	    // Sanitize begin & end using this shorthand for ToInt32(argument)
-	    // http://www.ecma-international.org/ecma-262/6.0/#sec-toint32
-	    if (begin !== undefined) {
-	      begin = begin | 0;
-	    }
-	    if (end !== undefined) {
-	      end = end | 0;
-	    }
-
 	    if (wholeSlice(begin, end, originalSize)) {
 	      return iterable;
 	    }
@@ -1590,9 +1574,7 @@
 
 	    var sliceSeq = makeSequence(iterable);
 
-	    // If iterable.size is undefined, the size of the realized sliceSeq is
-	    // unknown at this point unless the number of items to slice is 0
-	    sliceSeq.size = sliceSize === 0 ? sliceSize : iterable.size && sliceSize || undefined;
+	    sliceSeq.size = sliceSize;
 
 	    if (!useKeys && isSeq(iterable) && sliceSize >= 0) {
 	      sliceSeq.get = function (index, notSetValue) {
@@ -2041,7 +2023,7 @@
 
 	    function src_Map__Map(value) {
 	      return value === null || value === undefined ? emptyMap() :
-	        isMap(value) && !isOrdered(value) ? value :
+	        isMap(value) ? value :
 	        emptyMap().withMutations(function(map ) {
 	          var iter = KeyedIterable(value);
 	          assertNotInfinite(iter.size);
@@ -2888,12 +2870,12 @@
 
 	    List.prototype.get = function(index, notSetValue) {
 	      index = wrapIndex(this, index);
-	      if (index >= 0 && index < this.size) {
-	        index += this._origin;
-	        var node = listNodeFor(this, index);
-	        return node && node.array[index & MASK];
+	      if (index < 0 || index >= this.size) {
+	        return notSetValue;
 	      }
-	      return notSetValue;
+	      index += this._origin;
+	      var node = listNodeFor(this, index);
+	      return node && node.array[index & MASK];
 	    };
 
 	    // @pragma Modification
@@ -3089,25 +3071,29 @@
 	    };
 
 	    VNode.prototype.removeAfter = function(ownerID, level, index) {
-	      if (index === (level ? 1 << level : 0) || this.array.length === 0) {
+	      if (index === level ? 1 << level : 0 || this.array.length === 0) {
 	        return this;
 	      }
 	      var sizeIndex = ((index - 1) >>> level) & MASK;
 	      if (sizeIndex >= this.array.length) {
 	        return this;
 	      }
-
+	      var removingLast = sizeIndex === this.array.length - 1;
 	      var newChild;
 	      if (level > 0) {
 	        var oldChild = this.array[sizeIndex];
 	        newChild = oldChild && oldChild.removeAfter(ownerID, level - SHIFT, index);
-	        if (newChild === oldChild && sizeIndex === this.array.length - 1) {
+	        if (newChild === oldChild && removingLast) {
 	          return this;
 	        }
 	      }
-
+	      if (removingLast && !newChild) {
+	        return this;
+	      }
 	      var editable = editableVNode(this, ownerID);
-	      editable.array.splice(sizeIndex + 1);
+	      if (!removingLast) {
+	        editable.array.pop();
+	      }
 	      if (newChild) {
 	        editable.array[sizeIndex] = newChild;
 	      }
@@ -3198,10 +3184,6 @@
 
 	  function updateList(list, index, value) {
 	    index = wrapIndex(list, index);
-
-	    if (index !== index) {
-	      return list;
-	    }
 
 	    if (index >= list.size || index < 0) {
 	      return list.withMutations(function(list ) {
@@ -3294,14 +3276,6 @@
 	  }
 
 	  function setListBounds(list, begin, end) {
-	    // Sanitize begin & end using this shorthand for ToInt32(argument)
-	    // http://www.ecma-international.org/ecma-262/6.0/#sec-toint32
-	    if (begin !== undefined) {
-	      begin = begin | 0;
-	    }
-	    if (end !== undefined) {
-	      end = end | 0;
-	    }
 	    var owner = list.__ownerID || new OwnerID();
 	    var oldOrigin = list._origin;
 	    var oldCapacity = list._capacity;
@@ -3814,7 +3788,7 @@
 
 	    function src_Set__Set(value) {
 	      return value === null || value === undefined ? emptySet() :
-	        isSet(value) && !isOrdered(value) ? value :
+	        isSet(value) ? value :
 	        emptySet().withMutations(function(set ) {
 	          var iter = SetIterable(value);
 	          assertNotInfinite(iter.size);
@@ -4559,6 +4533,10 @@
 	      return reify(this, concatFactory(this, values));
 	    },
 
+	    contains: function(searchValue) {
+	      return this.includes(searchValue);
+	    },
+
 	    includes: function(searchValue) {
 	      return this.some(function(value ) {return is(value, searchValue)});
 	    },
@@ -4848,7 +4826,7 @@
 
 	    hashCode: function() {
 	      return this.__hash || (this.__hash = hashIterable(this));
-	    }
+	    },
 
 
 	    // ### Internal
@@ -4871,7 +4849,6 @@
 	  IterablePrototype.inspect =
 	  IterablePrototype.toSource = function() { return this.toString(); };
 	  IterablePrototype.chain = IterablePrototype.flatMap;
-	  IterablePrototype.contains = IterablePrototype.includes;
 
 	  // Temporary warning about using length
 	  (function () {
@@ -4942,7 +4919,7 @@
 	          function(k, v)  {return mapper.call(context, k, v, this$0)}
 	        ).flip()
 	      );
-	    }
+	    },
 
 	  });
 
@@ -4997,10 +4974,7 @@
 	      if (numArgs === 0 || (numArgs === 2 && !removeNum)) {
 	        return this;
 	      }
-	      // If index is negative, it should resolve relative to the size of the
-	      // collection. However size may be expensive to compute if not cached, so
-	      // only call count() if the number is in fact negative.
-	      index = resolveBegin(index, index < 0 ? this.count() : this.size);
+	      index = resolveBegin(index, this.size);
 	      var spliced = this.slice(0, index);
 	      return reify(
 	        this,
@@ -5073,7 +5047,7 @@
 	      var iterables = arrCopy(arguments);
 	      iterables[0] = this;
 	      return reify(this, zipWithFactory(this, zipper, iterables));
-	    }
+	    },
 
 	  });
 
@@ -5099,7 +5073,7 @@
 
 	    keySeq: function() {
 	      return this.valueSeq();
-	    }
+	    },
 
 	  });
 
@@ -5203,7 +5177,7 @@
 	    Repeat: Repeat,
 
 	    is: is,
-	    fromJS: fromJS
+	    fromJS: fromJS,
 
 	  };
 
@@ -5461,6 +5435,29 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var Subscription = (function () {
+	  function Subscription(dirtyTracker, callback) {
+	    _classCallCheck(this, Subscription);
+
+	    this.dirtyTracker = dirtyTracker;
+	    this.callback = callback;
+	  }
+
+	  _createClass(Subscription, [{
+	    key: "markClean",
+	    value: function markClean() {
+	      this.dirtyTracker.markClean(this.callback);
+	    }
+	  }, {
+	    key: "cancel",
+	    value: function cancel() {
+	      this.dirtyTracker.unwatch(this.callback);
+	    }
+	  }]);
+
+	  return Subscription;
+	})();
+
 	var DirtyTracker = (function () {
 	  function DirtyTracker() {
 	    _classCallCheck(this, DirtyTracker);
@@ -5480,51 +5477,52 @@
 	      return this.branches[name];
 	    }
 	  }, {
-	    key: "register",
-	    value: function register(object, branches) {
+	    key: "watch",
+	    value: function watch(branches, callback) {
 	      var _this = this;
 
-	      this.all.add(object);
+	      this.all.add(callback);
 	      branches.forEach(function (b) {
-	        return _this.branch(b).add(object);
+	        return _this.branch(b).add(callback);
 	      });
-	      this.branchesEachObjectCaresAbout.set(object, branches);
+	      this.branchesEachObjectCaresAbout.set(callback, branches);
+	      return new Subscription(this, callback);
 	    }
 	  }, {
-	    key: "unregister",
-	    value: function unregister(object) {
+	    key: "unwatch",
+	    value: function unwatch(callback) {
 	      var _this2 = this;
 
-	      this.all["delete"](object);
-	      this.dirty["delete"](object);
-	      this.branchesEachObjectCaresAbout.get(object).forEach(function (b) {
-	        _this2.branch(b)["delete"](object);
+	      this.all["delete"](callback);
+	      this.dirty["delete"](callback);
+	      this.branchesEachObjectCaresAbout.get(callback).forEach(function (b) {
+	        _this2.branch(b)["delete"](callback);
 	      });
-	      this.branchesEachObjectCaresAbout["delete"](object);
+	      this.branchesEachObjectCaresAbout["delete"](callback);
 	    }
 	  }, {
 	    key: "markBranchDirty",
 	    value: function markBranchDirty(branch) {
 	      var _this3 = this;
 
-	      var objects = branch ? this.branch(branch) : this.all;
-	      objects.forEach(function (c) {
+	      var callbacks = branch ? this.branch(branch) : this.all;
+	      callbacks.forEach(function (c) {
 	        return _this3.dirty.add(c);
 	      });
 	    }
 	  }, {
 	    key: "markClean",
-	    value: function markClean(object) {
-	      this.dirty["delete"](object);
+	    value: function markClean(callback) {
+	      this.dirty["delete"](callback);
 	    }
 	  }, {
 	    key: "cleanAllDirty",
-	    value: function cleanAllDirty(callback) {
+	    value: function cleanAllDirty() {
 	      var _this4 = this;
 
-	      this.dirty.forEach(function (object) {
-	        callback(object);
-	        _this4.markClean(object);
+	      this.dirty.forEach(function (callback) {
+	        callback();
+	        _this4.markClean(callback);
 	      });
 	    }
 	  }]);
@@ -5605,10 +5603,6 @@
 	        data[key] = cursors[key].get();
 	      }
 	      return data;
-	    },
-
-	    syncWithTree: function syncWithTree() {
-	      console.log("You need to define syncWithTree. In it you can make use of this.currentTreeState()", this);
 	    }
 
 	  };
@@ -5649,16 +5643,24 @@
 	      return this._relevantBranches;
 	    },
 
+	    syncWithTree: function syncWithTree() {
+	      console.log("You need to define syncWithTree. In it you can make use of this.currentTreeState()", this);
+	    },
+
 	    registerWithDirtyTracker: function registerWithDirtyTracker() {
-	      this.dirtyTracker().register(this, this.relevantBranches());
+	      this.dirtyTrackerSubscription = this.dirtyTracker().watch(this.relevantBranches(), this.syncWithTree.bind(this));
 	    },
 
 	    markCleanWithDirtyTracker: function markCleanWithDirtyTracker() {
-	      this.dirtyTracker().markClean(this);
+	      if (this.dirtyTrackerSubscription) {
+	        this.dirtyTrackerSubscription.markClean();
+	      }
 	    },
 
 	    unregisterWithDirtyTracker: function unregisterWithDirtyTracker() {
-	      this.dirtyTracker().unregister(this);
+	      if (this.dirtyTrackerSubscription) {
+	        this.dirtyTrackerSubscription.cancel();
+	      }
 	    },
 
 	    watchTree: function watchTree() {
