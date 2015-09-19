@@ -28,10 +28,13 @@ class DirtyTracker {
     return this.branches[name]
   }
 
-  watch (branches, callback) {
+  watch (branches, callback, options) {
     this.all.add(callback)
     branches.forEach(b => this.branch(b).add(callback))
     this.branchesEachObjectCaresAbout.set(callback, branches)
+    if (options && options.callNow) {
+      callback()
+    }
     return new Subscription(this, callback)
   }
 

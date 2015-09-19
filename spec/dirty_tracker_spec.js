@@ -43,4 +43,11 @@ describe("DirtyTracker", () => {
     expect(dirtyTracker.dirty.has(callback)).toEqual(false)
     expect(callback).toHaveBeenCalled()
   })
+
+  it("allows calling the callback immediately", () => {
+    dirtyTracker.watch(['dogs'], callback)
+    expect(callback).not.toHaveBeenCalled()
+    dirtyTracker.watch(['dogs'], callback, {callNow: true})
+    expect(callback).toHaveBeenCalled()
+  })
 })
