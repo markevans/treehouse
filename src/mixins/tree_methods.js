@@ -5,17 +5,15 @@ export default (app) => {
       return app.tree
     },
 
-    stateFromTree () {
-      return {}
-    },
-
     cursors () {
       if (!this._cursors) {
-        var key, path, cursors = {},
-            paths = this.stateFromTree()
-        for ( key in paths ) {
-          path = paths[key]
-          cursors[key] = this.tree().at(path)
+        let cursors = {}
+        if (this.stateFromTree) {
+          let key, path, paths = this.stateFromTree()
+          for ( key in paths ) {
+            path = paths[key]
+            cursors[key] = this.tree().at(path)
+          }
         }
         this._cursors = cursors
       }

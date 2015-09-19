@@ -19,11 +19,11 @@ export default {
   },
 
   componentDidUpdate () {
-    this.markCleanWithDirtyTracker()
+    this.markClean()
   },
 
   componentWillUnmount () {
-    this.unregisterWithDirtyTracker()
+    this.unwatchTree()
   }
 
 }
