@@ -1,5 +1,7 @@
 #Treehouse JS
 
+[![Build Status](https://travis-ci.org/markevans/treehouse.svg?branch=master)](https://travis-ci.org/markevans/treehouse)
+
 ## Overall Flow
 
 All wiring is done for you. There are no events to bind to - if you follow the strict pattern laid out below you should get from zero to app hero in no time!
