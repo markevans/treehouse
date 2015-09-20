@@ -1,4 +1,4 @@
-import immutable from "immutable"
+import i from './immutable_adapter'
 
 // "users.edgar" -> ['users', 'edgar']
 let normalizePath = (path) => {
@@ -27,19 +27,19 @@ class Cursor {
   }
 
   get (...path) {
-    return this.tree.getData().getIn(normalizePath(this.path.concat(path)))
+    return i.getIn(this.tree.getData(), normalizePath(this.path.concat(path)))
   }
 
   update (value) {
     if (typeof value === 'function') {
-      let currentValue = this.tree.getData().getIn(this.path)
+      let currentValue = i.getIn(this.tree.getData(), this.path)
       value = value(currentValue)
     }
     if (value === undefined) {
       throw new Error("You tried to set a value on the tree with undefined")
     }
-    value = immutable.fromJS(value) // ensure it's immutable
-    this.tree.setData(this.tree.getData().updateIn(this.path, () => value), this.path)
+    value = i.fromJS(value) // ensure it's immutable
+    this.tree.setData(i.updateIn(this.tree.getData(), this.path, () => value), this.path)
 
     return this
   }
@@ -49,11 +49,11 @@ class Cursor {
   }
 
   merge (object) {
-    return this.update(obj => obj.merge(object))
+    return this.update(obj => i.merge(obj, object))
   }
 
   reverseMerge (object) {
-    return this.update(obj => immutable.fromJS(object).merge(obj))
+    return this.update(obj => i.reverseMerge(obj, object))
   }
 
   commit () {

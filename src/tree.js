@@ -1,11 +1,11 @@
-import immutable from 'immutable'
+import i from './immutable_adapter'
 import Cursor from './cursor'
 import EventEmitter from './event_emitter'
 
 class Tree {
 
-  constructor (data = {}) {
-    this.data = immutable.fromJS(data)
+  constructor () {
+    this.data = i.fromJS({})
     this.rootCursor = this.at()
     this.eventEmitter = new EventEmitter()
   }
