@@ -6,6 +6,7 @@ class Tree {
 
   constructor (data = {}) {
     this.data = immutable.fromJS(data)
+    this.rootCursor = this.at()
     this.eventEmitter = new EventEmitter()
   }
 

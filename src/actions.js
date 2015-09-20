@@ -11,7 +11,7 @@ class Actions {
 
   do (name, payload={}) {
     if ( this.actions[name] ) {
-      this.actions[name](this.tree.at(), payload, this.tree.commit.bind(this.tree))
+      this.actions[name](this.tree.rootCursor, payload, this.tree.commit.bind(this.tree))
     } else {
       console.log(`Action '${name}' not found`)
     }
