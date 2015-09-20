@@ -91,7 +91,7 @@ describe("Component", () => {
     })
 
     it("renders from the tree", () => {
-      tree.set({fruit: 'orange', animal: 'sheep'}).commit()
+      tree.update({fruit: 'orange', animal: 'sheep'}).commit()
       render(<Widget/>)
       expect($('.widget').html()).toEqual('orange')
     })
@@ -99,7 +99,7 @@ describe("Component", () => {
     describe("updating", () => {
 
       beforeEach(() => {
-        tree.set({fruit: 'orange', animal: 'sheep'}).commit()
+        tree.update({fruit: 'orange', animal: 'sheep'}).commit()
         render(<Widget/>)
         widgetShouldUpdateCount = 0
         widgetRenderCount = 0
@@ -150,7 +150,7 @@ describe("Component", () => {
             return <div className="container"><Widget/></div>
           }
         }
-        tree.set({fruit: 'orange'}).commit()
+        tree.update({fruit: 'orange'}).commit()
 
         render(<Container/>)
 

@@ -30,30 +30,30 @@ class Cursor {
     return this.tree.getData().getIn(normalizePath(this.path.concat(path)))
   }
 
-  set (...args) {
-    let pathToAttr, valueArg
-    if (args.length == 2) { // set(attr, value)
-      pathToAttr = this.path.concat(normalizePath(args[0]))
-      valueArg = args[1]
-    } else { // set(value)
-      pathToAttr = this.path
-      valueArg = args[0]
-    }
-
-    let value
-    if (typeof valueArg === 'function') {
-      let currentValue = this.tree.getData().getIn(pathToAttr)
-      value = valueArg(currentValue)
-    } else {
-      value = valueArg
+  update (value) {
+    if (typeof value === 'function') {
+      let currentValue = this.tree.getData().getIn(this.path)
+      value = value(currentValue)
     }
     if (value === undefined) {
-      throw new Error("You can't call 'set' with value undefined")
+      throw new Error("You tried to set a value on the tree with undefined")
     }
     value = immutable.fromJS(value) // ensure it's immutable
-    this.tree.setData(this.tree.getData().updateIn(pathToAttr, () => value), pathToAttr)
+    this.tree.setData(this.tree.getData().updateIn(this.path, () => value), this.path)
 
     return this
+  }
+
+  set (path, value) {
+    return this.at(path).update(value)
+  }
+
+  merge (object) {
+    return this.update(obj => obj.merge(object))
+  }
+
+  reverseMerge (object) {
+    return this.update(obj => immutable.fromJS(object).merge(obj))
   }
 
   commit () {

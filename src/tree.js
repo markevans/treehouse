@@ -42,6 +42,10 @@ class Tree {
     return this.eventEmitter.on('change', callback)
   }
 
+  toJSON () {
+    return this.data.toJSON()
+  }
+
 }
 
 export default Tree
