@@ -27,11 +27,11 @@ describe("shallowCompare", () => {
     expect(shallowCompare(obj2, obj1)).toEqual(false)
   })
 
-  it("doesn't care if the first is the subset of the second", () => {
+  it("returns false if one is a subset of the other", () => {
     let obj1 = {a: 1, b: 2}
     let obj2 = {b: 2}
     expect(shallowCompare(obj1, obj2)).toEqual(false)
-    expect(shallowCompare(obj2, obj1)).toEqual(true)
+    expect(shallowCompare(obj2, obj1)).toEqual(false)
   })
 
   it("works with immutable objects", () => {
@@ -46,5 +46,10 @@ describe("shallowCompare", () => {
     let obj2 = {a: null}
     expect(shallowCompare(obj1, obj2)).toEqual(false)
     expect(shallowCompare(obj2, obj1)).toEqual(false)
+  })
+
+  it("blows up if one of the objects is null", () => {
+    expect(() => { shallowCompare(null, {}) }).toThrow()
+    expect(() => { shallowCompare({}, null) }).toThrow()
   })
 })
