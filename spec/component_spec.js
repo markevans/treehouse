@@ -172,4 +172,53 @@ describe("Component", () => {
 
   })
 
+  describe("facets", () => {
+    let Widget
+
+    beforeEach(() => {
+      Widget = class Widget extends React.Component {
+        stateFromFacets () {
+          return {
+            fruit: 'selectedFruit'
+          }
+        }
+
+        render () {
+          return <div className="widget">{this.state.fruit}</div>
+        }
+      }
+
+      app.facets.register({
+        selectedFruit: {
+          cursors: {
+            fruits: 'fruits',
+            selectedFruitID: 'selectedFruitID'
+          },
+          evaluate: ({fruits, selectedFruitID}) => {
+            return fruits.get(selectedFruitID)
+          }
+        }
+      })
+
+      tree.update({
+        fruits: {
+          id1: 'orange',
+          id2: 'banana'
+        },
+        selectedFruitID: 'id1'
+      }).commit()
+
+      render(<Widget/>)
+    })
+
+    it("adds the facet to the state", () => {
+      expect($('.widget').html()).toEqual('orange')
+    })
+
+    it("responds to changes", () => {
+      tree.set('selectedFruitID', 'id2').commit()
+      expect($('.widget').html()).toEqual('banana')
+    })
+  })
+
 })

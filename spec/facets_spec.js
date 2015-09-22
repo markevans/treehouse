@@ -29,9 +29,8 @@ describe("Facets", () => {
           }
         }
       })
-      expect(facets.call('o nome')).toEqual('googie')
+      expect(facets.get('o nome').call('o nome')).toEqual('googie')
     })
-
   })
 
 })

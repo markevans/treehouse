@@ -15,9 +15,9 @@ class Facets {
     }
   }
 
-  call (name) {
+  get (name) {
     if ( this.facets[name] ) {
-      return this.facets[name].call()
+      return this.facets[name]
     } else {
       console.log(`Facet '${name}' not found`)
     }

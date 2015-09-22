@@ -1,18 +1,18 @@
 import Tree from './tree'
-import Actions from './actions'
+import Facets from './facets'
 import DirtyTracker from './dirty_tracker'
-import actionMethods from './mixins/action_methods'
+import Actions from './actions'
+
 import treeMethods from './mixins/tree_methods'
 import dirtyTrackerMethods from './mixins/dirty_tracker_methods'
+import actionMethods from './mixins/action_methods'
 import reactComponentMethods from './mixins/react_component_methods'
-
 
 class App {
 
   constructor () {
     this.tree = new Tree()
-
-    this.actions = new Actions(this.tree)
+    this.facets = new Facets(this.tree)
 
     this.dirtyTracker = new DirtyTracker()
 
@@ -22,6 +22,8 @@ class App {
     this.tree.onCommit(() => {
       this.dirtyTracker.cleanAllDirty()
     })
+
+    this.actions = new Actions(this.tree)
   }
 
   watch (branches, callback) {
