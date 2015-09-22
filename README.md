@@ -133,7 +133,13 @@ Cursors allow you to update the tree, and will do the necessary updates all the 
 ```javascript
 tree.at('some.path')                          // cursor
   .update({hello: 'guys'})                    // replaces the data at the cursor path
+  .update((data) => {
+    return data.set('hello', 'gals')          // or use a function which yields the current value at the cursor
+  })
   .set('colour', 'yellow')                    // sets an attribute
+  .set('colour', (currentColour) => {
+    return 'dark '+currentColour              // or use a function
+  })
   .merge({new: 'stuff'})                      // merges in an object, overwriting keys that already exist
   .reverseMerge({colour: 'defaultColour'})    // merges in an object but doesn't overwrite pre-existing elements
   .commit()                                   // tell components/other objects that care that you've finished
