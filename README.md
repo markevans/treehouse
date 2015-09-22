@@ -36,17 +36,18 @@ Define the actions
 export default {
 
   init (tree) {
-    tree.set({
+    tree.update({
       eggs: {
         id1: {name: 'big'},
         id2: {name: 'small'},
         id3: {name: 'bad'}
-      }
-    }).commit()
+      },
+      selectedEggID: null
+    }).commit()     // commit says "I've finished", and components will update
   }
 
   selectEgg (tree, {eggID}) {
-    tree.set('selectedEgg', eggID).commit()
+    tree.set('selectedEggID', eggID).commit()
   }
 }
 ```
@@ -62,7 +63,7 @@ export default class App extends React.Component {
   // Declare which parts of the tree you care about
   stateFromTree () {
     return {
-      selectedEgg: ['selectedEgg'], // (key on this.state): (path to point on tree)
+      selectedEggID: ['selectedEggID'], // (key on this.state): (path to point on tree)
       eggs: 'eggs' // paths can either be an array or a dot separated string like 'path.to.thing'
     }
   }
@@ -71,7 +72,7 @@ export default class App extends React.Component {
 
   render () {
     return (<div>
-      The currently selected egg is: {this.state.selectedEgg}
+      The currently selected egg ID is: {this.state.selectedEggID}
       {this.state.eggs.map((egg, i) => {
         return <Egg eggID={i} key={i} />
       })}
@@ -89,7 +90,6 @@ export default class Egg extends React.Component {
 
   stateFromTree () {
     return {
-      selectedEgg: 'selectedEgg',
       egg: ['eggs', this.props.eggID]
     }
   }
@@ -120,6 +120,82 @@ treehouse.actions.register(require('./actions/egg_actions'))
 treehouse.actions.do('init')
 React.render(<App/>, document.body)
 ```
+
+### Updating the tree from inside actions
+The 'tree' yielded inside actions is actually a cursor to the root of the tree.
+A cursor is a bit like a window (or maybe... a treehouse!) looking onto the tree, that has knowledge of a particular path, and can get/set attributes on it.
+```javascript
+tree.at('some.path')          // cursor to tree['some']['path']
+tree.at(['some', 'path'])     // can also use an array
+tree.at(['eggs', 1])          // works on arrays too
+```
+Cursors allow you to update the tree, and will do the necessary updates all the way up to the root of the tree (as the tree is immutable, any change on the tree means its parent needs changing, as does its grandparent, and so on, all the way up to the root.
+```javascript
+tree.at('some.path')                          // cursor
+  .update({hello: 'guys'})                    // replaces the data at the cursor path
+  .set('colour', 'yellow')                    // sets an attribute
+  .merge({new: 'stuff'})                      // merges in an object, overwriting keys that already exist
+  .reverseMerge({colour: 'defaultColour'})    // merges in an object but doesn't overwrite pre-existing elements
+  .commit()                                   // tell components/other objects that care that you've finished
+```
+
+### Facets
+The tree should contain normalized data, hypothetically JSON serializable/deserializable.
+
+Facets are like a "view" of the data, made up from specified parts of the tree. They can be registered globally then used inside a component.
+
+Define (assumes that the tree looks like it does in the examples above),
+```javascript
+// facets/egg_facets.js
+export default {
+
+  selectedEgg: {   // name of the facet
+    cursors: {     // declare the paths on the tree you care about
+      id: ['selectedEggID'],
+      eggs: ['eggs']
+    },
+    evaluate: ({eggs, id}) => {   // the specified data from the tree is yielded to evaluate
+      return eggs.get(id)  // remember eggs is an immutable.js data structure
+    }
+  }
+
+}
+```
+
+register,
+```javascript
+// app.js
+treehouse.facets.register(require('./facets/egg_facets'))
+```
+
+and use in a component:
+```javascript
+// components/selected_egg.js
+import React from 'react'
+
+export default class SelectedEgg extends React.Component {
+
+  // Declare which facets you care about
+  stateFromFacets () {
+    return {
+      egg: 'selectedEgg' // (key on this.state): (registered facet name)
+    }
+  }
+
+  stateFromTree () {
+    // ...
+  }
+
+  render () {
+    return (<div>
+      The currently selected egg name is: {this.state.egg.get('name')}
+      ...
+    </div>)
+  }
+}
+```
+
+The result is internally memoized, so the evaluate function is only called if the state it cares about has changed. This makes it especially useful for expensive algorithms (e.g. sorted arrays, etc.).
 
 ### Extending other components
 Supposing you have a singleton `server` object that you want to have access to actions. You can do
