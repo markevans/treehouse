@@ -52,10 +52,6 @@ class Cursor {
     return this.update(obj => i.merge(obj, object))
   }
 
-  reverseMerge (object) {
-    return this.update(obj => i.reverseMerge(obj, object))
-  }
-
   commit () {
     this.tree.commit()
     return this

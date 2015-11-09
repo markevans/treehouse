@@ -33,13 +33,6 @@ describe("Cursor", () => {
       cursor.merge({type: 'Tiger'})
       expect(tree.toJSON()).toEqual({animal: {type: 'Tiger', size: 'very big'}})
     })
-
-    it("merges with another object", () => {
-      cursor.reverseMerge({size: 'very big'})
-      expect(tree.toJSON()).toEqual({animal: {type: 'Lion', size: 'very big'}})
-      cursor.reverseMerge({type: 'Tiger'})
-      expect(tree.toJSON()).toEqual({animal: {type: 'Lion', size: 'very big'}})
-    })
   })
 
 })

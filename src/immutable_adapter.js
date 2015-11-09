@@ -15,10 +15,6 @@ export default {
 
   merge (obj1, obj2) {
     return obj1.merge(obj2)
-  },
-
-  reverseMerge (obj1, obj2) {
-    return this.fromJS(obj2).merge(obj1)
   }
 }
 
