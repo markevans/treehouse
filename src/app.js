@@ -32,14 +32,10 @@ class App {
     })
   }
 
-  extend (object) {
+  extendReact (object) {
     Object.assign(object, actionMethods(this))
     Object.assign(object, treeMethods(this))
     Object.assign(object, dirtyTrackerMethods(this))
-  }
-
-  extendReact (object) {
-    this.extend(object)
     Object.assign(object, reactComponentMethods)
   }
 
