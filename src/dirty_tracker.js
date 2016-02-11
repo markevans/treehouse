@@ -1,19 +1,8 @@
 class Subscription {
-  constructor (dirtyTracker, pathMap, callback) {
+  constructor (dirtyTracker, branches, callback) {
     this.dirtyTracker = dirtyTracker
-    this.pathMap = pathMap
+    this.branches = branches
     this.callback = callback
-  }
-
-  branches () {
-    if (!this._branches) {
-      let branches = [], key
-      for (key in this.pathMap) {
-        branches.push(this.pathMap[key][0])
-      }
-      this._branches = branches
-    }
-    return this._branches
   }
 
   call () {
@@ -47,17 +36,17 @@ class DirtyTracker {
     return this.branches[name]
   }
 
-  watch (pathMap, callback, options) {
-    let subscription = new Subscription(this, pathMap, callback)
+  watch (branches, callback) {
+    let subscription = new Subscription(this, branches, callback)
     this.all.add(subscription)
-    subscription.branches().forEach(b => this.branch(b).add(subscription))
+    subscription.branches.forEach(b => this.branch(b).add(subscription))
     return subscription
   }
 
   unwatch (subscription) {
     this.all.delete(subscription)
     this.dirty.delete(subscription)
-    subscription.branches().forEach(b => this.branch(b).delete(subscription))
+    subscription.branches.forEach(b => this.branch(b).delete(subscription))
   }
 
   markBranchDirty (branch) {

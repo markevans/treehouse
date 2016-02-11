@@ -10,26 +10,26 @@ describe("DirtyTracker", () => {
   })
 
   it("dirtys a callback if its branch is dirty", () => {
-    let sub = dirtyTracker.watch({myDog: ['dogs','rover']}, callback)
+    let sub = dirtyTracker.watch(['dogs'], callback)
     dirtyTracker.markBranchDirty('dogs')
     expect(sub.isDirty()).toEqual(true)
   })
 
   it("doesn't dirty a callback if another branch is dirty", () => {
-    let sub = dirtyTracker.watch({myDog: ['dogs','rover']}, callback)
+    let sub = dirtyTracker.watch(['dogs'], callback)
     dirtyTracker.markBranchDirty('cats')
     expect(sub.isDirty()).toEqual(false)
   })
 
   it("doesn't dirty a callback if it unwatches before the branch is dirty", () => {
-    let sub = dirtyTracker.watch({myDog: ['dogs','rover']}, callback)
+    let sub = dirtyTracker.watch(['dogs'], callback)
     sub.cancel()
     dirtyTracker.markBranchDirty('dogs')
     expect(sub.isDirty()).toEqual(false)
   })
 
   it("allows marking clean", () => {
-    let sub = dirtyTracker.watch({myDog: ['dogs','rover']}, callback)
+    let sub = dirtyTracker.watch(['dogs'], callback)
     dirtyTracker.markBranchDirty('dogs')
     expect(sub.isDirty()).toEqual(true)
     sub.markClean()
@@ -37,7 +37,7 @@ describe("DirtyTracker", () => {
   })
 
   it("cleans each callback", () => {
-    let sub = dirtyTracker.watch({myDog: ['dogs','rover']}, callback)
+    let sub = dirtyTracker.watch(['dogs'], callback)
     dirtyTracker.markBranchDirty('dogs')
     dirtyTracker.cleanAllDirty()
     expect(sub.isDirty()).toEqual(false)
@@ -45,9 +45,9 @@ describe("DirtyTracker", () => {
   })
 
   it("allows calling the callback immediately on the subscription", () => {
-    dirtyTracker.watch({myDog: ['dogs','rover']}, callback)
+    dirtyTracker.watch(['dogs'], callback)
     expect(callback).not.toHaveBeenCalled()
-    dirtyTracker.watch({myDog: ['dogs','rover']}, callback).call()
+    dirtyTracker.watch(['dogs'], callback).call()
     expect(callback).toHaveBeenCalled()
   })
 })

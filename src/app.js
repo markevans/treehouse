@@ -8,6 +8,14 @@ import dirtyTrackerMethods from './mixins/dirty_tracker_methods'
 import actionMethods from './mixins/action_methods'
 import reactComponentMethods from './mixins/react_component_methods'
 
+let branchesFromPathMap = (pathMap) => {
+  let branches = [], key
+  for (key in pathMap) {
+    branches.push(pathMap[key][0])
+  }
+  return branches
+}
+
 class App {
 
   constructor () {
@@ -26,8 +34,8 @@ class App {
     this.actions = new Actions(this.tree)
   }
 
-  watch (branches, callback) {
-    return this.dirtyTracker.watch(branches, () => {
+  watch (pathMap, callback) {
+    return this.dirtyTracker.watch(branchesFromPathMap(pathMap), () => {
       callback(this.tree)
     })
   }
