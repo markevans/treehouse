@@ -1,5 +1,6 @@
 import i from './immutable_adapter'
 import Cursor from './cursor'
+import MultiCursor from './multi_cursor'
 import EventEmitter from './event_emitter'
 
 class Tree {
@@ -25,6 +26,10 @@ class Tree {
 
   get (...path) {
     return this.at(...path).get()
+  }
+
+  pick (pathMap) {
+    return new MultiCursor(this, pathMap)
   }
 
   p () {
