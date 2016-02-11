@@ -1,15 +1,35 @@
 class Subscription {
-  constructor (dirtyTracker, callback) {
+  constructor (dirtyTracker, pathMap, callback) {
     this.dirtyTracker = dirtyTracker
+    this.pathMap = pathMap
     this.callback = callback
   }
 
+  branches () {
+    if (!this._branches) {
+      let branches = [], key
+      for (key in this.pathMap) {
+        branches.push(this.pathMap[key][0])
+      }
+      this._branches = branches
+    }
+    return this._branches
+  }
+
+  call () {
+    this.callback.call()
+  }
+
+  isDirty () {
+    return this.dirtyTracker.dirty.has(this)
+  }
+
   markClean () {
-    this.dirtyTracker.markClean(this.callback)
+    this.dirtyTracker.markClean(this)
   }
 
   cancel () {
-    this.dirtyTracker.unwatch(this.callback)
+    this.dirtyTracker.unwatch(this)
   }
 }
 
@@ -18,7 +38,6 @@ class DirtyTracker {
     this.all = new Set()
     this.branches = {}
     this.dirty = new Set()
-    this.branchesEachObjectCaresAbout = new Map()
   }
 
   branch (name) {
@@ -28,38 +47,32 @@ class DirtyTracker {
     return this.branches[name]
   }
 
-  watch (branches, callback, options) {
-    this.all.add(callback)
-    branches.forEach(b => this.branch(b).add(callback))
-    this.branchesEachObjectCaresAbout.set(callback, branches)
-    if (options && options.callNow) {
-      callback()
-    }
-    return new Subscription(this, callback)
+  watch (pathMap, callback, options) {
+    let subscription = new Subscription(this, pathMap, callback)
+    this.all.add(subscription)
+    subscription.branches().forEach(b => this.branch(b).add(subscription))
+    return subscription
   }
 
-  unwatch (callback) {
-    this.all.delete(callback)
-    this.dirty.delete(callback)
-    this.branchesEachObjectCaresAbout.get(callback).forEach((b) => {
-      this.branch(b).delete(callback)
-    })
-    this.branchesEachObjectCaresAbout.delete(callback)
+  unwatch (subscription) {
+    this.all.delete(subscription)
+    this.dirty.delete(subscription)
+    subscription.branches().forEach(b => this.branch(b).delete(subscription))
   }
 
   markBranchDirty (branch) {
-    let callbacks = branch ? this.branch(branch) : this.all
-    callbacks.forEach(c => this.dirty.add(c))
+    let subscriptions = branch ? this.branch(branch) : this.all
+    subscriptions.forEach(s => this.dirty.add(s))
   }
 
-  markClean (callback) {
-    this.dirty.delete(callback)
+  markClean (subscription) {
+    this.dirty.delete(subscription)
   }
 
   cleanAllDirty () {
-    this.dirty.forEach((callback) => {
-      callback()
-      this.markClean(callback)
+    this.dirty.forEach((subscription) => {
+      subscription.call()
+      this.markClean(subscription)
     })
   }
 }
