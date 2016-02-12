@@ -18,8 +18,16 @@ class Watcher {
     this.dirtyTracker.track(this, this.branches)
   }
 
+  get () {
+    return this.multiCursor.get()
+  }
+
+  set (data) {
+    return this.multiCursor.set(data)
+  }
+
   call () {
-    this.callback.call(this, this.multiCursor, this.tree)
+    this.callback.call(this, this)
     return this
   }
 

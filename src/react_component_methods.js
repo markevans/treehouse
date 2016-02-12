@@ -8,15 +8,16 @@ export default {
 
   componentWillMount () {
     if (this.stateFromTree) {
-      let pathMap = this.stateFromTree()
-      this.treehouseWatcher = this.treehouse.watch(pathMap, (multiCursor) => {
-        this.setState(multiCursor.get())
+      this.treehouseWatcher = this.treehouse.watch(this.stateFromTree(), (watcher) => {
+        this.setState(watcher.get())
       }).call()
     }
   },
 
   componentWillReceiveProps () {
-    this.treehouseWatcher.call()
+    if (this.treehouseWatcher) {
+      this.treehouseWatcher.call()
+    }
   },
 
   shouldComponentUpdate (nextProps, nextState) {
