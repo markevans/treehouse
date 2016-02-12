@@ -24,6 +24,13 @@ class MultiCursor {
     return data
   }
 
+  set (data) {
+    let key, cursors = this.cursors()
+    for (key in data) {
+      cursors[key].update(data[key])
+    }
+  }
+
 }
 
 export default MultiCursor

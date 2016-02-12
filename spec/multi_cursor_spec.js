@@ -30,4 +30,21 @@ describe("MultiCursor", () => {
     })
   })
 
+  describe("setting data", () => {
+
+    let multiCursor
+
+    beforeEach(() => {
+      multiCursor = new MultiCursor(tree, {
+        first: ['a'],
+        second: ['b', 'c']
+      })
+    })
+
+    it("sets multiple attributes", () => {
+      expect(multiCursor.set({first: '1st', second: '2nd'}))
+      expect(tree.get().toJSON()).toEqual({a: '1st', b: {c: '2nd'}})
+    })
+  })
+
 })
