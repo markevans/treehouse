@@ -217,10 +217,20 @@ You can watch for tree changes with
 let watcher = treehouse.watch({
   user: ['path', 'to', 'user'],    // Specify the paths you want to watch, naming each with a key
   colour: ['car', 4, 'colour']
-}, (multiCursor, tree) => {
-  // the callback yields a "multicursor" object, keyed in the same way, e.g.
-  multiCursor.get()    // {user: 'Mark', colour: 'red'}
+}, (watcher) => {
+  // the callback yields the watcher itself
 })
+```
+With a watcher you can get the specified data in the form you specified the paths
+```javascript
+watcher.get()   // {
+                //   user: "Mark",
+                //   colour: "red"
+                // }
+```
+You can set on the tree again in the same form
+```javascript
+watcher.set({user: "Don", colour: "blue"})   // This updates at paths ['path', 'to', 'user'] and ['car', 4, 'colour']
 ```
 To unsubscribe
 ```javascript
