@@ -2,52 +2,46 @@ import DirtyTracker from '../src/dirty_tracker'
 
 describe("DirtyTracker", () => {
 
-  let dirtyTracker, callback
+  let dirtyTracker, item
 
   beforeEach(() => {
     dirtyTracker = new DirtyTracker()
-    callback = jasmine.createSpy('callback')
+    item = {call: ()=>{}}
+    spyOn(item, 'call').and.callThrough()
   })
 
-  it("dirtys a callback if its branch is dirty", () => {
-    let sub = dirtyTracker.watch(['dogs'], callback)
+  it("dirtys a item if its branch is dirty", () => {
+    dirtyTracker.track(item, ['dogs'])
     dirtyTracker.markBranchDirty('dogs')
-    expect(sub.isDirty()).toEqual(true)
+    expect(dirtyTracker.isDirty(item)).toEqual(true)
   })
 
-  it("doesn't dirty a callback if another branch is dirty", () => {
-    let sub = dirtyTracker.watch(['dogs'], callback)
+  it("doesn't dirty a item if another branch is dirty", () => {
+    dirtyTracker.track(item, ['dogs'])
     dirtyTracker.markBranchDirty('cats')
-    expect(sub.isDirty()).toEqual(false)
+    expect(dirtyTracker.isDirty(item)).toEqual(false)
   })
 
-  it("doesn't dirty a callback if it unwatches before the branch is dirty", () => {
-    let sub = dirtyTracker.watch(['dogs'], callback)
-    sub.cancel()
+  it("doesn't dirty a item if it unwatches before the branch is dirty", () => {
+    dirtyTracker.track(item, ['dogs'])
+    dirtyTracker.untrack(item, ['dogs'])
     dirtyTracker.markBranchDirty('dogs')
-    expect(sub.isDirty()).toEqual(false)
+    expect(dirtyTracker.isDirty(item)).toEqual(false)
   })
 
   it("allows marking clean", () => {
-    let sub = dirtyTracker.watch(['dogs'], callback)
+    dirtyTracker.track(item, ['dogs'])
     dirtyTracker.markBranchDirty('dogs')
-    expect(sub.isDirty()).toEqual(true)
-    sub.markClean()
-    expect(sub.isDirty()).toEqual(false)
+    expect(dirtyTracker.isDirty(item)).toEqual(true)
+    dirtyTracker.markClean(item)
+    expect(dirtyTracker.isDirty(item)).toEqual(false)
   })
 
-  it("cleans each callback", () => {
-    let sub = dirtyTracker.watch(['dogs'], callback)
+  it("cleans each item", () => {
+    dirtyTracker.track(item, ['dogs'])
     dirtyTracker.markBranchDirty('dogs')
     dirtyTracker.cleanAllDirty()
-    expect(sub.isDirty()).toEqual(false)
-    expect(callback).toHaveBeenCalled()
-  })
-
-  it("allows calling the callback immediately on the subscription", () => {
-    dirtyTracker.watch(['dogs'], callback)
-    expect(callback).not.toHaveBeenCalled()
-    dirtyTracker.watch(['dogs'], callback).call()
-    expect(callback).toHaveBeenCalled()
+    expect(dirtyTracker.isDirty(item)).toEqual(false)
+    expect(item.call).toHaveBeenCalled()
   })
 })

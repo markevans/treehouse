@@ -1,27 +1,3 @@
-class Subscription {
-  constructor (dirtyTracker, branches, callback) {
-    this.dirtyTracker = dirtyTracker
-    this.branches = branches
-    this.callback = callback
-  }
-
-  call () {
-    this.callback.call()
-  }
-
-  isDirty () {
-    return this.dirtyTracker.dirty.has(this)
-  }
-
-  markClean () {
-    this.dirtyTracker.markClean(this)
-  }
-
-  cancel () {
-    this.dirtyTracker.unwatch(this)
-  }
-}
-
 class DirtyTracker {
   constructor () {
     this.all = new Set()
@@ -36,17 +12,15 @@ class DirtyTracker {
     return this.branches[name]
   }
 
-  watch (branches, callback) {
-    let subscription = new Subscription(this, branches, callback)
-    this.all.add(subscription)
-    subscription.branches.forEach(b => this.branch(b).add(subscription))
-    return subscription
+  track (item, branches) {
+    this.all.add(item)
+    branches.forEach(b => this.branch(b).add(item))
   }
 
-  unwatch (subscription) {
-    this.all.delete(subscription)
-    this.dirty.delete(subscription)
-    subscription.branches.forEach(b => this.branch(b).delete(subscription))
+  untrack (item, branches) {
+    this.all.delete(item)
+    this.dirty.delete(item)
+    branches.forEach(b => this.branch(b).delete(item))
   }
 
   markBranchDirty (branch) {
@@ -54,14 +28,18 @@ class DirtyTracker {
     subscriptions.forEach(s => this.dirty.add(s))
   }
 
-  markClean (subscription) {
-    this.dirty.delete(subscription)
+  markClean (item) {
+    this.dirty.delete(item)
+  }
+
+  isDirty (item) {
+    return this.dirty.has(item)
   }
 
   cleanAllDirty () {
-    this.dirty.forEach((subscription) => {
-      subscription.call()
-      this.markClean(subscription)
+    this.dirty.forEach((item) => {
+      item.call()
+      this.markClean(item)
     })
   }
 }
