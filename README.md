@@ -207,48 +207,26 @@ export default class SelectedEgg extends React.Component {
 
 The result is internally memoized, so the evaluate function is only called if the state it cares about has changed. This makes it especially useful for expensive algorithms (e.g. sorted arrays, etc.).
 
-### Extending other components
-Supposing you have a singleton `server` object that you want to have access to actions. You can do
-
-```javascript
-treehouse.extend(server)
-```
-
-then inside the server object you have access to
-```javascript
-this.action('someAction', {some: 'payload'})
-```
-
-Now supposing the server object needs to access a piece of the tree. It can declare what it needs with `stateFromTree`, just like components do, and it can make use of the `watchTree`, `syncWithTree`, and `currentTreeState` methods:
-
-```javascript
-class Server {
-
-  constructor () {
-    this.watchTree() // ensures syncWithTree gets called when authToken changes
-  }
-
-  stateFromTree () {
-    return {token: 'authToken'}
-  }
-
-  syncWithTree () {
-    this.token = this.currentTreeState().token
-  }
-
-  //...
-}
-
-treehouse.extend(Server.prototype)
-```
-
-If you don't want to extend objects in this way you can still do actions with
+### Using treehouse outside of React Components
+Any input into the system (message over websocket, url change, etc.) should call an action
 ```javascript
 treehouse.actions.do('someAction', {some: 'payload'})
 ```
-and watch for tree changes with
+You can watch for tree changes with
 ```javascript
-treehouse.watch(['someBranch', 'anotherBranch'], (tree) => {
-  // do something with tree.get('someBranch') or tree.get('anotherBranch.something.nested')
+let watcher = treehouse.watch({
+  user: ['path', 'to', 'user'],    // Specify the paths you want to watch, naming each with a key
+  colour: ['car', 4, 'colour']
+}, (multiCursor, tree) => {
+  // the callback yields a "multicursor" object, keyed in the same way, e.g.
+  multiCursor.get()    // {user: 'Mark', colour: 'red'}
 })
+```
+To unsubscribe
+```javascript
+watcher.cancel()
+```
+To call the callback immediately
+```javascript
+watcher.call()  // returns self
 ```
