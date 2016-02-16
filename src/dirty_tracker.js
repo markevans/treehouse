@@ -12,15 +12,15 @@ class DirtyTracker {
     return this.branches[name]
   }
 
-  track (item, branches) {
-    this.all.add(item)
-    branches.forEach(b => this.branch(b).add(item))
+  track (callback, branches) {
+    this.all.add(callback)
+    branches.forEach(b => this.branch(b).add(callback))
   }
 
-  untrack (item, branches) {
-    this.all.delete(item)
-    this.dirty.delete(item)
-    branches.forEach(b => this.branch(b).delete(item))
+  untrack (callback, branches) {
+    this.all.delete(callback)
+    this.dirty.delete(callback)
+    branches.forEach(b => this.branch(b).delete(callback))
   }
 
   markBranchDirty (branch) {
@@ -28,18 +28,18 @@ class DirtyTracker {
     subscriptions.forEach(s => this.dirty.add(s))
   }
 
-  markClean (item) {
-    this.dirty.delete(item)
+  markClean (callback) {
+    this.dirty.delete(callback)
   }
 
-  isDirty (item) {
-    return this.dirty.has(item)
+  isDirty (callback) {
+    return this.dirty.has(callback)
   }
 
   cleanAllDirty () {
-    this.dirty.forEach((item) => {
-      item.call()
-      this.markClean(item)
+    this.dirty.forEach((callback) => {
+      callback()
+      this.markClean(callback)
     })
   }
 }
