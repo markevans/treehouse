@@ -8,15 +8,19 @@ export default {
 
   componentWillMount () {
     if (this.stateFromTree) {
-      this.treehouseWatcher = this.treehouse.watch(this.stateFromTree(), (watcher) => {
-        this.setState(watcher.get())
-      }).call()
+      this.treeView = this.treehouse.pick(this.stateFromTree())
+      this.treeView.watch(this.syncWithTree.bind(this))
+      this.syncWithTree()
     }
   },
 
   componentWillReceiveProps () {
-    if (this.treehouseWatcher) {
-      this.treehouseWatcher.call()
+    this.syncWithTree()
+  },
+
+  syncWithTree () {
+    if (this.treeView) {
+      this.setState(this.treeView.get())
     }
   },
 
@@ -25,14 +29,14 @@ export default {
   },
 
   componentDidUpdate () {
-    if (this.treehouseWatcher) {
-      this.treehouseWatcher.markClean()
+    if (this.treeView) {
+      this.treeView.markClean()
     }
   },
 
   componentWillUnmount () {
-    if (this.treehouseWatcher) {
-      this.treehouseWatcher.cancel()
+    if (this.treeView) {
+      this.treeView.unwatch()
     }
   }
 

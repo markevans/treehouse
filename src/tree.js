@@ -28,10 +28,6 @@ class Tree {
     return this.at(...path).get()
   }
 
-  pick (pathMap) {
-    return new TreeView(this, pathMap)
-  }
-
   p () {
     console.log(JSON.stringify(this.data))
   }
