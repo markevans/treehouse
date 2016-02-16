@@ -57,6 +57,10 @@ class TreeView {
     }
   }
 
+  setter (data) {
+    return () => this.set(data)
+  }
+
 }
 
 export default TreeView
