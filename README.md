@@ -212,31 +212,31 @@ Any input into the system (message over websocket, url change, etc.) should call
 ```javascript
 treehouse.actions.do('someAction', {some: 'payload'})
 ```
-You can watch for tree changes with
+Create a "TreeView" by picking which tree paths you care about
 ```javascript
-let watcher = treehouse.watch({
-  user: ['path', 'to', 'user'],    // Specify the paths you want to watch, naming each with a key
+let treeView = treehouse.pick({
+  user: ['path', 'to', 'user'],    // Specify paths, naming each with a key
   colour: ['car', 4, 'colour']
-}, (watcher) => {
-  // the callback yields the watcher itself
-})
+}
 ```
-With a watcher you can get the specified data in the form you specified the paths
+Get data
 ```javascript
-watcher.get()   // {
-                //   user: "Mark",
-                //   colour: "red"
-                // }
+treeView.get()   // {
+                 //   user: "Mark",
+                 //   colour: "red"
+                 // }
 ```
 You can set on the tree again in the same form
 ```javascript
-watcher.set({user: "Don", colour: "blue"})   // This updates at paths ['path', 'to', 'user'] and ['car', 4, 'colour']
+treeView.set({user: "Don", colour: "blue"})   // This updates at paths ['path', 'to', 'user'] and ['car', 4, 'colour']
 ```
-To unsubscribe
+To watch for data changes at any of the specified paths
 ```javascript
-watcher.cancel()
+treeView.watch((tv) => {
+  // (the callback yields the treeView itself)
+})
 ```
-To call the callback immediately
+To unwatch
 ```javascript
-watcher.call()  // returns self
+treeView.unwatch()
 ```
