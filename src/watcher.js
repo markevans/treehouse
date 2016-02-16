@@ -14,16 +14,16 @@ class Watcher {
     this.callback = callback
 
     this.branches = branchesFromPathMap(pathMap)
-    this.multiCursor = this.tree.pick(pathMap)
+    this.treeView = this.tree.pick(pathMap)
     this.dirtyTracker.track(this, this.branches)
   }
 
   get () {
-    return this.multiCursor.get()
+    return this.treeView.get()
   }
 
   set (data) {
-    return this.multiCursor.set(data)
+    return this.treeView.set(data)
   }
 
   call () {

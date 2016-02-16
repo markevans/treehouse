@@ -1,7 +1,7 @@
 import Tree from '../src/tree'
-import MultiCursor from '../src/multi_cursor'
+import TreeView from '../src/tree_view'
 
-describe("MultiCursor", () => {
+describe("TreeView", () => {
 
   let tree
 
@@ -11,7 +11,7 @@ describe("MultiCursor", () => {
 
   describe("getting data", () => {
 
-    let multiCursor
+    let treeView
 
     beforeEach(() => {
       tree.at().update({
@@ -19,30 +19,30 @@ describe("MultiCursor", () => {
         b: {c: ['d', 'e']},
         x: 1
       })
-      multiCursor = new MultiCursor(tree, {
+      treeView = new TreeView(tree, {
         first: ['a'],
         second: ['b', 'c', 1]
       })
     })
 
     it("gets multiple attributes", () => {
-      expect(multiCursor.get()).toEqual({first: 'b', second: 'e'})
+      expect(treeView.get()).toEqual({first: 'b', second: 'e'})
     })
   })
 
   describe("setting data", () => {
 
-    let multiCursor
+    let treeView
 
     beforeEach(() => {
-      multiCursor = new MultiCursor(tree, {
+      treeView = new TreeView(tree, {
         first: ['a'],
         second: ['b', 'c']
       })
     })
 
     it("sets multiple attributes", () => {
-      expect(multiCursor.set({first: '1st', second: '2nd'}))
+      expect(treeView.set({first: '1st', second: '2nd'}))
       expect(tree.get().toJSON()).toEqual({a: '1st', b: {c: '2nd'}})
     })
   })

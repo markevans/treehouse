@@ -1,4 +1,4 @@
-class MultiCursor {
+class TreeView {
   constructor (tree, pathMap) {
     this.tree = tree
     this.pathMap = pathMap
@@ -33,4 +33,4 @@ class MultiCursor {
 
 }
 
-export default MultiCursor
+export default TreeView

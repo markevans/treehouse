@@ -10,7 +10,7 @@ describe("Tree", () => {
 
   describe("pick", () => {
     it("picks various things off the tree", () => {
-      let multiCursor = tree.pick({
+      let treeView = tree.pick({
         name: ['users', 'abc123'],
         plant: ['berryType']
       })
@@ -18,7 +18,7 @@ describe("Tree", () => {
         users: {abc123: 'donnie'},
         berryType: 'bubbleberry'
       })
-      expect(multiCursor.get()).toEqual({
+      expect(treeView.get()).toEqual({
         name: 'donnie',
         plant: 'bubbleberry'
       })

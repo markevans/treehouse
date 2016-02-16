@@ -14,8 +14,8 @@ describe("App", () => {
     beforeEach(() => {
       name = null
       thing = {
-        callback: (multiCursor) => {
-          name = multiCursor.get()['n']
+        callback: (treeView) => {
+          name = treeView.get()['n']
         }
       }
       spyOn(thing, 'callback').and.callThrough()

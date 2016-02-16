@@ -1,1 +1,3 @@
-- refactor facets so accessing them is like accessing other parts of the tree
+- MultiCursor -> TreeView
+- Facet -> Facade, get/set
+- Setters

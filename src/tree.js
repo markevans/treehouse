@@ -1,6 +1,6 @@
 import i from './immutable_adapter'
 import Cursor from './cursor'
-import MultiCursor from './multi_cursor'
+import TreeView from './tree_view'
 import EventEmitter from './event_emitter'
 
 class Tree {
@@ -29,7 +29,7 @@ class Tree {
   }
 
   pick (pathMap) {
-    return new MultiCursor(this, pathMap)
+    return new TreeView(this, pathMap)
   }
 
   p () {
