@@ -5,7 +5,7 @@
   "authors": [
     "Mark Evans"
   ],
-  "description": "Opinionated mini-framework for javascript webapps using React and Immutable.js",
+  "description": "Opinionated mini-framework for javascript webapps, perfect for using with React",
   "main": "lib/treehouse.js",
   "moduleType": [
     "amd",

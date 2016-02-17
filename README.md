@@ -12,8 +12,6 @@ The basic flow as as follows:
 
   - ALL the state about the system is kept in one state tree.
     The tree is JSON serializable, i.e. contains only objects, arrays, strings and numbers.
-    Treehouse ensures that the state tree is made up of immutable data structures, using the immutable.js library.
-    Check the docs at [https://facebook.github.io/immutable-js/docs](https://facebook.github.io/immutable-js/docs) to see how it works, specifically those for `List` and `Map`, as these are the only objects Treehouse is concerned with.
 
   - EVERY single input enters the system via the actions. An "input" includes:
     - user interaction with the DOM, e.g. a click
@@ -103,9 +101,8 @@ export default class Egg extends React.Component {
   }
 
   render () {
-    // remember that objects are immutable.js maps, hence "egg.get('name')"
     return (<div onClick={this.handleClick}>
-      I am a {this.state.egg.get('name')} egg
+      I am a {this.state.egg.name} egg
     </div>)
   }
 }
