@@ -37,17 +37,6 @@ Define the actions
 
 export default {
 
-  init (tree) {
-    tree.set({
-      eggs: {
-        id1: {name: 'big'},
-        id2: {name: 'small'},
-        id3: {name: 'bad'}
-      },
-      selectedEggID: null
-    })
-  }
-
   selectEgg (tree, {eggID}) {
     tree.at(['selectedEggID']).set(eggID)
   }
@@ -108,7 +97,7 @@ export default class Egg extends React.Component {
 }
 ```
 
-Then start the app and call the 'init' action.
+Then start the app
 
 ```javascript
 // app.js
@@ -118,7 +107,16 @@ import App from './components/app'
 
 treehouse.extendReact(React.Component.prototype)
 treehouse.actions.register(require('./actions/egg_actions'))
-treehouse.actions.do('init')
+
+treehouse.init({
+  eggs: {
+    id1: {name: 'big'},
+    id2: {name: 'small'},
+    id3: {name: 'bad'}
+  },
+  selectedEggID: null
+})
+
 React.render(<App/>, document.body)
 ```
 

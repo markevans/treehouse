@@ -26,6 +26,10 @@ class App {
     this.dirtyTracker.markBranchDirty(boughChanged)
   }
 
+  init (data) {
+    this.setTree(data)
+  }
+
   trunk () {
     return (this._trunk = this._trunk || this.at([]))
   }
