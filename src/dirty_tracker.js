@@ -1,30 +1,30 @@
 class DirtyTracker {
   constructor () {
     this.all = new Set()
-    this.branches = {}
+    this.channels = {}
     this.dirty = new Set()
   }
 
-  branch (name) {
-    if (!this.branches[name]) {
-      this.branches[name] = new Set()
+  channel (name) {
+    if (!this.channels[name]) {
+      this.channels[name] = new Set()
     }
-    return this.branches[name]
+    return this.channels[name]
   }
 
-  track (callback, branches) {
+  track (callback, channels) {
     this.all.add(callback)
-    branches.forEach(b => this.branch(b).add(callback))
+    channels.forEach(b => this.channel(b).add(callback))
   }
 
-  untrack (callback, branches) {
+  untrack (callback, channels) {
     this.all.delete(callback)
     this.dirty.delete(callback)
-    branches.forEach(b => this.branch(b).delete(callback))
+    channels.forEach(b => this.channel(b).delete(callback))
   }
 
-  markBranchDirty (branch) {
-    let subscriptions = branch ? this.branch(branch) : this.all
+  markBranchDirty (channel) {
+    let subscriptions = channel ? this.channel(channel) : this.all
     subscriptions.forEach(s => this.dirty.add(s))
   }
 
