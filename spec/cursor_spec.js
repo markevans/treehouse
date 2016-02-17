@@ -3,35 +3,50 @@ import Cursor from '../src/cursor'
 
 describe("Cursor", () => {
 
-  let tree
-
-  beforeEach(() => {
-    tree = new Tree()
-  })
-
   describe("setting data", () => {
-
-    let cursor
+    let tree, cursor
 
     beforeEach(() => {
-      cursor = new Cursor(tree, ['animal'])
-      cursor.set('type', 'Lion')
+      tree = new Tree({animal: {type: 'Dog'}})
+      cursor = new Cursor(tree, ['animal', 'type'])
     })
 
     it("sets attributes", () => {
-      expect(tree.toJSON()).toEqual({animal: {type: 'Lion'}})
+      cursor.set('Lion')
+      expect(tree.get()).toEqual({animal: {type: 'Lion'}})
     })
 
-    it("update", () => {
-      cursor.update(4)
-      expect(tree.toJSON()).toEqual({animal: 4})
+    it("changes each object that has been changed", () => {
+      let oldData = tree.get()
+      cursor.set('Lion')
+      let newData = tree.get()
+      expect(oldData === newData).not.toBeTruthy()
+      expect(oldData.animal === newData.animal).not.toBeTruthy()
     })
 
-    it("merges", () => {
-      cursor.merge({size: 'very big'})
-      expect(tree.toJSON()).toEqual({animal: {type: 'Lion', size: 'very big'}})
-      cursor.merge({type: 'Tiger'})
-      expect(tree.toJSON()).toEqual({animal: {type: 'Tiger', size: 'very big'}})
+    it("creates intermediate objects if they don't already exist", () => {
+      cursor = new Cursor(tree, ['friends', 'reunited'])
+      cursor.set('gone forever')
+      expect(tree.get().friends.reunited).toEqual('gone forever')
+    })
+
+  })
+
+  describe("getting data", () => {
+    let tree, cursor
+
+    beforeEach(() => {
+      tree = new Tree({animal: {type: 'Dog'}})
+    })
+
+    it("gets nested data", () => {
+      let cursor = new Cursor(tree, ['animal', 'type'])
+      expect(cursor.get()).toEqual('Dog')
+    })
+
+    it("returns undefined if the path doesn't match anything", () => {
+      let cursor = new Cursor(tree, ['doobie', 'mcgovern'])
+      expect(cursor.get()).toBeUndefined()
     })
   })
 
