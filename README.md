@@ -19,7 +19,7 @@ The basic flow as as follows:
     - a timer/interval callback
     - a URL update
     - etc. etc.
-    The actions simply update the state, at the relevant points on the tree, and then call "commit", which is a way of saying "I'm done, anything that cares about the changes can update yourselves now"
+    The actions simply update the state, at the relevant points on the tree, and then (automatically) call "commit", which is a way of saying "I'm done, anything that cares about the changes can update yourselves now"
 
   - Treehouse extends React components to be aware of the tree and of actions. The components:
     - declare which parts of the tree they care about
@@ -38,18 +38,18 @@ Define the actions
 export default {
 
   init (tree) {
-    tree.update({
+    tree.set({
       eggs: {
         id1: {name: 'big'},
         id2: {name: 'small'},
         id3: {name: 'bad'}
       },
       selectedEggID: null
-    }).commit()     // commit says "I've finished", and components will update
+    })
   }
 
   selectEgg (tree, {eggID}) {
-    tree.set('selectedEggID', eggID).commit()
+    tree.at(['selectedEggID']).set(eggID)
   }
 }
 ```
@@ -66,7 +66,7 @@ export default class App extends React.Component {
   stateFromTree () {
     return {
       selectedEggID: ['selectedEggID'], // (key on this.state): (path to point on tree)
-      eggs: 'eggs' // paths can either be an array or a dot separated string like 'path.to.thing'
+      eggs: ['eggs']
     }
   }
 
@@ -123,27 +123,26 @@ React.render(<App/>, document.body)
 ```
 
 ### Updating the tree from inside actions
-The 'tree' yielded inside actions is actually a cursor to the root of the tree.
-A cursor is a bit like a window (or maybe... a treehouse!) looking onto the tree, that has knowledge of a particular path, and can get/set attributes on it.
+The 'tree' yielded inside actions is actually a platform on the trunk of the tree
+A platform is a bit like a treehouse sitting on some branch in the tree, that has knowledge of a particular path, and can get/set attributes on it.
 ```javascript
-tree.at('some.path')          // cursor to tree['some']['path']
 tree.at(['some', 'path'])     // can also use an array
 tree.at(['eggs', 1])          // works on arrays too
 ```
-Cursors allow you to update the tree, and will do the necessary updates all the way up to the root of the tree (as the tree is immutable, any change on the tree means its parent needs changing, as does its grandparent, and so on, all the way up to the root.
+Platforms allow you to update the tree, and will do the necessary updates all the way up to the trunk of the tree (because we treat the tree as immutable, any change somewhere on the tree means its parent needs changing, as does its grandparent, and so on, all the way up to the trunk.
 ```javascript
-tree.at('some.path')                          // cursor
-  .update({hello: 'guys'})                    // replaces the data at the cursor path
-  .update((data) => {
-    return data.set('hello', 'gals')          // or use a function which yields the current value at the cursor
+tree.at(['some', 'path'])                     // platform
+    .set({hello: 'guys'})                     // replaces the data at the cursor path
+```
+### Asynchronous actions
+After changing the tree asynchronously in an action, you should commit the changes manually, using the yielded function
+```javascript
+getUsersFromServer: (tree, payload, commit) => {  // this is a registered action
+  server.getUsers().then((data) => {
+    tree.at(['users']).set(data)
+    commit()
   })
-  .set('colour', 'yellow')                    // sets an attribute
-  .set('colour', (currentColour) => {
-    return 'dark '+currentColour              // or use a function
-  })
-  .merge({new: 'stuff'})                      // merges in an object, overwriting keys that already exist
-  .reverseMerge({colour: 'defaultColour'})    // merges in an object but doesn't overwrite pre-existing elements
-  .commit()                                   // tell components/other objects that care that you've finished
+}
 ```
 
 ### Using treehouse outside of React Components
