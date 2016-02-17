@@ -11,6 +11,10 @@ let getIn = (data, path) => {
 
 // Immutable operation; returns a new object
 let setIn = (data, path, twigValue, level=0) => {
+  if (path.length == 0) {
+    return twigValue
+  }
+
   let newData = clone(data),
       branch = path[level],
       value
@@ -32,18 +36,19 @@ let clone = (object) => {
 }
 
 class Cursor {
-  constructor (tree, path=[]) {
-    this.tree = tree
+  constructor (app, path=[]) {
+    this.app = app
     this.path = path
+    this.bough = this.path[0]
   }
 
   get () {
-    return getIn(this.tree.get(), this.path)
+    return getIn(this.app.tree(), this.path)
   }
 
   set (value) {
-    let data = setIn(this.tree.get(), this.path, value)
-    this.tree.set(data)
+    let data = setIn(this.app.tree(), this.path, value)
+    this.app.setTree(data, this.bough)
   }
 }
 

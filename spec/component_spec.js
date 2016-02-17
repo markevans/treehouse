@@ -38,13 +38,12 @@ describe("Component", () => {
 
   //---------------
 
-  let app, tree
+  let app
 
   beforeEach(() => {
     let App = require('../src/app')
     app = new App()
     app.extendReact(React.Component.prototype)
-    tree = app.tree.at()
   })
 
   describe("actions", () => {
@@ -91,7 +90,8 @@ describe("Component", () => {
     })
 
     it("renders from the tree", () => {
-      tree.update({fruit: 'orange', animal: 'sheep'}).commit()
+      app.trunk().set({fruit: 'orange', animal: 'sheep'})
+      app.commit()
       render(<Widget/>)
       expect($('.widget').html()).toEqual('orange')
     })
@@ -99,28 +99,32 @@ describe("Component", () => {
     describe("updating", () => {
 
       beforeEach(() => {
-        tree.update({fruit: 'orange', animal: 'sheep'}).commit()
+        app.trunk().set({fruit: 'orange', animal: 'sheep'})
+        app.commit()
         render(<Widget/>)
         widgetShouldUpdateCount = 0
         widgetRenderCount = 0
       })
 
       it("updates when the relevant branch has been touched", () => {
-        tree.set('fruit', 'apple').commit()
+        app.at(['fruit']).set('apple')
+        app.commit()
         expect($('.widget').html()).toEqual('apple')
         expect(widgetShouldUpdateCount).toEqual(1)
         expect(widgetRenderCount).toEqual(1)
       })
 
       it("doesn't update when the relevant branch hasn't been touched", () => {
-        tree.set('animal', 'sloth').commit()
+        app.at(['animal']).set('sloth')
+        app.commit()
         expect($('.widget').html()).toEqual('orange')
         expect(widgetShouldUpdateCount).toEqual(0)
         expect(widgetRenderCount).toEqual(0)
       })
 
       it("doesn't call render if the state from tree is the same", () => {
-        tree.set('fruit', 'orange').commit()
+        app.at(['fruit']).set('orange')
+        app.commit()
         expect($('.widget').html()).toEqual('orange')
         expect(widgetShouldUpdateCount).toEqual(1)
         expect(widgetRenderCount).toEqual(0)
@@ -150,7 +154,8 @@ describe("Component", () => {
             return <div className="container"><Widget/></div>
           }
         }
-        tree.update({fruit: 'orange'}).commit()
+        app.trunk().set({fruit: 'orange'})
+        app.commit()
 
         render(<Container/>)
 
@@ -161,7 +166,8 @@ describe("Component", () => {
       })
 
       it("only updates once even though its parent wants to update it as well as itself", () => {
-        tree.set('fruit', 'apple').commit()
+        app.at(['fruit']).set('apple')
+        app.commit()
         expect($('.container').text()).toEqual('apple')
         expect(containerShouldUpdateCount).toEqual(1)
         expect(containerRenderCount).toEqual(1)

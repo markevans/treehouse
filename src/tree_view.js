@@ -7,9 +7,9 @@ let branchesFromPathMap = (pathMap) => {
 }
 
 class TreeView {
-  constructor (tree, dirtyTracker, pathMap) {
-    this.tree = tree
-    this.dirtyTracker = dirtyTracker
+  constructor (app, pathMap) {
+    this.app = app
+    this.dirtyTracker = app.dirtyTracker
     this.pathMap = pathMap
     this.callback = null
     this.branches = branchesFromPathMap(this.pathMap)
@@ -20,7 +20,7 @@ class TreeView {
       let platforms = {}, key
       for (key in this.pathMap) {
         let path = this.pathMap[key]
-        platforms[key] = new Platform(path)
+        platforms[key] = this.app.at(path)
       }
       this._platforms = platforms
     }

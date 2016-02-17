@@ -1,27 +1,15 @@
-import Tree from './tree'
 import DirtyTracker from './dirty_tracker'
 import Actions from './actions'
+import Platform from './platform'
 import TreeView from './tree_view'
-
 import reactComponentMethods from './react_component_methods'
 
 class App {
 
-  constructor () {
-    this.tree = new Tree()
+  constructor (data={}) {
+    this._tree = data
     this.dirtyTracker = new DirtyTracker()
-    this.actions = new Actions(this.tree)
-
-    this.tree.onChange(({path}) => {
-      this.dirtyTracker.markBranchDirty(path[0])
-    })
-    this.tree.onCommit(() => {
-      this.dirtyTracker.cleanAllDirty()
-    })
-  }
-
-  pick (pathMap) {
-    return new TreeView(this.tree, this.dirtyTracker, pathMap)
+    this.actions = new Actions(this)
   }
 
   extendReact (object) {
@@ -29,6 +17,30 @@ class App {
     Object.assign(object, reactComponentMethods)
   }
 
+  tree () {
+    return this._tree
+  }
+
+  setTree (data, boughChanged) {
+    this._tree = data
+    this.dirtyTracker.markBranchDirty(boughChanged)
+  }
+
+  trunk () {
+    return (this._trunk = this._trunk || this.at([]))
+  }
+
+  at (path) {
+    return new Platform(this, path)
+  }
+
+  pick (pathMap) {
+    return new TreeView(this, pathMap)
+  }
+
+  commit () {
+    this.dirtyTracker.cleanAllDirty()
+  }
 }
 
 export default App

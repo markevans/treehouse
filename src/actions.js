@@ -1,8 +1,8 @@
 class Actions {
 
-  constructor (tree) {
+  constructor (app) {
     this.actions = {}
-    this.tree = tree
+    this.app = app
   }
 
   register(actions) {
@@ -11,7 +11,7 @@ class Actions {
 
   do (name, payload={}) {
     if ( this.actions[name] ) {
-      this.actions[name](this.tree.rootCursor, payload, this.tree.commit.bind(this.tree))
+      this.actions[name](this.app.trunk(), payload, this.app.commitChanges.bind(this.app))
     } else {
       console.log(`Action '${name}' not found`)
     }
