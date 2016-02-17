@@ -11,7 +11,9 @@ class Actions {
 
   do (name, payload={}) {
     if ( this.actions[name] ) {
-      this.actions[name](this.app.trunk(), payload, this.app.commitChanges.bind(this.app))
+      let commit = this.app.commit.bind(this.app)
+      this.actions[name](this.app.trunk(), payload, commit)
+      commit()
     } else {
       console.log(`Action '${name}' not found`)
     }
