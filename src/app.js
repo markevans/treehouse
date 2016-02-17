@@ -1,5 +1,4 @@
 import Tree from './tree'
-import Facets from './facets'
 import DirtyTracker from './dirty_tracker'
 import Actions from './actions'
 import TreeView from './tree_view'
@@ -10,7 +9,6 @@ class App {
 
   constructor () {
     this.tree = new Tree()
-    this.facets = new Facets(this.tree)
     this.dirtyTracker = new DirtyTracker()
     this.actions = new Actions(this.tree)
 

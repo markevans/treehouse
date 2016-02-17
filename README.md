@@ -149,64 +149,6 @@ tree.at('some.path')                          // cursor
   .commit()                                   // tell components/other objects that care that you've finished
 ```
 
-### Facets
-The tree should contain normalized data, hypothetically JSON serializable/deserializable.
-
-Facets are like a "view" of the data, made up from specified parts of the tree. They can be registered globally then used inside a component.
-
-Define (assumes that the tree looks like it does in the examples above),
-```javascript
-// facets/egg_facets.js
-export default {
-
-  selectedEgg: {   // name of the facet
-    cursors: {     // declare the paths on the tree you care about
-      id: ['selectedEggID'],
-      eggs: ['eggs']
-    },
-    evaluate: ({eggs, id}) => {   // the specified data from the tree is yielded to evaluate
-      return eggs.get(id)  // remember eggs is an immutable.js data structure
-    }
-  }
-
-}
-```
-
-register,
-```javascript
-// app.js
-treehouse.facets.register(require('./facets/egg_facets'))
-```
-
-and use in a component:
-```javascript
-// components/selected_egg.js
-import React from 'react'
-
-export default class SelectedEgg extends React.Component {
-
-  // Declare which facets you care about
-  stateFromFacets () {
-    return {
-      egg: 'selectedEgg' // (key on this.state): (registered facet name)
-    }
-  }
-
-  stateFromTree () {
-    // ...
-  }
-
-  render () {
-    return (<div>
-      The currently selected egg name is: {this.state.egg.get('name')}
-      ...
-    </div>)
-  }
-}
-```
-
-The result is internally memoized, so the evaluate function is only called if the state it cares about has changed. This makes it especially useful for expensive algorithms (e.g. sorted arrays, etc.).
-
 ### Using treehouse outside of React Components
 Any input into the system (message over websocket, url change, etc.) should call an action
 ```javascript
