@@ -15,16 +15,16 @@ class TreeView {
     this.branches = branchesFromPathMap(this.pathMap)
   }
 
-  cursors () {
-    if (!this._cursors) {
-      let cursors = {}, key
+  platforms () {
+    if (!this._platforms) {
+      let platforms = {}, key
       for (key in this.pathMap) {
         let path = this.pathMap[key]
-        cursors[key] = this.tree.at(path)
+        platforms[key] = new Platform(path)
       }
-      this._cursors = cursors
+      this._platforms = platforms
     }
-    return this._cursors
+    return this._platforms
   }
 
   watch (callback) {
@@ -43,17 +43,17 @@ class TreeView {
   }
 
   get () {
-    let data = {}, cursors = this.cursors(), key
-    for (key in cursors) {
-      data[key] = cursors[key].get()
+    let data = {}, platforms = this.platforms(), key
+    for (key in platforms) {
+      data[key] = platforms[key].get()
     }
     return data
   }
 
   set (data) {
-    let key, cursors = this.cursors()
+    let key, platforms = this.platforms()
     for (key in data) {
-      cursors[key].update(data[key])
+      platforms[key].set(data[key])
     }
   }
 

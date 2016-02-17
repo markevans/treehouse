@@ -1,5 +1,5 @@
 import i from './immutable_adapter'
-import Cursor from './cursor'
+import Platform from './platform'
 import TreeView from './tree_view'
 import EventEmitter from './event_emitter'
 
@@ -21,7 +21,7 @@ class Tree {
   }
 
   at (...path) {
-    return new Cursor(this, path)
+    return new Platform(this, path)
   }
 
   get (...path) {
