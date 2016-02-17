@@ -28,7 +28,9 @@ describe("Actions", () => {
     })
 
     it("doesn't blow up if not registered", () => {
+      spyOn(console, 'log')
       actions.do('somethingElse')
+      expect(console.log).toHaveBeenCalled()
     })
 
     it("automatically commits", () => {
