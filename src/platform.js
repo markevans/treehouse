@@ -34,6 +34,11 @@ class Platform {
     this.handler().set(value)
     return this
   }
+
+  mutate (name, ...args) {
+    this.set(this.app.mutate(name, this.get(), ...args))
+    return this
+  }
 }
 
 export default Platform
