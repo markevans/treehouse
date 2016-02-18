@@ -39,9 +39,6 @@ describe("Platform", () => {
     it("delegates getting to the handler", () => {
       expect(handler.get()).toEqual('theseAreUsers')
     })
-
-    it("allows setting with a function", () => {
-    })
   })
 
 
@@ -60,7 +57,7 @@ describe("Platform", () => {
     })
 
     it("allows setting with a function", () => {
-      platform.set((oldUsers) => {return oldUsers.toUpperCase()} )
+      platform.set((p) => {return p.get().toUpperCase()} )
       expect(handler.set).toHaveBeenCalledWith('OLDUSERS')
     })
 
@@ -68,6 +65,16 @@ describe("Platform", () => {
       expect(() => {
         platform.set((oldUsers) => {} )
       }).toThrowError("You tried to set a value on the tree with undefined")
+    })
+  })
+
+  describe("setting with a mutator", () => {
+    it("calls the appropriate mutator", () => {
+      spyOn(app, 'mutate').and.returnValue([1, 2, 3, 4])
+      platform.set([1, 2])
+      platform.mutate('push', 3, 4)
+      expect(app.mutate).toHaveBeenCalledWith('push', [1, 2], 3, 4)
+      expect(platform.get()).toEqual([1, 2, 3, 4])
     })
   })
 

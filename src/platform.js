@@ -26,8 +26,7 @@ class Platform {
 
   set (value) {
     if (typeof value === 'function') {
-      let currentValue = this.get()
-      value = value(currentValue)
+      value = value(this)
     }
     if (value === undefined) {
       throw new Error("You tried to set a value on the tree with undefined")
