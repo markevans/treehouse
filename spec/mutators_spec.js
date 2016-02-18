@@ -11,8 +11,8 @@ describe("Mutators", () => {
   describe("registering and using a mutator", () => {
     it("uses a registered mutator", () => {
       mutators.register({
-        push: function (array, args, m) {
-          return m.clone(array, (a) => {
+        push (array, ...args) {
+          return this.clone(array, (a) => {
             a.push(...args)
           })
         }

@@ -32,7 +32,7 @@ class Mutators {
 
   call (name, data, ...args) {
     if ( this.mutators[name] ) {
-      let result = this.mutators[name](data, args, this.mutators)
+      let result = this.mutators[name](data, ...args)
       if (result === undefined) {
         throw new Error(`Mutator '${name}' didn't return anything`)
       } else if (result === data) {
