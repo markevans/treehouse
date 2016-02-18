@@ -1,6 +1,8 @@
 import DirtyTracker from './dirty_tracker'
 import Actions from './actions'
 import Mutators from './mutators'
+import arrayMutators from './mutators/array_mutators'
+import objectMutators from './mutators/object_mutators'
 import Platform from './platform'
 import TreeView from './tree_view'
 import reactComponentMethods from './react_component_methods'
@@ -12,6 +14,9 @@ class App {
     this.dirtyTracker = new DirtyTracker()
     this.actions = new Actions(this)
     this.mutators = new Mutators()
+
+    this.registerMutators(arrayMutators)
+    this.registerMutators(objectMutators)
   }
 
   extendReact (object) {
