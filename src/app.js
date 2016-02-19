@@ -40,9 +40,9 @@ class App {
     return this._tree
   }
 
-  setTree (data, boughChanged) {
+  setTree (data, channels) {
     this._tree = data
-    this.dirtyTracker.markChannelDirty(boughChanged)
+    this.dirtyTracker.markChannelDirty(channels)
   }
 
   init (data) {

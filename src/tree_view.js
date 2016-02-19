@@ -1,18 +1,9 @@
-let branchesFromPathMap = (pathMap) => {
-  let branches = [], key
-  for (key in pathMap) {
-    branches.push(pathMap[key][0])
-  }
-  return branches
-}
-
 class TreeView {
   constructor (app, pathMap) {
     this.app = app
     this.dirtyTracker = app.dirtyTracker
     this.pathMap = pathMap
     this.callback = null
-    this.branches = branchesFromPathMap(this.pathMap)
   }
 
   platforms () {
@@ -27,13 +18,24 @@ class TreeView {
     return this._platforms
   }
 
+  channels () {
+    if (!this._channels) {
+      let channels = [], platforms = this.platforms(), key
+      for (key in platforms) {
+        channels.push(platforms[key].channels())
+      }
+      this._channels = channels
+    }
+    return this._channels
+  }
+
   watch (callback) {
     this.callback = () => { callback(this) }
-    this.dirtyTracker.track(this.callback, this.branches)
+    this.dirtyTracker.track(this.callback, this.channels())
   }
 
   unwatch () {
-    this.dirtyTracker.untrack(this.callback, this.branches)
+    this.dirtyTracker.untrack(this.callback, this.channels())
     this.callback = null
   }
 

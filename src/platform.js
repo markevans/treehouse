@@ -39,6 +39,10 @@ class Platform {
     this.set(this.app.mutate(name, this.get(), ...args))
     return this
   }
+
+  channels () {
+    return this.handler().channels()
+  }
 }
 
 export default Platform

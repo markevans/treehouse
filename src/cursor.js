@@ -39,7 +39,6 @@ class Cursor {
   constructor (app, path=[]) {
     this.app = app
     this.path = path
-    this.bough = this.path[0]
   }
 
   get () {
@@ -48,7 +47,11 @@ class Cursor {
 
   set (value) {
     let data = setIn(this.app.tree(), this.path, value)
-    this.app.setTree(data, this.bough)
+    this.app.setTree(data, this.channels())
+  }
+
+  channels () {
+    return (this._channels = this._channels || [this.path[0]])
   }
 }
 
