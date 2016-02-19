@@ -76,7 +76,6 @@ describe("TreeView", () => {
       app.dirtyTracker.markChannelDirty('z')
       app.dirtyTracker.cleanAllDirty()
       expect(callback).not.toHaveBeenCalled()
-      //expect(thing.callback.calls.count()).toEqual(0)
     })
 
     it("allows unwatching", () => {
@@ -85,6 +84,26 @@ describe("TreeView", () => {
       app.dirtyTracker.markChannelDirty('a')
       app.dirtyTracker.cleanAllDirty()
       expect(callback).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("channels", () => {
+    let treeView
+
+    it("returns all channels it cares about", () => {
+      treeView = new TreeView(app, {
+        first: ['a'],
+        second: ['b', 'c']
+      })
+      expect(treeView.channels()).toEqual(['a', 'b'])
+    })
+
+    it("doesn't repeat a channel", () => {
+      treeView = new TreeView(app, {
+        first: ['a'],
+        second: ['a', 'b']
+      })
+      expect(treeView.channels()).toEqual(['a'])
     })
   })
 

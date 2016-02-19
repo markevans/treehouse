@@ -22,7 +22,9 @@ class TreeView {
     if (!this._channels) {
       let channels = [], platforms = this.platforms(), key
       for (key in platforms) {
-        channels.push(platforms[key].channels())
+        platforms[key].channels().forEach((c) => {
+          if (channels.indexOf(c) == -1) { channels.push(c) }
+        })
       }
       this._channels = channels
     }
