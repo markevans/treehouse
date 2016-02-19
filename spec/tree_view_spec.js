@@ -66,14 +66,14 @@ describe("TreeView", () => {
 
     it("allows for watching the tree", () => {
       treeView.watch(callback)
-      app.dirtyTracker.markBranchDirty('a')
+      app.dirtyTracker.markChannelDirty('a')
       app.dirtyTracker.cleanAllDirty()
       expect(callback).toHaveBeenCalledWith(treeView)
     })
 
     it("doesn't call back if the relevant branches aren't touched", () => {
       treeView.watch(callback)
-      app.dirtyTracker.markBranchDirty('z')
+      app.dirtyTracker.markChannelDirty('z')
       app.dirtyTracker.cleanAllDirty()
       expect(callback).not.toHaveBeenCalled()
       //expect(thing.callback.calls.count()).toEqual(0)
@@ -82,7 +82,7 @@ describe("TreeView", () => {
     it("allows unwatching", () => {
       treeView.watch(callback)
       treeView.unwatch()
-      app.dirtyTracker.markBranchDirty('a')
+      app.dirtyTracker.markChannelDirty('a')
       app.dirtyTracker.cleanAllDirty()
       expect(callback).not.toHaveBeenCalled()
     })

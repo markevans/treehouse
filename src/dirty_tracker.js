@@ -23,7 +23,7 @@ class DirtyTracker {
     channels.forEach(b => this.channel(b).delete(callback))
   }
 
-  markBranchDirty (channel) {
+  markChannelDirty (channel) {
     let subscriptions = channel ? this.channel(channel) : this.all
     subscriptions.forEach(s => this.dirty.add(s))
   }
