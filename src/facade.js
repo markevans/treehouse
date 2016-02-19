@@ -21,6 +21,9 @@ class Facade {
     throw new Error("Setting from a facade not implemented yet")
   }
 
+  channels () {
+    return this.treeView.channels()
+  }
 }
 
 export default Facade

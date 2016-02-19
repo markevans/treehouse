@@ -15,7 +15,7 @@ class Platform {
 
   handler () {
     if (!this._handler) {
-      this._handler = new Cursor(this.app, this.path)
+      this._handler = this.app.facade(this.path) || new Cursor(this.app, this.path)
     }
     return this._handler
   }

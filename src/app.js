@@ -3,6 +3,7 @@ import Actions from './actions'
 import Mutators from './mutators'
 import arrayMutators from './mutators/array_mutators'
 import objectMutators from './mutators/object_mutators'
+import Facades from './facades'
 import Platform from './platform'
 import TreeView from './tree_view'
 import reactComponentMethods from './react_component_methods'
@@ -14,6 +15,7 @@ class App {
     this.dirtyTracker = new DirtyTracker()
     this.actions = new Actions(this)
     this.mutators = new Mutators()
+    this.facades = new Facades(this)
 
     this.registerMutators(arrayMutators)
     this.registerMutators(objectMutators)
@@ -34,6 +36,14 @@ class App {
 
   mutate (name, data, ...args) {
     return this.mutators.call(name, data, ...args)
+  }
+
+  registerFacades (facades) {
+    this.facades.register(facades)
+  }
+
+  facade (path) {
+    return this.facades.find(path)
   }
 
   tree () {

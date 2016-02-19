@@ -26,6 +26,12 @@ describe("Platform", () => {
       expect(handler).toEqual(jasmine.any(Cursor))
       expect(handler.path).toEqual(['users'])
     })
+
+    it("uses a facade if one is found", () => {
+      let facade = {}
+      spyOn(app, 'facade').and.returnValue(facade)
+      expect(platform.handler()).toEqual(facade)
+    })
   })
 
   describe("getting data", () => {
