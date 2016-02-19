@@ -19,6 +19,15 @@ describe("shallowCompare", () => {
     expect(shallowCompare(obj2, obj1)).toEqual(false)
   })
 
+  it("sanity check with object references", () => {
+    let object = {hi: 'guys'}
+    let obj1 = {a: object}
+    let obj2 = {a: object}
+    let obj3 = {a: {hi: 'guys'}}
+    expect(shallowCompare(obj1, obj2)).toEqual(true)
+    expect(shallowCompare(obj1, obj3)).toEqual(false)
+  })
+
   it("returns false if any key is different", () => {
     let obj1 = {a: 1}
     let obj2 = {b: 1}
