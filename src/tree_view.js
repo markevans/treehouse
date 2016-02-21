@@ -6,23 +6,23 @@ class TreeView {
     this.callback = null
   }
 
-  platforms () {
-    if (!this._platforms) {
-      let platforms = {}, key
+  streams () {
+    if (!this._streams) {
+      let streams = {}, key
       for (key in this.pathMap) {
         let path = this.pathMap[key]
-        platforms[key] = this.app.at(path)
+        streams[key] = this.app.at(path)
       }
-      this._platforms = platforms
+      this._streams = streams
     }
-    return this._platforms
+    return this._streams
   }
 
   channels () {
     if (!this._channels) {
-      let channels = [], platforms = this.platforms(), key
-      for (key in platforms) {
-        platforms[key].channels().forEach((c) => {
+      let channels = [], streams = this.streams(), key
+      for (key in streams) {
+        streams[key].channels().forEach((c) => {
           if (channels.indexOf(c) == -1) { channels.push(c) }
         })
       }
@@ -47,17 +47,17 @@ class TreeView {
   }
 
   get () {
-    let data = {}, platforms = this.platforms(), key
-    for (key in platforms) {
-      data[key] = platforms[key].get()
+    let data = {}, streams = this.streams(), key
+    for (key in streams) {
+      data[key] = streams[key].get()
     }
     return data
   }
 
   set (data) {
-    let key, platforms = this.platforms()
+    let key, streams = this.streams()
     for (key in data) {
-      platforms[key].set(data[key])
+      streams[key].set(data[key])
     }
   }
 

@@ -4,7 +4,7 @@ import Mutators from './mutators'
 import arrayMutators from './mutators/array_mutators'
 import objectMutators from './mutators/object_mutators'
 import Facades from './facades'
-import Platform from './platform'
+import Cursor from './cursor'
 import TreeView from './tree_view'
 import reactComponentMethods from './react_component_methods'
 
@@ -64,7 +64,7 @@ class App {
   }
 
   at (path) {
-    return new Platform(this, path)
+    return new Cursor(this, path)
   }
 
   pick (pathMap) {

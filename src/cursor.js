@@ -46,8 +46,26 @@ class Cursor {
   }
 
   set (value) {
+    if (typeof value === 'function') {
+      value = value(this)
+    }
+    if (value === undefined) {
+      throw new Error("You tried to set a value on the tree with undefined")
+    }
     let data = setIn(this.app.tree(), this.path, value)
     this.app.setTree(data, this.channels())
+  }
+
+  mutate (name, ...args) {
+    this.set(this.app.mutate(name, this.get(), ...args))
+    return this
+  }
+
+  at (path) {
+    return new this.constructor(
+      this.app,
+      this.path.concat(path)
+    )
   }
 
   channels () {

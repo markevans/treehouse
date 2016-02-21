@@ -121,15 +121,15 @@ React.render(<App/>, document.body)
 ```
 
 ### Updating the tree from inside actions
-The 'tree' yielded inside actions is actually a platform on the trunk of the tree
-A platform is a bit like a treehouse sitting on some branch in the tree, that has knowledge of a particular path, and can get/set attributes on it.
+The 'tree' yielded inside actions is actually a cursor on the trunk of the tree
+A cursor is a bit like a treehouse sitting on some branch in the tree, that has knowledge of a particular path, and can get/set attributes on it.
 ```javascript
 tree.at(['some', 'path'])     // can also use an array
 tree.at(['eggs', 1])          // works on arrays too
 ```
-Platforms allow you to update the tree, and will do the necessary updates all the way up to the trunk of the tree (because we treat the tree as immutable, any change somewhere on the tree means its parent needs changing, as does its grandparent, and so on, all the way up to the trunk.
+Cursors allow you to update the tree, and will do the necessary updates all the way up to the trunk of the tree (because we treat the tree as immutable, any change somewhere on the tree means its parent needs changing, as does its grandparent, and so on, all the way up to the trunk.
 ```javascript
-tree.at(['some', 'path'])                     // platform
+tree.at(['some', 'path'])                     // cursor
     .set({hello: 'guys'})                     // replaces the data at the cursor path
 ```
 ### Asynchronous actions

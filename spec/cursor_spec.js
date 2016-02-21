@@ -2,12 +2,41 @@ import App from '../src/app'
 import Cursor from '../src/cursor'
 
 describe("Cursor", () => {
+  let app
 
-  describe("setting data", () => {
-    let app, cursor
+  beforeEach(() => {
+    app = new App()
+  })
+
+  describe("getting data", () => {
+    let cursor
 
     beforeEach(() => {
-      app = new App({animal: {type: 'Dog'}})
+      app.init({animal: {type: 'Dog'}})
+    })
+
+    it("gets nested data", () => {
+      let cursor = new Cursor(app, ['animal', 'type'])
+      expect(cursor.get()).toEqual('Dog')
+    })
+
+    it("works fine with arrays", () => {
+      app.setTree({users: ['Sam', 'Henry', 'Daisy']})
+      let cursor = new Cursor(app, ['users', 1])
+      expect(cursor.get()).toEqual('Henry')
+    })
+
+    it("returns undefined if the path doesn't match anything", () => {
+      let cursor = new Cursor(app, ['doobie', 'mcgovern'])
+      expect(cursor.get()).toBeUndefined()
+    })
+  })
+
+  describe("setting data", () => {
+    let cursor
+
+    beforeEach(() => {
+      app.init({animal: {type: 'Dog'}})
       cursor = new Cursor(app, ['animal', 'type'])
     })
 
@@ -36,29 +65,42 @@ describe("Cursor", () => {
       expect(app.tree()).toEqual({ok: 'guys'})
     })
 
+    it("allows setting with a function", () => {
+      cursor.set((c) => {return c.get().toUpperCase()} )
+      expect(app.tree()).toEqual({animal: {type: 'DOG'}})
+    })
+
+    it("throws an error if the function doesn't return", () => {
+      expect(() => {
+        cursor.set((oldUsers) => {} )
+      }).toThrowError("You tried to set a value on the tree with undefined")
+    })
+
   })
 
-  describe("getting data", () => {
-    let app, cursor
+  describe("setting with a mutator", () => {
+    let cursor
 
     beforeEach(() => {
-      app = new App({animal: {type: 'Dog'}})
+      app.init({things: [1,2]})
+      cursor = new Cursor(app, ['things'])
     })
 
-    it("gets nested data", () => {
-      let cursor = new Cursor(app, ['animal', 'type'])
-      expect(cursor.get()).toEqual('Dog')
+    it("calls the appropriate mutator", () => {
+      spyOn(app, 'mutate').and.returnValue([1, 2, 3, 4])
+      cursor.mutate('push', 3, 4)
+      expect(app.mutate).toHaveBeenCalledWith('push', [1, 2], 3, 4)
+      expect(app.tree()).toEqual({things: [1, 2, 3, 4]})
     })
+  })
 
-    it("works fine with arrays", () => {
-      app.setTree({users: ['Sam', 'Henry', 'Daisy']})
-      let cursor = new Cursor(app, ['users', 1])
-      expect(cursor.get()).toEqual('Henry')
-    })
-
-    it("returns undefined if the path doesn't match anything", () => {
-      let cursor = new Cursor(app, ['doobie', 'mcgovern'])
-      expect(cursor.get()).toBeUndefined()
+  describe("at", () => {
+    it("returns a new cursor with the new path", () => {
+      let cursor = new Cursor(app, ['users'])
+      expect(cursor.path).toEqual(['users'])
+      let newCursor = cursor.at(['new', 1])
+      expect(newCursor).toEqual(jasmine.any(Cursor))
+      expect(newCursor.path).toEqual(['users', 'new', 1])
     })
   })
 
