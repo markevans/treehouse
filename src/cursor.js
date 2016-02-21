@@ -61,7 +61,10 @@ class Cursor {
     return this
   }
 
-  at (path) {
+  at (...path) {
+    if (Array.isArray(path[0])) {
+      path = path[0]
+    }
     return new this.constructor(
       this.app,
       this.path.concat(path)

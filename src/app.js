@@ -73,7 +73,10 @@ class App {
     return (this._trunk = this._trunk || this.at([]))
   }
 
-  at (path) {
+  at (...path) {
+    if (Array.isArray(path[0])) {
+      path = path[0]
+    }
     return new Cursor(this, path)
   }
 

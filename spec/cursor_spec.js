@@ -95,11 +95,20 @@ describe("Cursor", () => {
   })
 
   describe("at", () => {
+    let cursor
+
+    beforeEach(() => {
+      cursor = new Cursor(app, ['users'])
+    })
+
     it("returns a new cursor with the new path", () => {
-      let cursor = new Cursor(app, ['users'])
-      expect(cursor.path).toEqual(['users'])
       let newCursor = cursor.at(['new', 1])
       expect(newCursor).toEqual(jasmine.any(Cursor))
+      expect(newCursor.path).toEqual(['users', 'new', 1])
+    })
+
+    it("allows splatting", () => {
+      let newCursor = cursor.at('new', 1)
       expect(newCursor.path).toEqual(['users', 'new', 1])
     })
   })
