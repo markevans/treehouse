@@ -1,9 +1,9 @@
 import App from '../src/app'
-import Facade from '../src/facade'
+import Query from '../src/query'
 
-describe("Facade", () => {
+describe("Query", () => {
 
-  let app, facade
+  let app, query
 
   beforeEach(() => {
     app = new App()
@@ -22,7 +22,7 @@ describe("Facade", () => {
           eggID: 'id2'
         }
       })
-      facade = new Facade(app, {
+      query = new Query(app, {
         'selectedEggID': ['selectedStuff', 'eggID'],
         'eggs': ['eggs']
       }, ({selectedEggID, eggs}) => {
@@ -31,27 +31,27 @@ describe("Facade", () => {
     })
 
     it("evaluates using parts of the tree", () => {
-      spyOn(facade, 'getter').and.callThrough()
-      expect(facade.get()).toEqual('poached')
-      expect(facade.getter).toHaveBeenCalled()
+      spyOn(query, 'getter').and.callThrough()
+      expect(query.get()).toEqual('poached')
+      expect(query.getter).toHaveBeenCalled()
     })
 
     it("caches the result if not changed", () => {
-      expect(facade.get()).toEqual('poached')
-      spyOn(facade, 'getter').and.callThrough()
-      expect(facade.get()).toEqual('poached')
-      expect(facade.getter).not.toHaveBeenCalled()
+      expect(query.get()).toEqual('poached')
+      spyOn(query, 'getter').and.callThrough()
+      expect(query.get()).toEqual('poached')
+      expect(query.getter).not.toHaveBeenCalled()
     })
 
     it("evaluates again if anything is changed", () => {
-      expect(facade.get()).toEqual('poached')
+      expect(query.get()).toEqual('poached')
       app.at(['selectedStuff', 'eggID']).set('id3')
-      expect(facade.get()).toEqual('scrambled')
+      expect(query.get()).toEqual('scrambled')
     })
 
     it("gets called even if not watching any paths", () => {
-      facade = new Facade(app, {}, () => {return 'still called'})
-      expect(facade.get()).toEqual('still called')
+      query = new Query(app, {}, () => {return 'still called'})
+      expect(query.get()).toEqual('still called')
     })
 
   })

@@ -1,6 +1,6 @@
 import shallowCompare from './shallow_compare'
 
-class Facade {
+class Query {
 
   constructor (app, pathMap, getter) {
     this.treeView = app.pick(pathMap)
@@ -18,7 +18,7 @@ class Facade {
   }
 
   set () {
-    throw new Error("Setting from a facade not implemented yet")
+    throw new Error("Setting from a query not implemented yet")
   }
 
   channels () {
@@ -26,4 +26,4 @@ class Facade {
   }
 }
 
-export default Facade
+export default Query

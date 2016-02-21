@@ -1,6 +1,6 @@
 import App from '../../src/app'
 
-describe("Using facades", () => {
+describe("Using queries", () => {
 
   let app
 
@@ -8,7 +8,7 @@ describe("Using facades", () => {
     app = new App()
   })
 
-  describe("using a treeview with mixed cursors/facades", () => {
+  describe("using a treeview with mixed cursors/queries", () => {
 
     let treeView
 
@@ -21,7 +21,7 @@ describe("Using facades", () => {
         },
         selectedIDs: ['a', 'c']
       })
-      app.registerFacades([
+      app.registerQueries([
         {
           path: ['users', 'selected'],
           deps: {
