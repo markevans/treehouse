@@ -41,7 +41,7 @@ describe("Component", () => {
   let app
 
   beforeEach(() => {
-    let App = require('../src/app')
+    let App = require('../../src/app')
     app = new App()
     app.extendReact(React.Component.prototype)
   })
