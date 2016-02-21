@@ -1,9 +1,5 @@
 import Query from './query'
 
-let pathToKey = (path) => {
-  return path.join('/')
-}
-
 class Queries {
 
   constructor (app) {
@@ -12,13 +8,15 @@ class Queries {
   }
 
   register(queries) {
-    queries.forEach((spec) => {
-      this.queries[pathToKey(spec.path)] = new Query(this.app, spec.deps, spec.get)
-    })
+    let key, spec
+    for (key in queries) {
+      spec = queries[key]
+      this.queries[key] = new Query(this.app, spec.deps, spec.get)
+    }
   }
 
-  find (path) {
-    return this.queries[pathToKey(path)]
+  find (name) {
+    return this.queries[name]
   }
 
 }

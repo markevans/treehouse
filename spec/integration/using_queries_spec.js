@@ -21,12 +21,13 @@ describe("Using queries", () => {
         },
         selectedIDs: ['a', 'c']
       })
-      app.registerQueries([
-        {
-          path: ['users', 'selected'],
-          deps: {
-            users: ['users'],
-            selected: ['selectedIDs']
+      app.registerQueries({
+        selectedUsers: {
+          deps: (t) => {
+            return {
+              users: t.at(['users']),
+              selected: t.at(['selectedIDs'])
+            }
           },
           get: ({users, selected}) => {
             let key, selectedUsers = []
@@ -36,13 +37,15 @@ describe("Using queries", () => {
             return selectedUsers
           }
         }
-      ])
+      })
     })
 
     it("correctly gets data", () => {
-      treeView = app.pick({
-        IDs: ['selectedIDs'],
-        users: ['users', 'selected']
+      treeView = app.pick((t) => {
+        return {
+          IDs: t.at(['selectedIDs']),
+          users: t.query('selectedUsers')
+        }
       })
       expect(treeView.get()).toEqual({
         IDs: ['a', 'c'],
@@ -51,8 +54,10 @@ describe("Using queries", () => {
     })
 
     it("correctly updates", () => {
-      treeView = app.pick({
-        users: ['users', 'selected']
+      treeView = app.pick((t) => {
+        return {
+          users: t.query('selectedUsers')
+        }
       })
       let spy = jasmine.createSpy('watcher')
       treeView.watch(spy)

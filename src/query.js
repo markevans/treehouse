@@ -2,8 +2,8 @@ import shallowCompare from './shallow_compare'
 
 class Query {
 
-  constructor (app, pathMap, getter) {
-    this.treeView = app.pick(pathMap)
+  constructor (app, getDependencies, getter) {
+    this.treeView = app.pick(getDependencies)
     this.getter = getter
     this.state = null
   }

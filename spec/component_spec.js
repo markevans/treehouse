@@ -71,9 +71,9 @@ describe("Component", () => {
     beforeEach(() => {
       widgetRenderCount = 0
       Widget = class Widget extends React.Component {
-        stateFromTree () {
+        stateFromTree (t) {
           return {
-            theFruit: ['fruit']
+            theFruit: t.at(['fruit'])
           }
         }
 
@@ -138,9 +138,9 @@ describe("Component", () => {
 
       beforeEach(() => {
         Container = class Container extends React.Component {
-          stateFromTree () {
+          stateFromTree (t) {
             return {
-              fruit: ['fruit']
+              fruit: t.at(['fruit'])
             }
           }
 

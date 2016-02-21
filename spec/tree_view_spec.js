@@ -19,9 +19,11 @@ describe("TreeView", () => {
         b: {c: ['d', 'e']},
         x: 1
       })
-      treeView = new TreeView(app, {
-        first: ['a'],
-        second: ['b', 'c', 1]
+      treeView = new TreeView(app, (t) => {
+        return {
+          first: t.at(['a']),
+          second: t.at(['b', 'c', 1])
+        }
       })
     })
 
@@ -35,9 +37,11 @@ describe("TreeView", () => {
     let treeView
 
     beforeEach(() => {
-      treeView = new TreeView(app, {
-        first: ['a'],
-        second: ['b', 'c']
+      treeView = new TreeView(app, (t) => {
+        return {
+          first: t.at(['a']),
+          second: t.at(['b', 'c'])
+        }
       })
     })
 
@@ -58,9 +62,11 @@ describe("TreeView", () => {
 
     beforeEach(() => {
       callback = jasmine.createSpy('watchCallback')
-      treeView = new TreeView(app, {
-        first: ['a'],
-        second: ['b', 'c']
+      treeView = new TreeView(app, (t) => {
+        return {
+          first: t.at(['a']),
+          second: t.at(['b', 'c'])
+        }
       })
     })
 
@@ -91,17 +97,21 @@ describe("TreeView", () => {
     let treeView
 
     it("returns all channels it cares about", () => {
-      treeView = new TreeView(app, {
-        first: ['a'],
-        second: ['b', 'c']
+      treeView = new TreeView(app, (t) => {
+        return {
+          first: t.at(['a']),
+          second: t.at(['b', 'c'])
+        }
       })
       expect(treeView.channels()).toEqual(['a', 'b'])
     })
 
     it("doesn't repeat a channel", () => {
-      treeView = new TreeView(app, {
-        first: ['a'],
-        second: ['a', 'b']
+      treeView = new TreeView(app, (t) => {
+        return {
+          first: t.at(['a']),
+          second: t.at(['a', 'b'])
+        }
       })
       expect(treeView.channels()).toEqual(['a'])
     })

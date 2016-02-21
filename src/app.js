@@ -67,8 +67,8 @@ class App {
     return new Cursor(this, path)
   }
 
-  pick (pathMap) {
-    return new TreeView(this, pathMap)
+  pick (callback) {
+    return new TreeView(this, callback)
   }
 
   commit () {

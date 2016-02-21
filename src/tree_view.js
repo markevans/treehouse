@@ -1,19 +1,14 @@
 class TreeView {
-  constructor (app, pathMap) {
+  constructor (app, getStreams) {
     this.app = app
     this.dirtyTracker = app.dirtyTracker
-    this.pathMap = pathMap
+    this.getStreams = getStreams
     this.callback = null
   }
 
   streams () {
     if (!this._streams) {
-      let streams = {}, key
-      for (key in this.pathMap) {
-        let path = this.pathMap[key]
-        streams[key] = this.app.at(path)
-      }
-      this._streams = streams
+      this._streams = this.getStreams(this.app)
     }
     return this._streams
   }

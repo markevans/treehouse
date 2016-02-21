@@ -22,9 +22,11 @@ describe("Query", () => {
           eggID: 'id2'
         }
       })
-      query = new Query(app, {
-        'selectedEggID': ['selectedStuff', 'eggID'],
-        'eggs': ['eggs']
+      query = new Query(app, (t) => {
+        return {
+          'selectedEggID': t.at(['selectedStuff', 'eggID']),
+          'eggs': t.at(['eggs'])
+        }
       }, ({selectedEggID, eggs}) => {
         return eggs[selectedEggID]
       })
@@ -50,7 +52,7 @@ describe("Query", () => {
     })
 
     it("gets called even if not watching any paths", () => {
-      query = new Query(app, {}, () => {return 'still called'})
+      query = new Query(app, () => { return {} }, () => {return 'still called'})
       expect(query.get()).toEqual('still called')
     })
 
