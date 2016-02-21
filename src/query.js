@@ -3,6 +3,7 @@ import shallowCompare from './shallow_compare'
 class Query {
 
   constructor (app, getDependencies, args, getter) {
+    this.app = app
     this.treeView = app.pick(getDependencies || {})
     this.args = args
     this.getter = getter
@@ -24,6 +25,10 @@ class Query {
 
   channels () {
     return this.treeView.channels()
+  }
+
+  filter (name) {
+    return this.app.buildFilteredStream(this, name)
   }
 }
 

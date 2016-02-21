@@ -4,6 +4,7 @@ import Mutators from './mutators'
 import arrayMutators from './mutators/array_mutators'
 import objectMutators from './mutators/object_mutators'
 import Queries from './queries'
+import Filters from './filters'
 import Cursor from './cursor'
 import TreeView from './tree_view'
 import reactComponentMethods from './react_component_methods'
@@ -16,6 +17,7 @@ class App {
     this.actions = new Actions(this)
     this.mutators = new Mutators()
     this.queries = new Queries(this)
+    this.filters = new Filters(this)
 
     this.registerMutators(arrayMutators)
     this.registerMutators(objectMutators)
@@ -44,6 +46,14 @@ class App {
 
   query (name, args) {
     return this.queries.build(name, args)
+  }
+
+  registerFilters (filters) {
+    this.filters.register(filters)
+  }
+
+  buildFilteredStream (source, name) {
+    return this.filters.buildStream(source, name)
   }
 
   tree () {

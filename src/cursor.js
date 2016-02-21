@@ -71,6 +71,10 @@ class Cursor {
   channels () {
     return (this._channels = this._channels || [this.path[0]])
   }
+
+  filter (name) {
+    return this.app.buildFilteredStream(this, name)
+  }
 }
 
 export default Cursor

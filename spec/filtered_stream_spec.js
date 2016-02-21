@@ -1,9 +1,11 @@
+import App from '../src/app'
 import FilteredStream from '../src/filtered_stream'
 
 describe("FilteredStream", () => {
-  let filteredStream, source
+  let filteredStream, source, app
 
   beforeEach(() => {
+    app = new App()
     source = {
       get: () => {
         return 'egg'
@@ -12,7 +14,7 @@ describe("FilteredStream", () => {
         return ['grog']
       }
     }
-    filteredStream = new FilteredStream(source, (word) => { return word.toUpperCase() })
+    filteredStream = new FilteredStream(app, source, (word) => { return word.toUpperCase() })
   })
 
   it("returns the filtered data", () => {

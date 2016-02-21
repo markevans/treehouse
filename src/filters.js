@@ -2,7 +2,8 @@ import FilteredStream from './filtered_stream'
 
 class Filters {
 
-  constructor () {
+  constructor (app) {
+    this.app = app
     this.filters = {}
   }
 
@@ -13,7 +14,7 @@ class Filters {
   buildStream (source, name) {
     let filter = this.filters[name]
     if (filter) {
-      return new FilteredStream(source, filter)
+      return new FilteredStream(this.app, source, filter)
     } else {
       throw new Error(`Can't find filter '${name}' as it's not defined`)
     }

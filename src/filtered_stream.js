@@ -1,11 +1,12 @@
 class FilteredStream {
-  constructor (source, filter) {
-    this.filter = filter
+  constructor (app, source, filterFunction) {
+    this.app = app
+    this.filterFunction = filterFunction
     this.source = source
   }
 
   get () {
-    return this.filter(this.source.get())
+    return this.filterFunction(this.source.get())
   }
 
   set (value) {
@@ -14,6 +15,10 @@ class FilteredStream {
 
   channels () {
     return this.source.channels()
+  }
+
+  filter (name) {
+    return this.app.buildFilteredStream(this, name)
   }
 }
 

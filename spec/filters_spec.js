@@ -1,12 +1,14 @@
+import App from '../src/app'
 import Filters from '../src/filters'
 import FilteredStream from '../src/filtered_stream'
 
 describe("Filters", () => {
 
-  let filters, source
+  let filters, source, app
 
   beforeEach(() => {
-    filters = new Filters()
+    app = new App()
+    filters = new Filters(app)
     source = {
       get: () => {
         return [4,5,2]
