@@ -8,7 +8,7 @@ export default {
 
   componentWillMount () {
     if (this.treehouseState) {
-      this.treeView = this.treehouse.pick(this.treehouseState)
+      this.treeView = this.treehouse.pick(this.treehouseState.bind(this))
       this.treeView.watch(this.syncWithTree.bind(this))
       this.syncWithTree()
     }

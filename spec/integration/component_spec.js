@@ -96,6 +96,29 @@ describe("Component", () => {
       expect($('.widget').html()).toEqual('orange')
     })
 
+    describe("using props", () => {
+
+      beforeEach(() => {
+        Widget = class Widget extends React.Component {
+          treehouseState (t) {
+            return {
+              user: t.at(['users', this.props.userID])
+            }
+          }
+
+          render () {
+            return <div className="user">{this.state.user.name}</div>
+          }
+        }
+      })
+
+      it("gives access to props", () => {
+        app.trunk().set({users: [{name: 'Rhubarb'}, {name: 'Doogie'}]})
+        render(<Widget userID="1"/>)
+        expect($('.user').html()).toEqual('Doogie')
+      })
+    })
+
     describe("updating", () => {
 
       beforeEach(() => {
