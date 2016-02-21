@@ -3,20 +3,21 @@ import Query from './query'
 class Queries {
 
   constructor (app) {
-    this.queries = {}
+    this.querySpecs = {}
     this.app = app
   }
 
-  register(queries) {
-    let key, spec
-    for (key in queries) {
-      spec = queries[key]
-      this.queries[key] = new Query(this.app, spec.deps, spec.get)
-    }
+  register(specs) {
+    Object.assign(this.querySpecs, specs)
   }
 
-  find (name) {
-    return this.queries[name]
+  build (name, args) {
+    let spec = this.querySpecs[name]
+    if (spec) {
+      return new Query(this.app, spec.deps, args, spec.get)
+    } else {
+      throw new Error(`Can't build query '${name}' as it's not defined`)
+    }
   }
 
 }

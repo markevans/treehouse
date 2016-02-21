@@ -2,8 +2,9 @@ import shallowCompare from './shallow_compare'
 
 class Query {
 
-  constructor (app, getDependencies, getter) {
-    this.treeView = app.pick(getDependencies)
+  constructor (app, getDependencies, args, getter) {
+    this.treeView = app.pick(getDependencies || {})
+    this.args = args
     this.getter = getter
     this.state = null
   }
@@ -11,7 +12,7 @@ class Query {
   get () {
     let currentState = this.treeView.get()
     if (!this.state || !shallowCompare(this.state, currentState)) {
-      this.result = this.getter(currentState)
+      this.result = this.getter(currentState, this.args)
       this.state = currentState
     }
     return this.result

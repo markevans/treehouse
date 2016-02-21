@@ -42,8 +42,8 @@ class App {
     this.queries.register(queries)
   }
 
-  query (path) {
-    return this.queries.find(path)
+  query (name, args) {
+    return this.queries.build(name, args)
   }
 
   tree () {

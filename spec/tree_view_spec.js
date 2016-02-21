@@ -30,6 +30,13 @@ describe("TreeView", () => {
     it("gets multiple attributes", () => {
       expect(treeView.get()).toEqual({first: 'b', second: 'e'})
     })
+
+    it("allows initializing with an object", () => {
+      treeView = new TreeView(app, {
+        first: app.at(['a']),
+      })
+      expect(treeView.get()).toEqual({first: 'b'})
+    })
   })
 
   describe("setting data", () => {

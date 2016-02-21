@@ -65,6 +65,25 @@ describe("Using queries", () => {
       app.commit()
       expect(spy).toHaveBeenCalled()
     })
+
+    it("uses the args", () => {
+      app.registerQueries({
+        returnArgs: {
+          get: ({}, args) => {
+            return args
+          }
+        }
+      })
+      treeView = app.pick((t) => {
+        return {
+          theArgs: t.query('returnArgs', {a: 1})
+        }
+      })
+      expect(treeView.get()).toEqual({
+        theArgs: {a: 1}
+      })
+    })
+
   })
 
 })

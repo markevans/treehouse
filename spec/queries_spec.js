@@ -11,8 +11,8 @@ describe("Queries", () => {
     queries = new Queries(app)
   })
 
-  describe("registering and finding", () => {
-    it("finds a registered query", () => {
+  describe("registering and building", () => {
+    it("builds a registered query", () => {
       queries.register({
         oldestUsers: {
           deps: (t) => {
@@ -20,16 +20,18 @@ describe("Queries", () => {
               users: t.at(['users'])
             }
           },
-          get: () => { return 'some result' }
+          get: ({}, {append}) => { return 'some result '+append }
         }
       })
-      let query = queries.find('oldestUsers')
+      let query = queries.build('oldestUsers', {append: 'word'})
       expect(query).toEqual(jasmine.any(Query))
-      expect(query.get()).toEqual('some result')
+      expect(query.get()).toEqual('some result word')
     })
 
     it("returns nothing if not found", () => {
-      expect(queries.find("iDoNotExist")).toBeUndefined()
+      expect(() => {
+        queries.build("iDoNotExist")
+      }).toThrowError("Can't build query 'iDoNotExist' as it's not defined")
     })
   })
 
