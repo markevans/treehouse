@@ -7,8 +7,8 @@ export default {
   },
 
   componentWillMount () {
-    if (this.stateFromTree) {
-      this.treeView = this.treehouse.pick(this.stateFromTree)
+    if (this.treehouseState) {
+      this.treeView = this.treehouse.pick(this.treehouseState)
       this.treeView.watch(this.syncWithTree.bind(this))
       this.syncWithTree()
     }

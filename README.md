@@ -52,7 +52,7 @@ import Egg from './egg'
 export default class App extends React.Component {
 
   // Declare which parts of the tree you care about
-  stateFromTree () {
+  treehouseState () {
     return {
       selectedEggID: ['selectedEggID'], // (key on this.state): (path to point on tree)
       eggs: ['eggs']
@@ -79,7 +79,7 @@ import React from 'react'
 
 export default class Egg extends React.Component {
 
-  stateFromTree () {
+  treehouseState () {
     return {
       egg: ['eggs', this.props.eggID]
     }
