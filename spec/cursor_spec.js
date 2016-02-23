@@ -88,7 +88,7 @@ describe("Cursor", () => {
 
     it("calls the appropriate mutator", () => {
       spyOn(app, 'mutate').and.returnValue([1, 2, 3, 4])
-      cursor.mutate('push', 3, 4)
+      cursor.setWith('push', 3, 4)
       expect(app.mutate).toHaveBeenCalledWith('push', [1, 2], 3, 4)
       expect(app.tree()).toEqual({things: [1, 2, 3, 4]})
     })

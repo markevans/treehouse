@@ -58,8 +58,8 @@ class Cursor {
     this.app.setTree(data, this.channels())
   }
 
-  mutate (name, ...args) {
-    this.set(this.app.mutate(name, this.get(), ...args))
+  setWith (mutatorName, ...args) {
+    this.set(this.app.mutate(mutatorName, this.get(), ...args))
     return this
   }
 
