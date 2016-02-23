@@ -1,16 +1,16 @@
 class FilteredStream {
-  constructor (app, source, filterFunction) {
+  constructor (app, source, filterObject) {
     this.app = app
-    this.filterFunction = filterFunction
+    this.filterObject = filterObject
     this.source = source
   }
 
   get () {
-    return this.filterFunction(this.source.get())
+    return this.filterObject.forward(this.source.get())
   }
 
   set (value) {
-    throw new Error("set not implemented yet for filters")
+    this.source.set(this.filterObject.reverse(value))
   }
 
   channels () {

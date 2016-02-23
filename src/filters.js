@@ -1,3 +1,4 @@
+import Filter from './filter'
 import FilteredStream from './filtered_stream'
 
 class Filters {
@@ -7,8 +8,11 @@ class Filters {
     this.filters = {}
   }
 
-  register (filters) {
-    Object.assign(this.filters, filters)
+  register (filterSpecs) {
+    let name
+    for (name in filterSpecs) {
+      this.filters[name] = new Filter(name, filterSpecs[name])
+    }
   }
 
   buildStream (name, source) {
@@ -16,7 +20,11 @@ class Filters {
   }
 
   filter (name, data) {
-    return this.find(name)(data)
+    return this.find(name).forward(data)
+  }
+
+  unfilter (name, data) {
+    return this.find(name).reverse(data)
   }
 
   find (name) {
