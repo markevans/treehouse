@@ -35,6 +35,13 @@ describe("Using queries", () => {
               if (selected.indexOf(key) > -1) { selectedUsers.push(users[key].name) }
             }
             return selectedUsers
+          },
+          set: (names, {users, selected}) => {
+            let ids = [], usrs = users.get(), key
+            for (key in usrs) {
+              if (names.indexOf(usrs[key].name) > -1) { ids.push(key) }
+            }
+            selected.set(ids)
           }
         }
       })
@@ -64,6 +71,19 @@ describe("Using queries", () => {
       app.at(['selectedIDs']).set(['b'])
       app.commit()
       expect(spy).toHaveBeenCalled()
+    })
+
+    it("correctly sets", () => {
+      let selectedUsers = app.query('selectedUsers')
+      selectedUsers.set(['Agbo', 'Blumy'])
+      expect(app.tree()).toEqual({
+        users: {
+          a: {name: 'Agbo'},
+          b: {name: 'Blumy'},
+          c: {name: 'Celia'}
+        },
+        selectedIDs: ['a', 'b']
+      })
     })
 
     it("uses the args", () => {
