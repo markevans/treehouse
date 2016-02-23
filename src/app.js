@@ -52,8 +52,8 @@ class App {
     this.filters.register(filters)
   }
 
-  buildFilteredStream (source, name) {
-    return this.filters.buildStream(source, name)
+  buildFilteredStream (name, source) {
+    return this.filters.buildStream(name, source)
   }
 
   tree () {

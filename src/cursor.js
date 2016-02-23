@@ -76,7 +76,7 @@ class Cursor {
   }
 
   filter (name) {
-    return this.app.buildFilteredStream(this, name)
+    return this.app.buildFilteredStream(name, this)
   }
 }
 

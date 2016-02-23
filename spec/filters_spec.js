@@ -6,31 +6,52 @@ describe("Filters", () => {
 
   let filters, source, app
 
-  beforeEach(() => {
-    app = new App()
-    filters = new Filters(app)
-    source = {
-      get: () => {
-        return [4,5,2]
-      }
-    }
-  })
-
-  it("builds a registered filter", () => {
-    filters.register({
-      order: (array) => {
-        return array.sort()
+  describe("filtering", () => {
+    beforeEach(() => {
+      app = new App()
+      filters = new Filters(app)
+      source = {
+        get: () => {
+          return [4,5,2]
+        }
       }
     })
-    let filteredStream = filters.buildStream(source, 'order')
-    expect(filteredStream).toEqual(jasmine.any(FilteredStream))
-    expect(filteredStream.get()).toEqual([2,4,5])
-  })
 
-  it("returns nothing if not found", () => {
-    expect(() => {
-      filters.buildStream(source, "iDoNotExist")
-    }).toThrowError("Can't find filter 'iDoNotExist' as it's not defined")
+    describe("with nothing registered", () => {
+      it("buildStream throws", () => {
+        expect(() => {
+          filters.buildStream("iDoNotExist", source)
+        }).toThrowError("Can't find filter 'iDoNotExist' as it's not defined")
+      })
+
+      it("filter throws", () => {
+        expect(() => {
+          filters.filter('iDoNotExist', source)
+        }).toThrowError("Can't find filter 'iDoNotExist' as it's not defined")
+      })
+    })
+
+
+    describe("with a normally registered filter", () => {
+      beforeEach(() => {
+        filters.register({
+          order: (array) => {
+            return array.sort()
+          }
+        })
+      })
+
+      it("builds a registered filter", () => {
+        let filteredStream = filters.buildStream('order', source)
+        expect(filteredStream).toEqual(jasmine.any(FilteredStream))
+        expect(filteredStream.get()).toEqual([2,4,5])
+      })
+
+      it("filters data", () => {
+        expect(filters.filter('order', [7,2])).toEqual([2,7])
+      })
+    })
+
   })
 
 })
