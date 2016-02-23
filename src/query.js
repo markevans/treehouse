@@ -1,4 +1,5 @@
 import shallowCompare from './shallow_compare'
+import filterable from './mixins/filterable'
 
 class Query {
 
@@ -32,10 +33,8 @@ class Query {
   channels () {
     return this.treeView.channels()
   }
-
-  filter (name) {
-    return this.app.buildFilteredStream(name, this)
-  }
 }
+
+filterable(Query)
 
 export default Query

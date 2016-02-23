@@ -1,3 +1,5 @@
+import filterable from './mixins/filterable'
+
 let getIn = (data, path) => {
   let i, value = data
   for(i=0; i<path.length; i++) {
@@ -74,10 +76,8 @@ class Cursor {
   channels () {
     return (this._channels = this._channels || [this.path[0]])
   }
-
-  filter (name) {
-    return this.app.buildFilteredStream(name, this)
-  }
 }
+
+filterable(Cursor)
 
 export default Cursor

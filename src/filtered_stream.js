@@ -1,3 +1,5 @@
+import filterable from './mixins/filterable'
+
 class FilteredStream {
   constructor (app, source, filterObject) {
     this.app = app
@@ -16,10 +18,8 @@ class FilteredStream {
   channels () {
     return this.source.channels()
   }
-
-  filter (name) {
-    return this.app.buildFilteredStream(name, this)
-  }
 }
+
+filterable(FilteredStream)
 
 export default FilteredStream
