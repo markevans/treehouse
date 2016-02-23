@@ -1,3 +1,5 @@
+TODO: UPDATE THIS README!
+
 #Treehouse JS
 
 [![Code Climate](https://codeclimate.com/github/markevans/treehouse/badges/gpa.svg)](https://codeclimate.com/github/markevans/treehouse)
