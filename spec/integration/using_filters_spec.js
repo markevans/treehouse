@@ -10,11 +10,28 @@ describe("Using filters", () => {
       words: ['glug']
     })
     app.registerFilters({
-      upcase: (text) => {
-        return text.toUpperCase()
+      upcase: {
+        forward: (text) => {
+          return text.toUpperCase()
+        },
+        reverse: (text) => {
+          return text.toLowerCase()
+        }
       },
+
       dubble: (text) => {
         return text+text
+      },
+
+      extractAttr: {
+        forward: (obj, {attr}) => {
+          return obj[attr]
+        },
+        reverse: (value, {attr}) => {
+          let obj = {}
+          obj[attr] = value
+          return obj
+        }
       }
     })
   })
@@ -26,6 +43,24 @@ describe("Using filters", () => {
       }
     })
     expect(treeView.get()).toEqual({word: 'GLUG'})
+  })
+
+  it("works the other way", () => {
+    let stream = app.at(['words', 0]).filter('upcase')
+    expect(stream.get()).toEqual('GLUG')
+    stream.set('BONES')
+    expect(stream.get()).toEqual('BONES')
+    expect(app.at('words').get()).toEqual(['bones'])
+  })
+
+  it("allows using args", () => {
+    let cursor = app.at('person')
+    cursor.set({name: 'Mark'})
+    let stream = cursor.filter('extractAttr', {attr: 'name'})
+    expect(stream.get()).toEqual('Mark')
+    stream.set('Joker')
+    expect(stream.get()).toEqual('Joker')
+    expect(cursor.get()).toEqual({name: 'Joker'})
   })
 
   it("filters query data", () => {

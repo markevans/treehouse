@@ -1,18 +1,19 @@
 import filterable from './mixins/filterable'
 
 class FilteredStream {
-  constructor (app, source, filterObject) {
+  constructor (app, source, filterObject, args) {
     this.app = app
-    this.filterObject = filterObject
     this.source = source
+    this.filterObject = filterObject
+    this.args = args
   }
 
   get () {
-    return this.filterObject.forward(this.source.get())
+    return this.filterObject.forward(this.source.get(), this.args)
   }
 
   set (value) {
-    this.source.set(this.filterObject.reverse(value))
+    this.source.set(this.filterObject.reverse(value, this.args))
   }
 
   channels () {

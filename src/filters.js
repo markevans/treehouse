@@ -15,8 +15,8 @@ class Filters {
     }
   }
 
-  buildStream (name, source) {
-    return new FilteredStream(this.app, source, this.find(name))
+  buildStream (name, source, args) {
+    return new FilteredStream(this.app, source, this.find(name), args)
   }
 
   filter (name, data) {

@@ -17,19 +17,19 @@ describe("FilteredStream", () => {
       }
     }
     filter = new Filter('upcase', {
-      forward: (word) => { return word.toUpperCase() },
-      reverse: (word) => { return word.toLowerCase() }
+      forward: (word, {someArg}) => { return word.toUpperCase()+someArg },
+      reverse: (word, {someArg}) => { return word.replace(someArg,'').toLowerCase() }
     })
     spyOn(source, 'set')
-    filteredStream = new FilteredStream(app, source, filter)
+    filteredStream = new FilteredStream(app, source, filter, {someArg: ',SOMEARG'})
   })
 
   it("returns the filtered data", () => {
-    expect(filteredStream.get()).toEqual('EGG')
+    expect(filteredStream.get()).toEqual('EGG,SOMEARG')
   })
 
   it("filters set data", () => {
-    filteredStream.set('BUGS')
+    filteredStream.set('BUGS,SOMEARG')
     expect(source.set).toHaveBeenCalledWith('bugs')
   })
 
