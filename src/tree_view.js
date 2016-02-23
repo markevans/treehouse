@@ -19,6 +19,10 @@ class TreeView {
     return this._channels
   }
 
+  items () {
+    return this.streams
+  }
+
   watch (callback) {
     this.callback = () => { callback(this) }
     this.dirtyTracker.track(this.callback, this.channels())

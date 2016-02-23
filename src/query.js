@@ -2,11 +2,13 @@ import shallowCompare from './shallow_compare'
 
 class Query {
 
-  constructor (app, getDependencies, args, getter) {
+  constructor (app, name, getDependencies, args, getter, setter) {
+    this.name = name
     this.app = app
     this.treeView = app.pick(getDependencies || {})
     this.args = args
     this.getter = getter
+    this.setter = setter
     this.state = null
   }
 
@@ -19,8 +21,12 @@ class Query {
     return this.result
   }
 
-  set () {
-    throw new Error("Setting from a query not implemented yet")
+  set (value) {
+    if (this.setter) {
+      this.setter(value, this.treeView.items(), this.args)
+    } else {
+      throw new Error(`Query '${this.name}' doesn't implement set`)
+    }
   }
 
   channels () {

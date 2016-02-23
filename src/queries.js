@@ -14,7 +14,7 @@ class Queries {
   build (name, args) {
     let spec = this.querySpecs[name]
     if (spec) {
-      return new Query(this.app, spec.deps, args, spec.get)
+      return new Query(this.app, name, spec.deps, args, spec.get)
     } else {
       throw new Error(`Can't build query '${name}' as it's not defined`)
     }
