@@ -32,6 +32,10 @@ class App {
     this.actions.register(actions)
   }
 
+  action (name, payload) {
+    this.actions.do(name, payload)
+  }
+
   registerMutators (mutators) {
     this.mutators.register(mutators)
   }
