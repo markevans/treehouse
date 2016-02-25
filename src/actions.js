@@ -15,7 +15,7 @@ class Actions {
       this.actions[name](this.app.trunk(), payload, commit)
       commit()
     } else {
-      console.log(`Action '${name}' not found`)
+      this.app.log(`Action '${name}' not found`)
     }
   }
 

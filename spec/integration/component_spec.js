@@ -146,6 +146,7 @@ describe("Component", () => {
       })
 
       it("doesn't call render if the state from tree is the same", () => {
+        spyOn(app, 'log') // Suppress log warning
         app.at(['fruit']).set('orange')
         app.commit()
         expect($('.widget').html()).toEqual('orange')

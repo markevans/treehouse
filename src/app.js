@@ -109,6 +109,14 @@ class App {
     Object.assign(object, reactComponentMethods)
   }
 
+  // Log
+
+  log (message) {
+    if (global.console && global.console.log) {
+      global.console.log(message)
+    }
+  }
+
 }
 
 export default App
