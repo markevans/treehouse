@@ -47,10 +47,10 @@ class Cursor {
       value = value(currentValue, this.mutators)
     }
     if (value === undefined) {
-      throw new Error(`You tried to set the tree at path ${this.pathString()} with undefined`)
+      throw new Error(`You tried to set the tree at path '${this.pathString()}' with undefined`)
     }
     if (value === currentValue) {
-      this.app.log(`You tried to set the tree at path ${this.pathString()} with the same object. Remember the tree should be immutable`)
+      this.app.log(`You tried to set the tree at path '${this.pathString()}' with the same object. Remember the tree should be immutable`)
     }
     let data = setIn(this.app.tree(), this.path, value)
     this.app.setTree(data, this.channels())
