@@ -1,4 +1,4 @@
-import shallowCompare from './shallow_compare'
+import shallowCompare from './utils/shallow_compare'
 
 export default {
 

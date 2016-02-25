@@ -12,9 +12,9 @@ describe("Mutators", () => {
     it("uses a registered mutator", () => {
       mutators.register({
         push (array, ...args) {
-          return this.clone(array, (a) => {
-            a.push(...args)
-          })
+          let newArray = array.slice()
+          newArray.push(...args)
+          return newArray
         }
       })
       let array = []

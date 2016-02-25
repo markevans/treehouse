@@ -1,7 +1,9 @@
+import objectMutators from './object_mutators'
+
 export default {
 
   push (array, ...args) {
-    return this.clone(array, (a) => {
+    return objectMutators.clone(array, (a) => {
       a.push(...args)
     })
   },

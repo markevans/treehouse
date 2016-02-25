@@ -1,3 +1,4 @@
+import clone from './utils/clone'
 import filterable from './mixins/filterable'
 
 let getIn = (data, path) => {
@@ -27,14 +28,6 @@ let setIn = (data, path, twigValue, level=0) => {
   }
   newData[branch] = value
   return newData
-}
-
-let clone = (object) => {
-  if (Array.isArray(object)) {
-    return object.slice()
-  } else {
-    return Object.assign({}, object)
-  }
 }
 
 class Cursor {

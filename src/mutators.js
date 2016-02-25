@@ -1,29 +1,8 @@
-let clone = (object) => {
-  if (Array.isArray(object)) {
-    return object.slice()
-  } else {
-    return Object.assign({}, object)
-  }
-}
-
-let defaultMutators = {
-  clone: (object, modifier) => {
-    if (modifier) {
-      let newObject = clone(object)
-      modifier(newObject)
-      return newObject
-    } else {
-      return clone(object)
-    }
-  }
-}
-
 class Mutators {
 
   constructor (app) {
     this.mutators = {}
     this.app = app
-    this.register(defaultMutators)
   }
 
   register (mutators) {

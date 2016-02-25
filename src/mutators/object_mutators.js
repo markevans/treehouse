@@ -1,4 +1,16 @@
+import clone from '../utils/clone'
+
 export default {
+
+  clone: (object, modifier) => {
+    if (modifier) {
+      let newObject = clone(object)
+      modifier(newObject)
+      return newObject
+    } else {
+      return clone(object)
+    }
+  },
 
   merge (object, ...args) {
     return Object.assign({}, object, ...args)
