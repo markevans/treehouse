@@ -34,6 +34,7 @@ class Cursor {
   constructor (app, path=[]) {
     this.app = app
     this.path = path
+    this.mutators = this.app.mutators()
   }
 
   get () {
@@ -42,17 +43,18 @@ class Cursor {
 
   set (value) {
     if (typeof value === 'function') {
-      value = value(this.get())
+      value = value(this.get(), this.mutators)
     }
     if (value === undefined) {
       throw new Error("You tried to set a value on the tree with undefined")
     }
     let data = setIn(this.app.tree(), this.path, value)
     this.app.setTree(data, this.channels())
+    return this
   }
 
   setWith (mutatorName, ...args) {
-    this.set(this.app.mutate(mutatorName, this.get(), ...args))
+    this.set(this.mutators[mutatorName](this.get(), ...args))
     return this
   }
 

@@ -79,17 +79,26 @@ describe("Cursor", () => {
   })
 
   describe("setting with a mutator", () => {
-    let cursor
+    let cursor, mutators
 
     beforeEach(() => {
       app.init({things: [1,2]})
       cursor = new Cursor(app, ['things'])
+      mutators = cursor.mutators
+      spyOn(mutators, 'push').and.returnValue([1,2,3,4])
     })
 
-    it("calls the appropriate mutator", () => {
-      spyOn(app, 'mutate').and.returnValue([1, 2, 3, 4])
+    it("allows calling mutators from set", () => {
+      cursor.set((currentArray, mutators) => {
+        return mutators.push(currentArray, 3, 4)
+      })
+      expect(mutators.push).toHaveBeenCalledWith([1,2], 3, 4)
+      expect(app.tree()).toEqual({things: [1, 2, 3, 4]})
+    })
+
+    it("calls the appropriate mutator with setWith", () => {
       cursor.setWith('push', 3, 4)
-      expect(app.mutate).toHaveBeenCalledWith('push', [1, 2], 3, 4)
+      expect(mutators.push).toHaveBeenCalledWith([1,2], 3, 4)
       expect(app.tree()).toEqual({things: [1, 2, 3, 4]})
     })
   })

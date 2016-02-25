@@ -1,12 +1,11 @@
-import DirtyTracker from './dirty_tracker'
-import Actions from './actions'
-import Mutators from './mutators'
+import Cursor from './cursor'
 import arrayMutators from './mutators/array_mutators'
 import objectMutators from './mutators/object_mutators'
 import Queries from './queries'
 import Filters from './filters'
-import Cursor from './cursor'
 import TreeView from './tree_view'
+import Actions from './actions'
+import DirtyTracker from './dirty_tracker'
 import reactComponentMethods from './react_component_methods'
 
 class App {
@@ -15,7 +14,7 @@ class App {
     this._tree = data
     this.dirtyTracker = new DirtyTracker()
     this.actions = new Actions(this)
-    this.mutators = new Mutators()
+    this._mutators = {}
     this.queries = new Queries(this)
     this.filters = new Filters(this)
 
@@ -23,42 +22,7 @@ class App {
     this.registerMutators(objectMutators)
   }
 
-  extendReact (object) {
-    object.treehouse = this
-    Object.assign(object, reactComponentMethods)
-  }
-
-  registerActions (actions) {
-    this.actions.register(actions)
-  }
-
-  action (name, payload) {
-    this.actions.do(name, payload)
-  }
-
-  registerMutators (mutators) {
-    this.mutators.register(mutators)
-  }
-
-  mutate (name, data, ...args) {
-    return this.mutators.call(name, data, ...args)
-  }
-
-  registerQueries (queries) {
-    this.queries.register(queries)
-  }
-
-  query (name, args) {
-    return this.queries.build(name, args)
-  }
-
-  registerFilters (filters) {
-    this.filters.register(filters)
-  }
-
-  buildFilteredStream (name, source, args) {
-    return this.filters.buildStream(name, source, args)
-  }
+  // Tree
 
   tree () {
     return this._tree
@@ -73,6 +37,8 @@ class App {
     this.setTree(data)
   }
 
+  // Cursors
+
   trunk () {
     return (this._trunk = this._trunk || this.at([]))
   }
@@ -84,13 +50,65 @@ class App {
     return new Cursor(this, path)
   }
 
+  // Queries
+
+  registerQueries (queries) {
+    this.queries.register(queries)
+  }
+
+  query (name, args) {
+    return this.queries.build(name, args)
+  }
+
+  // Mutators
+
+  registerMutators (mutators) {
+    Object.assign(this._mutators, mutators)
+  }
+
+  mutators () {
+    return this._mutators
+  }
+
+  // Filters
+
+  registerFilters (filters) {
+    this.filters.register(filters)
+  }
+
+  buildFilteredStream (name, source, args) {
+    return this.filters.buildStream(name, source, args)
+  }
+
+  // TreeView
+
   pick (callback) {
     return new TreeView(this, callback)
   }
 
+  // Actions
+
+  registerActions (actions) {
+    this.actions.register(actions)
+  }
+
+  action (name, payload) {
+    this.actions.do(name, payload)
+  }
+
+  // Dirty Tracker
+
   commit () {
     this.dirtyTracker.cleanAllDirty()
   }
+
+  // React
+
+  extendReact (object) {
+    object.treehouse = this
+    Object.assign(object, reactComponentMethods)
+  }
+
 }
 
 export default App

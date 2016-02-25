@@ -1,30 +1,27 @@
-import Mutators from '../../src/mutators'
-import objectMutators from '../../src/mutators/object_mutators'
+import mutators from '../../src/mutators/object_mutators'
 
 describe("objectMutators", () => {
 
-  let mutators, object
+  let object
 
   beforeEach(() => {
-    mutators = new Mutators()
-    mutators.register(objectMutators)
     object = {a: 1, b: 2}
   })
 
   it("merge", () => {
-    let newObject = mutators.call('merge', object, {b: 22, c: 3}, {d: 4})
+    let newObject = mutators.merge(object, {b: 22, c: 3}, {d: 4})
     expect(newObject).toEqual({a: 1, b: 22, c: 3, d: 4})
     expect(newObject == object).not.toBeTruthy()
   })
 
   it("setAttribute", () => {
-    let newObject = mutators.call('setAttribute', object, 'c', 3)
+    let newObject = mutators.setAttribute(object, 'c', 3)
     expect(newObject).toEqual({a: 1, b: 2, c: 3})
     expect(newObject == object).not.toBeTruthy()
   })
 
   it("delete", () => {
-    let newObject = mutators.call('delete', object, 'b')
+    let newObject = mutators.delete(object, 'b')
     expect(newObject).toEqual({a: 1})
     expect(newObject == object).not.toBeTruthy()
   })
