@@ -23,20 +23,20 @@ describe("Using queries", () => {
       })
       app.registerQueries({
         selectedUsers: {
-          deps: (t) => {
+          deps (t) {
             return {
               users: t.at(['users']),
               selected: t.at(['selectedIDs'])
             }
           },
-          get: ({users, selected}) => {
+          get ({users, selected}) {
             let key, selectedUsers = []
             for(key in users) {
               if (selected.indexOf(key) > -1) { selectedUsers.push(users[key].name) }
             }
             return selectedUsers
           },
-          set: (names, {users, selected}) => {
+          set (names, {users, selected}) {
             let ids = [], usrs = users.get(), key
             for (key in usrs) {
               if (names.indexOf(usrs[key].name) > -1) { ids.push(key) }
