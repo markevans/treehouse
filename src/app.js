@@ -17,6 +17,7 @@ class App {
     this._mutators = {}
     this.queries = new Queries(this)
     this.filters = new Filters(this)
+    this.Cursor = class Cursor extends Cursor{}
 
     this.registerMutators(arrayMutators)
     this.registerMutators(objectMutators)
@@ -47,7 +48,7 @@ class App {
     if (Array.isArray(path[0])) {
       path = path[0]
     }
-    return new Cursor(this, path)
+    return new this.Cursor(this, path)
   }
 
   // Queries
@@ -64,6 +65,9 @@ class App {
 
   registerMutators (mutators) {
     Object.assign(this._mutators, mutators)
+    for (let name in mutators) {
+      this.Cursor.addMutatorMethod(name)
+    }
   }
 
   mutators () {

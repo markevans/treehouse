@@ -15,15 +15,23 @@ describe("Using mutators", () => {
         teams: ['Spurs', 'Barca', 'America']
       })
       app.registerMutators({
-        reverse (array) {
-          return this.clone(array, (a) => {a.reverse()})
+        reverse (array, ...thenAppendThese) {
+          return this.clone(array, (a) => {
+            a.reverse()
+            a.push(...thenAppendThese)
+          })
         }
       })
     })
 
     it("correctly mutates", () => {
-      app.at('teams').setWith('reverse')
-      expect(app.tree()).toEqual({teams: ['America', 'Barca', 'Spurs']})
+      app.at('teams').setWith('reverse', 'Man Utd', 'Derby')
+      expect(app.tree()).toEqual({teams: ['America', 'Barca', 'Spurs', 'Man Utd', 'Derby']})
+    })
+
+    it("adds a method to the cursor object", () => {
+      app.at('teams').reverse('Man Utd', 'Derby')
+      expect(app.tree()).toEqual({teams: ['America', 'Barca', 'Spurs', 'Man Utd', 'Derby']})
     })
 
   })

@@ -81,6 +81,12 @@ class Cursor {
   }
 }
 
+Cursor.addMutatorMethod = function (name) {
+  this.prototype[name] = function (...args) {
+    this.setWith(name, ...args)
+  }
+}
+
 filterable(Cursor)
 
 export default Cursor
