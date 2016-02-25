@@ -66,7 +66,7 @@ describe("Cursor", () => {
     })
 
     it("allows setting with a function", () => {
-      cursor.set((c) => {return c.get().toUpperCase()} )
+      cursor.set((string) => {return string.toUpperCase()} )
       expect(app.tree()).toEqual({animal: {type: 'DOG'}})
     })
 

@@ -49,7 +49,7 @@ class Cursor {
 
   set (value) {
     if (typeof value === 'function') {
-      value = value(this)
+      value = value(this.get())
     }
     if (value === undefined) {
       throw new Error("You tried to set a value on the tree with undefined")
