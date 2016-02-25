@@ -73,7 +73,13 @@ describe("Cursor", () => {
     it("throws an error if the function doesn't return", () => {
       expect(() => {
         cursor.set((oldUsers) => {} )
-      }).toThrowError("You tried to set a value on the tree with undefined")
+      }).toThrowError("You tried to set the tree at path animal/type with undefined")
+    })
+
+    it("warns if setting with the same object", () => {
+      spyOn(app, 'log')
+      cursor.set((oldUsers) => { return oldUsers })
+      expect(app.log).toHaveBeenCalledWith("You tried to set the tree at path animal/type with the same object. Remember the tree should be immutable")
     })
 
   })
