@@ -1,9 +1,9 @@
 module.exports = {
   context: __dirname + "/src",
-  entry: "./treehouse_for_browser.js",
+  entry: "./treehouse.browser.js",
 
   output: {
-    filename: "treehouse.js",
+    filename: "treehouse.min.js",
     path: __dirname + "/dist",
   },
 

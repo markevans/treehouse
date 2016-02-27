@@ -6,7 +6,7 @@
     "Mark Evans"
   ],
   "description": "Opinionated mini-framework for javascript webapps, perfect for using with React",
-  "main": "lib/treehouse.js",
+  "main": "dist/treehouse.min.js",
   "moduleType": [
     "amd",
     "es6",
