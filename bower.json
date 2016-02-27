@@ -1,27 +1,26 @@
 {
   "name": "treehouse",
-  "version": "0.0.0",
-  "homepage": "https://github.com/markevans/treehouse",
+  "description": "Opinionated mini-framework for javascript webapps, perfect for using with React",
+  "main": "dist/treehouse.min.js",
   "authors": [
     "Mark Evans"
   ],
-  "description": "Opinionated mini-framework for javascript webapps, perfect for using with React",
-  "main": "dist/treehouse.min.js",
+  "license": "ISC",
+  "keywords": [
+    "javascript",
+    "react",
+    "state",
+    "immutable",
+    "cursor",
+    "tree"
+  ],
+  "homepage": "https://github.com/markevans/treehouse",
   "moduleType": [
     "amd",
     "es6",
     "globals",
     "node"
   ],
-  "keywords": [
-    "javascript",
-    "react",
-    "state",
-    "cursor",
-    "immutable",
-    "tree"
-  ],
-  "license": "MIT",
   "ignore": [
     "**/.*",
     "node_modules",
