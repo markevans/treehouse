@@ -1,1 +1,6 @@
 src/
+spec/
+dist/
+test.html
+webpack.config.js
+bower.json
