@@ -2,13 +2,13 @@ class TreeView {
   constructor (app, streams) {
     this.app = app
     this.dirtyTracker = app.dirtyTracker
-    this.streams = typeof(streams) == 'function' ? streams(this.app) : (streams || {})
+    this._streams = typeof(streams) == 'function' ? streams(this.app) : (streams || {})
     this.callback = null
   }
 
   channels () {
     if (!this._channels) {
-      let channels = [], streams = this.streams, key
+      let channels = [], streams = this.streams(), key
       for (key in streams) {
         streams[key].channels().forEach((c) => {
           if (channels.indexOf(c) == -1) { channels.push(c) }
@@ -19,8 +19,8 @@ class TreeView {
     return this._channels
   }
 
-  items () {
-    return this.streams
+  streams () {
+    return this._streams
   }
 
   watch (callback) {
@@ -39,7 +39,7 @@ class TreeView {
   }
 
   get () {
-    let data = {}, streams = this.streams, key
+    let data = {}, streams = this.streams(), key
     for (key in streams) {
       data[key] = streams[key].get()
     }
@@ -47,7 +47,7 @@ class TreeView {
   }
 
   set (data) {
-    let key, streams = this.streams
+    let key, streams = this.streams()
     for (key in data) {
       streams[key].set(data[key])
     }

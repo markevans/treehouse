@@ -24,7 +24,7 @@ class Query {
 
   set (value) {
     if (this.setter) {
-      this.setter(value, this.treeView.items(), this.args)
+      this.setter(value, this.treeView.streams(), this.args)
     } else {
       throw new Error(`Query '${this.name}' doesn't implement set`)
     }

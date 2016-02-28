@@ -1,4 +1,5 @@
 import App from '../src/app'
+import Cursor from '../src/cursor'
 import TreeView from '../src/tree_view'
 
 describe("TreeView", () => {
@@ -115,6 +116,22 @@ describe("TreeView", () => {
         }
       })
       expect(treeView.channels()).toEqual(['a'])
+    })
+  })
+
+  describe("streams", () => {
+    let treeView
+
+    it("returns registered streams", () => {
+      treeView = new TreeView(app, (t) => {
+        return {
+          first: t.at(['a']),
+          second: t.at(['b', 'c'])
+        }
+      })
+      let streams = treeView.streams()
+      expect(streams.first).toEqual(jasmine.any(Cursor))
+      expect(streams.second).toEqual(jasmine.any(Cursor))
     })
   })
 
