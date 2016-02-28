@@ -72,16 +72,30 @@ describe("Cursor", () => {
 
     it("throws an error if the function doesn't return", () => {
       expect(() => {
-        cursor.set((oldUsers) => {} )
+        cursor.set((oldData) => {} )
       }).toThrowError("You tried to set the tree at path 'animal/type' with undefined")
     })
 
     it("warns if setting with the same object", () => {
+      cursor.set({})
       spyOn(app, 'log')
-      cursor.set((oldUsers) => { return oldUsers })
+      cursor.set((oldData) => { return oldData })
       expect(app.log).toHaveBeenCalledWith("You tried to set the tree at path 'animal/type' with the same object. Remember the tree should be immutable")
     })
 
+    it("warns if setting with the same array", () => {
+      cursor.set([])
+      spyOn(app, 'log')
+      cursor.set((oldData) => { return oldData })
+      expect(app.log).toHaveBeenCalledWith("You tried to set the tree at path 'animal/type' with the same object. Remember the tree should be immutable")
+    })
+
+    it("doesn't warn if setting with the same primitive (immutable) object", () => {
+      cursor.set(1)
+      spyOn(app, 'log')
+      cursor.set((oldData) => { return oldData })
+      expect(app.log).not.toHaveBeenCalled()
+    })
   })
 
   describe("setting with a mutator", () => {
