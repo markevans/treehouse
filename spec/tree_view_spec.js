@@ -56,12 +56,6 @@ describe("TreeView", () => {
       expect(treeView.set({first: '1st', second: '2nd'}))
       expect(app.tree()).toEqual({a: '1st', b: {c: '2nd'}})
     })
-
-    it("returns a setter function", () => {
-      let setter = treeView.setter({first: '1st'})
-      setter()
-      expect(app.tree()).toEqual({a: '1st'})
-    })
   })
 
   describe("watching", () => {
