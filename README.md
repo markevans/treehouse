@@ -281,7 +281,7 @@ treeView.unwatch()
 
 ## Setting through filters and queries
 Very occasionally, you may want an easy way of creating a 1-1 map between parts of the
-tree and something else (this is how the treehouse router works, mapping between the URL
+tree and something else (this is how the [treehouse router](https://github.com/markevans/treehouse-router) works, mapping between the URL
   and parts of the tree).
 
 Given a cursor `treehouse.at('selectedUserID')` we can both `get()` and `set(value)`.
