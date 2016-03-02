@@ -337,7 +337,7 @@ treehouse.registerQueries({
       return users[id]
     },
     set (name, {users, id}) { // Second arg is object of cursor-like objects with "set"
-      let user = users.find(user => user.name == name)
+      let user = users.get().find(user => user.name == name)
       id.set(user.id)
     }
   }
