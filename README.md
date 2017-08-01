@@ -20,13 +20,16 @@ The basic flow as as follows:
 
   - An action updates the tree in some way. As the tree is immutable, the whole tree needs to be changed. Treehouse provides "cursor" objects to make this extremely easy.
 
-  - It works with React via an extension
+## Usage with React
+See the [Treehouse-React](https://github.com/markevans/treehouse-react) package
 
 ## To-do app
 Below is a working to-do app using React, written in JSX, that should give an idea of how it works.
 
+Note that it also uses the [Treehouse-React](https://github.com/markevans/treehouse-react) package, which provides the `wrap` method, which connects components to the treehouse state tree.
+
 ```javascript
-import treehouse from 'treehouse'
+const treehouse = require('treehouse')
 
 // Initialize state tree
 treehouse.init({
@@ -40,19 +43,14 @@ treehouse.init({
 })
 
 // React Components
-import React from 'react'
-treehouse.extendReact(React.Component.prototype)
+const React = require('react')
 
-class App extends React.Component {
-  render () {
-    return (
-      <div className="app">
-        <AddForm/>
-        <List/>
-      </div>
-    )
-  }
-}
+const App = () => (
+  <div className="app">
+    <AddForm/>
+    <List/>
+  </div>
+)
 
 class AddForm extends React.Component {
   constructor (props) {
@@ -69,9 +67,9 @@ class AddForm extends React.Component {
     e.preventDefault()
 
     // this.action is given by the treehouse extension
-    // It's very simple - this.action('actionName', {some: 'payload'})
+    // It's very simple - treehouse.action('actionName')({some: 'payload'})
     // does the registered (see below) action "actionName", passing in the payload
-    this.action('addTodo', {title: this.state.newTitle})
+    treehouse.action('addTodo')({title: this.state.newTitle})
 
     this.setState({newTitle: ''}) // to reset the text field
   }
@@ -86,51 +84,51 @@ class AddForm extends React.Component {
   }
 }
 
-class List extends React.Component {
+const List = wrap(
 
-  // treehouseState tells treehouse which parts of the tree this component
-  // cares about. Each item declared will be added to this.state
+  // Connect the component to parts of the state tree that it cares about.
+  // These will be passed in as props
   // Cursors (pointers) to a path on the tree are declared with
   //     t.at('some', 'path')
   // and pre-registered (see below) queries are declared with
   //     t.query('queryName', {some: 'args'})
-  treehouseState (t) {
-    return {
-      items: t.query('itemsByRecent')
-    }
-  }
+  treehouse.pick(t => {
+    items: t.query('itemsByRecent')
+  }),
 
-  render () {
-    return (
-      <ul className="list">
-        {this.state.items.map((item) => {
-          return <Item itemID={item.id} key={item.id}/>
-        })}
-      </ul>
-    )
-  }
-}
+  {items} => ( // The wrapped component
+    <ul className="list">
+      {items.map((item) => {
+        return <Item itemID={item.id} key={item.id}/>
+      })}
+    </ul>
+  )
 
-class Item extends React.Component {
-  treehouseState (t) {
-    return {
-      item: t.at('items', this.props.itemID) // cursor to path ['items', itemID]
-    }
-  }
+)
 
-  handleDelete () {
-    this.action('removeTodo', {id: this.props.itemID})
-  }
+const Item = wrap(
+  treehouse.pick(t => {
+    item: t.at('items', this.props.itemID) // cursor to path ['items', itemID]
+  }),
 
-  render () {
-    return (
-      <li>
-        {this.state.item.title}
-        <a onClick={this.handleDelete.bind(this)}> X</a>
-      </li>
-    )
-  }
-}
+  // Here we make use of an alternative way of calling an action:
+  // Instead of (if we were to call the action directly)
+  //
+  //   let action = treehouse.action('removeTodo')
+  //   action({id: itemID})
+  //
+  // we can use the "curried" version
+  //
+  //   let action = treehouse.action('removeTodo', {id: itemID})
+  //   action()
+  //
+  {item, itemID} => (
+    <li>
+      {item.title}
+      <a onClick={treehouse.action('removeTodo', {id: itemID})}> X</a>
+    </li>
+  )
+)
 
 // Actions
 treehouse.registerActions({
@@ -213,7 +211,7 @@ treehouse.registerFilters({
 })
 
 // Render into DOM
-import ReactDOM from 'react-dom'
+const ReactDOM = require('react-dom')
 ReactDOM.render(<App/>, document.getElementById('app'))
 ```
 
