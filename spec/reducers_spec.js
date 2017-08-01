@@ -20,8 +20,8 @@ describe("object reducers", () => {
     expect(newObject == object).not.toBeTruthy()
   })
 
-  it("delete", () => {
-    let newObject = reducers.delete(object, 'b')
+  it("remove", () => {
+    let newObject = reducers.remove(object, 'b')
     expect(newObject).toEqual({a: 1})
     expect(newObject == object).not.toBeTruthy()
   })
