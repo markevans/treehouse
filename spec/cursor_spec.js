@@ -70,6 +70,11 @@ describe("Cursor", () => {
       expect(app.tree()).toEqual({animal: {type: 'DOG'}})
     })
 
+    it("allows passing extra args to the reducer", () => {
+      cursor.update((string, a, b) => { return string.toUpperCase() + a + b}, "A", "B")
+      expect(app.tree()).toEqual({animal: {type: 'DOGAB'}})
+    })
+
     it("throws an error if the function doesn't return", () => {
       expect(() => {
         cursor.update((oldData) => {} )
