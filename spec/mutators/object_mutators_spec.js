@@ -1,4 +1,4 @@
-import mutators from '../../lib/mutators/object_mutators'
+const mutators = require('../../lib/mutators/object_mutators')
 
 describe("objectMutators", () => {
 

@@ -1,6 +1,6 @@
-import App from '../lib/app'
-import Cursor from '../lib/cursor'
-import TreeView from '../lib/tree_view'
+const App = require('../lib/app')
+const Cursor = require('../lib/cursor')
+const TreeView = require('../lib/tree_view')
 
 describe("TreeView", () => {
 

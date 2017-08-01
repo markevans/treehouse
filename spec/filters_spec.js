@@ -1,6 +1,6 @@
-import App from '../lib/app'
-import Filters from '../lib/filters'
-import FilteredStream from '../lib/filtered_stream'
+const App = require('../lib/app')
+const Filters = require('../lib/filters')
+const FilteredStream = require('../lib/filtered_stream')
 
 describe("Filters", () => {
 

@@ -1,4 +1,4 @@
-import shallowCompare from '../../lib/utils/shallow_compare'
+const shallowCompare = require('../../lib/utils/shallow_compare')
 
 describe("shallowCompare", () => {
 

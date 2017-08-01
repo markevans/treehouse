@@ -1,4 +1,4 @@
-import DirtyTracker from '../lib/dirty_tracker'
+const DirtyTracker = require('../lib/dirty_tracker')
 
 describe("DirtyTracker", () => {
 

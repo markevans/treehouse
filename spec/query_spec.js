@@ -1,5 +1,5 @@
-import App from '../lib/app'
-import Query from '../lib/query'
+const App = require('../lib/app')
+const Query = require('../lib/query')
 
 describe("Query", () => {
 

@@ -1,4 +1,4 @@
-import App from '../../lib/app'
+const App = require('../../lib/app')
 
 describe("Using queries", () => {
 

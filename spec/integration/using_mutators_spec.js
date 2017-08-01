@@ -1,4 +1,4 @@
-import App from '../../lib/app'
+const App = require('../../lib/app')
 
 describe("Using mutators", () => {
 
@@ -26,11 +26,6 @@ describe("Using mutators", () => {
 
     it("correctly mutates", () => {
       app.at('teams').setWith('reverse', 'Man Utd', 'Derby')
-      expect(app.tree()).toEqual({teams: ['America', 'Barca', 'Spurs', 'Man Utd', 'Derby']})
-    })
-
-    it("adds a method to the cursor object", () => {
-      app.at('teams').reverse('Man Utd', 'Derby')
       expect(app.tree()).toEqual({teams: ['America', 'Barca', 'Spurs', 'Man Utd', 'Derby']})
     })
 

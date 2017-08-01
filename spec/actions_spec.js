@@ -1,5 +1,5 @@
-import App from '../lib/app'
-import Actions from '../lib/actions'
+const App = require('../lib/app')
+const Actions = require('../lib/actions')
 
 describe("Actions", () => {
 

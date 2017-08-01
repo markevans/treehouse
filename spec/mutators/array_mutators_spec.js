@@ -1,4 +1,4 @@
-import mutators from '../../lib/mutators/array_mutators'
+const mutators = require('../../lib/mutators/array_mutators')
 
 describe("arrayMutators", () => {
 

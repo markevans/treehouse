@@ -1,5 +1,5 @@
-import App from '../lib/app'
-import Cursor from '../lib/cursor'
+const App = require('../lib/app')
+const Cursor = require('../lib/cursor')
 
 describe("Cursor", () => {
   let app
