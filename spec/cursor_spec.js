@@ -66,60 +66,35 @@ describe("Cursor", () => {
     })
 
     it("allows setting with a function", () => {
-      cursor.set((string) => {return string.toUpperCase()} )
+      cursor.update(string => string.toUpperCase())
       expect(app.tree()).toEqual({animal: {type: 'DOG'}})
     })
 
     it("throws an error if the function doesn't return", () => {
       expect(() => {
-        cursor.set((oldData) => {} )
+        cursor.update((oldData) => {} )
       }).toThrowError("You tried to set the tree at path 'animal/type' with undefined")
     })
 
     it("warns if setting with the same object", () => {
       cursor.set({})
       spyOn(app, 'log')
-      cursor.set((oldData) => { return oldData })
+      cursor.update(oldData => oldData)
       expect(app.log).toHaveBeenCalledWith("You tried to set the tree at path 'animal/type' with the same object. Remember the tree should be immutable")
     })
 
     it("warns if setting with the same array", () => {
       cursor.set([])
       spyOn(app, 'log')
-      cursor.set((oldData) => { return oldData })
+      cursor.update(oldData => oldData)
       expect(app.log).toHaveBeenCalledWith("You tried to set the tree at path 'animal/type' with the same object. Remember the tree should be immutable")
     })
 
     it("doesn't warn if setting with the same primitive (immutable) object", () => {
       cursor.set(1)
       spyOn(app, 'log')
-      cursor.set((oldData) => { return oldData })
+      cursor.update(oldData => oldData)
       expect(app.log).not.toHaveBeenCalled()
-    })
-  })
-
-  describe("setting with a mutator", () => {
-    let cursor, mutators
-
-    beforeEach(() => {
-      app.init({things: [1,2]})
-      cursor = new Cursor(app, ['things'])
-      mutators = cursor.mutators
-      spyOn(mutators, 'push').and.returnValue([1,2,3,4])
-    })
-
-    it("allows calling mutators from set", () => {
-      cursor.set((currentArray, mutators) => {
-        return mutators.push(currentArray, 3, 4)
-      })
-      expect(mutators.push).toHaveBeenCalledWith([1,2], 3, 4)
-      expect(app.tree()).toEqual({things: [1, 2, 3, 4]})
-    })
-
-    it("calls the appropriate mutator with setWith", () => {
-      cursor.setWith('push', 3, 4)
-      expect(mutators.push).toHaveBeenCalledWith([1,2], 3, 4)
-      expect(app.tree()).toEqual({things: [1, 2, 3, 4]})
     })
   })
 
