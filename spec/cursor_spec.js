@@ -75,6 +75,11 @@ describe("Cursor", () => {
       expect(app.tree()).toEqual({animal: {type: 'DOGAB'}})
     })
 
+    it("aliases update to $", () => {
+      cursor.$(string => string.toUpperCase())
+      expect(app.tree()).toEqual({animal: {type: 'DOG'}})
+    })
+
     it("throws an error if the function doesn't return", () => {
       expect(() => {
         cursor.update((oldData) => {} )
