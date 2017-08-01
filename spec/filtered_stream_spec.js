@@ -1,6 +1,6 @@
-import App from '../src/app'
-import Filter from '../src/filter'
-import FilteredStream from '../src/filtered_stream'
+import App from '../lib/app'
+import Filter from '../lib/filter'
+import FilteredStream from '../lib/filtered_stream'
 
 describe("FilteredStream", () => {
   let filteredStream, filter, source, app

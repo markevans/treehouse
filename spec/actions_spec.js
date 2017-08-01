@@ -1,5 +1,5 @@
-import App from '../src/app'
-import Actions from '../src/actions'
+import App from '../lib/app'
+import Actions from '../lib/actions'
 
 describe("Actions", () => {
 

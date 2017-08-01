@@ -1,4 +1,4 @@
-import App from '../../src/app'
+import App from '../../lib/app'
 
 describe("Using mutators", () => {
 

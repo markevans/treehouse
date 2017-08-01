@@ -1,4 +1,4 @@
-import mutators from '../../src/mutators/array_mutators'
+import mutators from '../../lib/mutators/array_mutators'
 
 describe("arrayMutators", () => {
 

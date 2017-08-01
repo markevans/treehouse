@@ -1,4 +1,4 @@
-import DirtyTracker from '../src/dirty_tracker'
+import DirtyTracker from '../lib/dirty_tracker'
 
 describe("DirtyTracker", () => {
 

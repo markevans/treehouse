@@ -1,6 +1,6 @@
-import App from '../src/app'
-import Query from '../src/query'
-import Queries from '../src/queries'
+import App from '../lib/app'
+import Query from '../lib/query'
+import Queries from '../lib/queries'
 
 describe("Queries", () => {
 

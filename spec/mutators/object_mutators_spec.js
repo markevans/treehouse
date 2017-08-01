@@ -1,4 +1,4 @@
-import mutators from '../../src/mutators/object_mutators'
+import mutators from '../../lib/mutators/object_mutators'
 
 describe("objectMutators", () => {
 

@@ -1,6 +1,6 @@
-import App from '../src/app'
-import Filters from '../src/filters'
-import FilteredStream from '../src/filtered_stream'
+import App from '../lib/app'
+import Filters from '../lib/filters'
+import FilteredStream from '../lib/filtered_stream'
 
 describe("Filters", () => {
 

@@ -1,5 +1,5 @@
-import App from '../src/app'
-import Cursor from '../src/cursor'
+import App from '../lib/app'
+import Cursor from '../lib/cursor'
 
 describe("Cursor", () => {
   let app
