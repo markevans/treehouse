@@ -6,7 +6,6 @@ import Filters from './filters'
 import TreeView from './tree_view'
 import Actions from './actions'
 import DirtyTracker from './dirty_tracker'
-import reactComponentMethods from './react_component_methods'
 
 class App {
 
@@ -104,13 +103,6 @@ class App {
 
   commit () {
     this.dirtyTracker.cleanAllDirty()
-  }
-
-  // React
-
-  extendReact (object) {
-    object.treehouse = this
-    Object.assign(object, reactComponentMethods)
   }
 
   // Log
