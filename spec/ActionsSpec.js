@@ -10,7 +10,7 @@ describe("Actions", () => {
     actions = new Actions(app)
   })
 
-  describe("doing actions", () => {
+  describe("building and calling actions", () => {
     let activities
 
     beforeEach(() => {
@@ -22,32 +22,41 @@ describe("Actions", () => {
       actions.register(activities)
     })
 
-    it("does a registered action", () => {
-      actions.do('spendMoney', {amount: 1000000})
+    it("calls a registered action", () => {
+      actions.build('spendMoney')({amount: 1000000})
       expect(app.tree()).toEqual({moneySpent: 1000000})
     })
 
-    it("doesn't blow up if not registered", () => {
+    it("allows currying the payload when building", () => {
+      actions.build('spendMoney', {amount: 1000000})()
+      expect(app.tree()).toEqual({moneySpent: 1000000})
+    })
+
+    it("logs on building and blows up on calling if not registered", () => {
       spyOn(app, 'log')
-      actions.do('somethingElse')
+      let action = actions.build('somethingElse')
       expect(app.log).toHaveBeenCalled()
+      expect(() => {
+        action()
+      }).toThrowError(`Can't call action 'somethingElse' as it's not registered`)
     })
 
     it("automatically commits", () => {
       spyOn(app, 'commit')
-      actions.do('spendMoney', {amount: 50})
+      actions.build('spendMoney')({amount: 50})
       expect(app.commit.calls.count()).toEqual(1)
     })
 
-    it("allows committing manually for async actions", () => {
-      spyOn(app, 'commit')
+    it("allows calling other actions for async actions", () => {
+      spyOn(app, 'log')
+      spyOn(actions, 'build').and.callThrough()
       actions.register({
-        asyncThing: (tree, payload, commit) => {
-          commit()
+        asyncThing: (tree, payload, action) => {
+          action('asyncThingReturned') // won't bother actually calling it
         }
       })
-      actions.do('asyncThing')
-      expect(app.commit.calls.count()).toEqual(2)
+      actions.build('asyncThing')()
+      expect(actions.build.calls.count()).toEqual(2)
     })
   })
 
