@@ -1,11 +1,15 @@
-#Treehouse JS
+# Treehouse JS
 
 [![Code Climate](https://codeclimate.com/github/markevans/treehouse/badges/gpa.svg)](https://codeclimate.com/github/markevans/treehouse)
 
 [![Build Status](https://travis-ci.org/markevans/treehouse.svg?branch=master)](https://travis-ci.org/markevans/treehouse)
 
 ## Overview
-Treehouse is an opinionated small javascript framework for writing web apps.
+Treehouse is an opinionated small javascript framework for writing single-page web apps.
+
+Its main concern is *maintaining application state*, and organising business logic into *actions*, that modify the state.
+
+For the view/template layer, you can use your preferred library.
 
 The basic flow as as follows:
 
@@ -21,236 +25,225 @@ The basic flow as as follows:
   - An action updates the tree in some way. As the tree is immutable, the whole tree needs to be changed. Treehouse provides "cursor" objects to make this extremely easy.
 
 ## Usage with React
-See the [Treehouse-React](https://github.com/markevans/treehouse-react) package
+See [Treehouse-React](https://github.com/markevans/treehouse-react).
 
-## To-do app
-Below is a working to-do app using React, written in JSX, that should give an idea of how it works.
-
-Note that it also uses the [Treehouse-React](https://github.com/markevans/treehouse-react) package, which provides the `wrap` method, which connects components to the treehouse state tree.
-
+### The treehouse app
 ```javascript
 const treehouse = require('treehouse')
+```
+Requiring treehouse returns a singleton treehouse app, which ties together all the other components.
 
-// Initialize state tree
+### Initializing the state tree
+```javascript
 treehouse.init({
+  currentUserId: 36,
   // Storing collections of objects keyed by ID is a REALLY GOOD IDEA!
   // Turning it into an array is super-easy with a "query" (see below)
-  items: {
-    id1: {title: 'Run home', id: 'id1', created: Date.now()},
-    id2: {title: 'Wash up', id: 'id2', created: Date.now()},
-    id3: {title: 'Solve Quantum Gravity', id: 'id3', created: Date.now()}
-  }
+  films: {
+    id1: {title: "Inception", id: 'id1', rating: 86},
+    id2: {title: "Dead Man's Shoes", id: 'id2', rating: 57},
+    id3: {title: "Groundhog Day", id: 'id3', rating: 96}
+  },
+  modalIsOpen: false
 })
+```
 
-// React Components
-const React = require('react')
-
-const App = () => (
-  <div className="app">
-    <AddForm/>
-    <List/>
-  </div>
-)
-
-class AddForm extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {newTitle: ''}
-  }
-
-  onChange (e) {
-    this.setState({newTitle: e.target.value})
-  }
-
-
-  onSubmit (e) {
-    e.preventDefault()
-
-    // this.action is given by the treehouse extension
-    // It's very simple - treehouse.action('actionName')({some: 'payload'})
-    // does the registered (see below) action "actionName", passing in the payload
-    treehouse.action('addTodo')({title: this.state.newTitle})
-
-    this.setState({newTitle: ''}) // to reset the text field
-  }
-
-  render () {
-    return (
-      <form onSubmit={this.onSubmit.bind(this)}>
-        <input autoComplete="off" onChange={this.onChange.bind(this)} name="title" value={this.state.newTitle} />
-        <button>Add</button>
-      </form>
+### Cursors
+Given that the tree should be immutable (which has great benefits when using with
+libraries like React), if we wanted to update the rating of "Dead Man's Shoes" to 84,
+then if we had a plain javascript object we'd need to update every branch up to the root,
+which would look something like this:
+```javascript
+let newTree = Object.assign(
+  {},
+  currentTree,
+  {
+    films: Object.assign(
+      {},
+      currentTree.films,
+      {
+        id2: Object.assign(
+          {},
+          currentTree.films.id2,
+          {
+            rating: 84
+          }
+        )
+      }
     )
   }
-}
-
-const List = wrap(
-
-  // Connect the component to parts of the state tree that it cares about.
-  // These will be passed in as props
-  // Cursors (pointers) to a path on the tree are declared with
-  //     t.at('some', 'path')
-  // and pre-registered (see below) queries are declared with
-  //     t.query('queryName', {some: 'args'})
-  treehouse.treeView(t => {
-    items: t.query('itemsByRecent')
-  }),
-
-  {items} => ( // The wrapped component
-    <ul className="list">
-      {items.map((item) => {
-        return <Item itemID={item.id} key={item.id}/>
-      })}
-    </ul>
-  )
-
 )
+```
+Yuk! Even with Javascript spread syntax it would be pretty bad, and what's more, error-prone.
 
-const Item = wrap(
-  treehouse.treeView(t => {
-    item: t.at('items', this.props.itemID) // cursor to path ['items', itemID]
-  }),
+Cursors hold a reference to the tree object internally, and update parent branches for us,
+so instead we can just do
+```javascript
+  treehouse.at('films', 'id2', 'rating').set(84)  // .at(...) returns a Cursor object
+```
 
-  // Here we make use of an alternative way of calling an action:
-  // Instead of (if we were to call the action directly)
-  //
-  //   let action = treehouse.action('removeTodo')
-  //   action({id: itemID})
-  //
-  // we can use the "curried" version
-  //
-  //   let action = treehouse.action('removeTodo', {id: itemID})
-  //   action()
-  //
-  {item, itemID} => (
-    <li>
-      {item.title}
-      <a onClick={treehouse.action('removeTodo', {id: itemID})}> X</a>
-    </li>
-  )
-)
+We can also update using a "reducer" function, which should always return a new object
+```javascript
+  treehouse.at('films', 'id2', 'rating').update(rating => rating + 27)
+```
 
-// Actions
+Furthermore, because this will be used so often, `update` is aliased to `$`.
+
+Treehouse provides a few reducer functions in `'treehouse/reducers'`,
+and typically the user will wish to define their own.
+Any extra args sent to `update`/`$` are passed to the reducer.
+
+```javascript
+  import { merge } from 'treehouse/reducers'
+  treehouse.at('films', 'id2').$(merge, {rating: 84})
+```
+
+To get the raw data at cursor, use `get`
+```javascript
+  treehouse.at('films', 'id2', 'rating').get()  // 84
+```
+
+
+### Actions
+As described above, _every_ single input that might change the state should enter the system via an "action".
+
+Each action's main job is to update the state tree. Each registered function takes
+the state tree, and a single payload argument.
+
+First register actions
+```javascript
 treehouse.registerActions({
 
-  // Each action's main job is to update the state tree.
-  // As the tree is immutable, the entire tree needs to be changed each time.
-  // The easiest way to do this is using cursors, e.g. tree.at('some', 'path')
-  // Then use set
-  //     tree.at('some', 'path').set(newValue)
-  // Or with a function
-  //     tree.at('some', 'path').set(oldValue => oldValue*2)
-  //
-  // The tree itself should not be changed, so you need to return a NEW OBJECT
-  //
-  // "mutators" (functions that return a NEW modified object, see below)
-  // can be used by setting with a callback
-  //     tree.at('some', 'path').set((oldValue, mutators) => {
-  //       return mutators.push(oldValue, 5)
-  //     })
-  // Or use the convenience method
-  //     tree.at('some', 'path').push(5)
-
-  addTodo (tree, {title}) {
-    // Using Math.random is not ideal but this illustrates the concept
-    let newTodo = {id: Math.random(), title: title, created: Date.now()}
-    tree.at('items').setAttribute(newTodo.id, newTodo)
+  updateRating (tree, {filmId, rating}) => {
+    tree.at('items', filmId, 'rating').set(rating)
   },
 
-  removeTodo (tree, {id}) {
-    tree.at('items').delete(id)
-  }
+  //...
 
 })
+```
 
-// Queries
+To call the action, we build it with
+```javascript
+let action = treehouse.action('updateRating')
+```
+and call it when we need to
+```javascript
+action({filmId: 'id2', rating: 84})
+```
 
-// Queries query the tree and return data. They are automatically cached,
-// and only change when any parts of the tree it cares about are changed.
+Alternatively, we can pass the payload in when building (effectively currying the payload argument)
+```javascript
+let action = treehouse.action('updateRating', {filmId: 'id2', rating: 84})
+```
+and call it with
+```javascript
+action()
+```
 
+This works particularly well with libraries like React, where we can do things like
+```jsx
+<a onClick={treehouse.action('updateRating', {filmId, rating: this.state.rating})}>Update Rating</a>
+```
+
+### Asynchronous actions
+If you change the tree asynchronously in an action, you should call another action once the asynchronous event has happened.
+A third argument is provided for this
+```javascript
+treehouse.registerActions({
+
+  getUsersFromServer: (tree, {filmId}, action) => {
+    server.getRating(filmId).then((rating) => {
+      action('updateRating')({filmId, rating})
+    })
+  }
+
+  //...
+})
+```
+
+
+### Queries
+Queries query the tree and return data. They are automatically cached,
+and only change when any parts of the tree it cares about are changed.
+
+```javascript
 treehouse.registerQueries({
 
-  itemsByRecent: {
-    deps: (t) => { // Declare dependencies, uses same syntax as treehouseState()
+  filmsByName: {
+    deps: (t) => { // Declare dependencies
       return {
-        items: t.at('items').filter('values')  // Uses a registered filter
-      }                                        // (see below)
+        films: t.at('films')
+      }
     },
-    get: ({items}) => {
-      return items.sort((a, b) => {
-        return a.created < b.created
+    get: ({films}) => {
+      return Object.values(films).sort((a, b) => {
+        return a.title < b.title
       })
     }
   }
 
 })
+```
 
-// Filters
+Once registered, they can be accessed with
+```javascript
+treehouse.query('filmsByName')
+```
+The actual data can be accessed with `get`
+```javascript
+treehouse.query('filmsByName').get() // [{id: "id2", ...}, ...]
+```
 
-// Cursors, e.g. treehouse.at('some', 'path') and queries, e.g.
-// treehouse.query('someQuery', {some: 'args'}) can be streamed through a
-// filter, e.g.
-//     treehouse.at('some', 'path').filter('orderBy', {key: 'date'})
-// Registering one is very easy - just give a function that takes data and
-// returns the filtered data, e.g.
-//    orderBy: (array, args) => {
-//     ...return new ordered array
-//    }
+Any arguments are passed as a second argument to the registered `get` function
+```javascript
+treehouse.registerQueries({
 
+  bestFilms: {
+    deps: (t) => {
+      return {
+        films: t.at('films')
+      }
+    },
+    get: ({films}, {minRating}) => {
+      let bestFilms = [], id
+      for (id in films) {
+        if(films[id].rating >= minRating) bestFilms.push(films[id])
+      }
+      return bestFilms
+    }
+  }
+
+})
+
+let query = treehouse.query('bestFilms', {minRating: 90})
+```
+
+### Filters
+
+Cursors, e.g. `treehouse.at('some', 'path')`
+and queries, e.g. `treehouse.query('someQuery', {some: 'args'})`
+can be streamed through a filter, e.g.
+```javascript
+  treehouse.at('some', 'path').filter('orderBy', {key: 'date'})
+```
+
+Registering one is very easy - just give a function that takes data and
+returns the filtered data, e.g.
+
+```javascript
 treehouse.registerFilters({
 
-  // "values" filter returns the values of an object as an array
-  values (object) {
-    let values = []
-    for (let key in object) {
-      values.push(object[key])
-    }
-    return values
+  orderBy: (array, args) => {
+    //...return new ordered array
   }
 
-})
-
-// Render into DOM
-const ReactDOM = require('react-dom')
-ReactDOM.render(<App/>, document.getElementById('app'))
-```
-
-## Mutators
-Mutators are useful when setting parts of the tree.
-To be able to do, e.g. `tree.at('path', 'to', 'names').reverse()`,
-you can register `"reverse"` like so:
-
-```javascript
-treehouse.registerMutators({
-
-  reverse (array) {
-    // 'this' is the mutators object that has all previously registered
-    // mutators on it. A useful one that comes by default is 'clone'
-    return this.clone(array, (a) => {  // clone the array...
-      a.reverse() // ... then modify the new object
-    })
-  }
-
+  //...
 })
 ```
 
-## Asynchronous actions
-If you change the tree asynchronously in an action, you should commit the changes manually, using the yielded function
-```javascript
-getUsersFromServer: (tree, payload, commit) => {  // this is a registered action
-  server.getUsers().then((data) => {
-    tree.at('users').set(data)
-    commit() // Call commit to tell treehouse to update
-  })
-}
-```
-
-## Using treehouse outside of React Components
-Any input into the system (message over websocket, url change, etc.) should call an action
-```javascript
-treehouse.action('someAction', {some: 'payload'})
-```
-Create a "TreeView" by treeViewing the items you care about
+## TreeViews
+Create a "TreeView" by selecting the items you care about
 ```javascript
 let treeView = treehouse.treeView((t) => {
   return {
@@ -259,6 +252,7 @@ let treeView = treehouse.treeView((t) => {
   }
 })
 ```
+
 Get data
 ```javascript
 treeView.get()   // {
@@ -266,18 +260,20 @@ treeView.get()   // {
                  //   unread: 7462964
                  // }
 ```
+
 To watch for data changes at any of the specified paths
 ```javascript
 treeView.watch((t) => { // (the callback yields the treeView itself)
   // ...
 })
 ```
+
 To unwatch
 ```javascript
 treeView.unwatch()
 ```
 
-## Setting through filters and queries
+### Setting through filters and queries
 Very occasionally, you may want an easy way of creating a 1-1 map between parts of the
 tree and something else (this is how the [treehouse router](https://github.com/markevans/treehouse-router) works, mapping between the URL
   and parts of the tree).
@@ -289,7 +285,7 @@ e.g. `treehouse.at('users').filter('objectToArray')`,
 or a query, e.g. `treehouse.query('selectedUserName')`?
 
 ### Setting through filters
-If a filter is two-way e.g. to filter between
+If a filter is two-way, e.g. to filter between
 ```javascript
 {                                               [
   id1: {name: 'Mark', id: 'id1'},    <-->         {name: 'Mark', id: 'id1'},
