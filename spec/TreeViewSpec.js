@@ -1,6 +1,6 @@
-const App = require('../lib/app')
-const Cursor = require('../lib/cursor')
-const TreeView = require('../lib/tree_view')
+const App = require('../lib/App')
+const Cursor = require('../lib/Cursor')
+const TreeView = require('../lib/TreeView')
 
 describe("TreeView", () => {
 

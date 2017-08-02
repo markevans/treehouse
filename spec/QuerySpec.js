@@ -1,5 +1,5 @@
-const App = require('../lib/app')
-const Query = require('../lib/query')
+const App = require('../lib/App')
+const Query = require('../lib/Query')
 
 describe("Query", () => {
 
@@ -112,4 +112,3 @@ describe("Query", () => {
 
   })
 })
-

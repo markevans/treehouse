@@ -1,5 +1,5 @@
-const App = require('../lib/app')
-const Cursor = require('../lib/cursor')
+const App = require('../lib/App')
+const Cursor = require('../lib/Cursor')
 
 describe("Cursor", () => {
   let app

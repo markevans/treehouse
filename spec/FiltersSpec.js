@@ -1,6 +1,6 @@
-const App = require('../lib/app')
-const Filters = require('../lib/filters')
-const FilteredStream = require('../lib/filtered_stream')
+const App = require('../lib/App')
+const Filters = require('../lib/Filters')
+const FilteredStream = require('../lib/FilteredStream')
 
 describe("Filters", () => {
 

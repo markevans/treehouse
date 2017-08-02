@@ -1,4 +1,4 @@
-const DirtyTracker = require('../lib/dirty_tracker')
+const DirtyTracker = require('../lib/DirtyTracker')
 
 describe("DirtyTracker", () => {
 

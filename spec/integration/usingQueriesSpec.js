@@ -1,4 +1,4 @@
-const App = require('../../lib/app')
+const App = require('../../lib/App')
 
 describe("Using queries", () => {
 

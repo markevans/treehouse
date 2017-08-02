@@ -1,5 +1,5 @@
-const App = require('../lib/app')
-const Actions = require('../lib/actions')
+const App = require('../lib/App')
+const Actions = require('../lib/Actions')
 
 describe("Actions", () => {
 

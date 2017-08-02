@@ -1,6 +1,6 @@
-const App = require('../lib/app')
-const Query = require('../lib/query')
-const Queries = require('../lib/queries')
+const App = require('../lib/App')
+const Query = require('../lib/Query')
+const Queries = require('../lib/Queries')
 
 describe("Queries", () => {
 
