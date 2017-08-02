@@ -92,7 +92,7 @@ const List = wrap(
   //     t.at('some', 'path')
   // and pre-registered (see below) queries are declared with
   //     t.query('queryName', {some: 'args'})
-  treehouse.pick(t => {
+  treehouse.treeView(t => {
     items: t.query('itemsByRecent')
   }),
 
@@ -107,7 +107,7 @@ const List = wrap(
 )
 
 const Item = wrap(
-  treehouse.pick(t => {
+  treehouse.treeView(t => {
     item: t.at('items', this.props.itemID) // cursor to path ['items', itemID]
   }),
 
@@ -250,9 +250,9 @@ Any input into the system (message over websocket, url change, etc.) should call
 ```javascript
 treehouse.action('someAction', {some: 'payload'})
 ```
-Create a "TreeView" by picking the items you care about
+Create a "TreeView" by treeViewing the items you care about
 ```javascript
-let treeView = treehouse.pick((t) => {
+let treeView = treehouse.treeView((t) => {
   return {
     messages: t.at('path', 'to', 'messages').filter('latest'),
     unread: t.query('numUnreadMessages')
@@ -351,7 +351,7 @@ does what we expect, i.e. sets the selectedUserID to the one we want!
 A treeview simply calls `get()` or `set()` on each item and collates them into
 an object
 ```javascript
-let treeView = treehouse.pick((t) => {
+let treeView = treehouse.treeView((t) => {
   return {
     thing: t.at('some', 'path'),
     latestUsers: t.at('users').filter('latest'),
