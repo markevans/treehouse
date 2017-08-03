@@ -1,6 +1,6 @@
 {
   "name": "treehouse",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "Opinionated mini-framework for dealing with state in single-page applications",
   "main": "lib/index.js",
   "scripts": {

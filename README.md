@@ -98,6 +98,21 @@ Any extra args sent to `update`/`$` are passed to the reducer.
   treehouse.at('films', 'id2').$(merge, {rating: 84})
 ```
 
+Furthermore, you can register reducers using
+```javascript
+treehouse.registerReducers({
+  append: (string, extra) => {
+    return string + extra
+  }
+
+  //...
+})
+```
+and then use by name
+```javascript
+treehouse.at('films', 'id2', 'name').$('append', ": The Movie")
+```
+
 To get the raw data at cursor, use `get`
 ```javascript
   treehouse.at('films', 'id2', 'rating').get()  // 84
