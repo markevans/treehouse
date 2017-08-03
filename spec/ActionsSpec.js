@@ -32,10 +32,8 @@ describe("Actions", () => {
       expect(app.tree()).toEqual({moneySpent: 1000000})
     })
 
-    it("logs on building and blows up on calling if not registered", () => {
-      spyOn(app, 'log')
+    it("blows up on calling if not registered", () => {
       let action = actions.build('somethingElse')
-      expect(app.log).toHaveBeenCalled()
       expect(() => {
         action()
       }).toThrowError(`Can't call action 'somethingElse' as it's not registered`)
