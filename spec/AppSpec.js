@@ -19,4 +19,13 @@ describe("App", () => {
     })
   })
 
+  describe("reducers", () => {
+    it("registers and calls reducers", () => {
+      app.registerReducers({
+        upcase: string => string.toUpperCase()
+      })
+      let result = app.findReducer("upcase")('stuff')
+      expect(result).toEqual("STUFF")
+    })
+  })
 })

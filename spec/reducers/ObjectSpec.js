@@ -1,4 +1,4 @@
-const reducers = require('../lib/reducers')
+const reducers = require('../../lib/reducers/Object')
 
 describe("object reducers", () => {
 
@@ -25,20 +25,4 @@ describe("object reducers", () => {
     expect(newObject).toEqual({a: 1})
     expect(newObject == object).not.toBeTruthy()
   })
-})
-
-describe("array reducers", () => {
-
-  let array
-
-  beforeEach(() => {
-    array = [1, 2]
-  })
-
-  it("push", () => {
-    let newArray = reducers.push(array, 3, 4)
-    expect(newArray).toEqual([1, 2, 3, 4])
-    expect(newArray == array).not.toBeTruthy()
-  })
-
 })
