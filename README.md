@@ -110,7 +110,7 @@ treehouse.registerReducers({
 ```
 and then use by name
 ```javascript
-treehouse.at('films', 'id2', 'name').$('append', ": The Movie")
+treehouse.at('films', 'id2', 'title').$('append', ": The Movie")
 ```
 
 To get the raw data at cursor, use `get`
