@@ -24,7 +24,7 @@ describe("App", () => {
       app.registerReducers({
         upcase: string => string.toUpperCase()
       })
-      let result = app.findReducer("upcase")('stuff')
+      let result = app.reducer("upcase")('stuff')
       expect(result).toEqual("STUFF")
     })
   })
