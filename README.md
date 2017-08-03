@@ -94,7 +94,7 @@ and typically the user will wish to define their own.
 Any extra args sent to `update`/`$` are passed to the reducer.
 
 ```javascript
-  import { merge } from 'treehouse/reducers'
+  import { merge } from 'treehouse/reducers/Object'
   treehouse.at('films', 'id2').$(merge, {rating: 84})
 ```
 
