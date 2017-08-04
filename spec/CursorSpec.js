@@ -127,4 +127,18 @@ describe("Cursor", () => {
     })
   })
 
+  describe("putBack", () => {
+    let cursor
+
+    beforeEach(() => {
+      app.init({animal: {type: 'Oliphant'}})
+      cursor = new Cursor(app, ['animal', 'type'])
+    })
+
+    it("returns the change to be made", () => {
+      let change = cursor.putBack('Donkey')
+      expect(change).toEqual({path: ['animal', 'type'], value: 'Donkey'})
+    })
+  })
+
 })
