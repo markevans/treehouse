@@ -141,4 +141,21 @@ describe("Cursor", () => {
     })
   })
 
+  describe("applying multiple changes", () => {
+    let cursor
+
+    beforeEach(() => {
+      app.init({animal: {type: 'Oliphant', size: 'huge!'}})
+      cursor = new Cursor(app, ['animal'])
+    })
+
+    it("applies a list of changes", () => {
+      cursor.apply([
+        {path: ['type'], value: 'Pony'},
+        {path: ['size'], value: 'liddle'}
+      ])
+      expect(cursor.get()).toEqual({type: 'Pony', size: 'liddle'})
+    })
+  })
+
 })
