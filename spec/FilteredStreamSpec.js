@@ -20,7 +20,7 @@ describe("FilteredStream", () => {
       forward: (word, {someArg}) => { return word.toUpperCase()+someArg },
       reverse: (word, {someArg}) => { return word.replace(someArg,'').toLowerCase() }
     })
-    spyOn(source, 'putBack').and.returnValue('some change')
+    spyOn(source, 'putBack').and.returnValue('some changes')
     filteredStream = new FilteredStream(app, source, filter, {someArg: ',SOMEARG'})
   })
 
@@ -29,9 +29,9 @@ describe("FilteredStream", () => {
   })
 
   it("back-propagates changes", () => {
-    let change = filteredStream.putBack('BUGS,SOMEARG')
+    let changes = filteredStream.putBack('BUGS,SOMEARG')
     expect(source.putBack).toHaveBeenCalledWith('bugs')
-    expect(change).toEqual('some change')
+    expect(changes).toEqual('some changes')
   })
 
   it("delegates channels to its source", () => {
