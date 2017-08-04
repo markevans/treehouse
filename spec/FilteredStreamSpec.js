@@ -11,7 +11,6 @@ describe("FilteredStream", () => {
       get: () => {
         return 'egg'
       },
-      set: () => {},
       change: () => {},
       channels: () => {
         return ['grog']
@@ -21,18 +20,12 @@ describe("FilteredStream", () => {
       forward: (word, {someArg}) => { return word.toUpperCase()+someArg },
       reverse: (word, {someArg}) => { return word.replace(someArg,'').toLowerCase() }
     })
-    spyOn(source, 'set')
     spyOn(source, 'change').and.returnValue('some change')
     filteredStream = new FilteredStream(app, source, filter, {someArg: ',SOMEARG'})
   })
 
   it("returns the filtered data", () => {
     expect(filteredStream.get()).toEqual('EGG,SOMEARG')
-  })
-
-  it("filters set data", () => {
-    filteredStream.set('BUGS,SOMEARG')
-    expect(source.set).toHaveBeenCalledWith('bugs')
   })
 
   it("back-propagates changes", () => {
