@@ -23,8 +23,11 @@ describe("Actions", () => {
     })
 
     it("calls a registered action", () => {
-      actions.build('spendMoney')({amount: 1000000})
+      let action = actions.build('spendMoney')
+      action({amount: 1000000})
       expect(app.tree()).toEqual({moneySpent: 1000000})
+      action({amount: -5})
+      expect(app.tree()).toEqual({moneySpent: -5})
     })
 
     it("allows currying the payload when building", () => {
