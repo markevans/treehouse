@@ -135,9 +135,9 @@ describe("Cursor", () => {
       cursor = new Cursor(app, ['animal', 'type'])
     })
 
-    it("returns the change to be made", () => {
-      let change = cursor.putBack('Donkey')
-      expect(change).toEqual({path: ['animal', 'type'], value: 'Donkey'})
+    it("returns the changes to be made", () => { // plural to give a uniform interface with queries, etc.
+      let changes = cursor.putBack('Donkey')
+      expect(changes).toEqual([{path: ['animal', 'type'], value: 'Donkey'}])
     })
   })
 

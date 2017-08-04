@@ -46,8 +46,8 @@ describe("Using filters", () => {
   it("works the other way", () => {
     let stream = app.at(['words', 0]).filter('upcase')
     expect(stream.get()).toEqual('GLUG')
-    let change = stream.putBack('BONES')
-    expect(change).toEqual({path: ['words', 0], value: 'bones'})
+    let changes = stream.putBack('BONES')
+    expect(changes).toEqual([{path: ['words', 0], value: 'bones'}])
   })
 
   it("allows using args", () => {
@@ -55,8 +55,8 @@ describe("Using filters", () => {
     cursor.set('Mark')
     let stream = cursor.filter('append', {word: 'Extra'})
     expect(stream.get()).toEqual('MarkExtra')
-    let change = stream.putBack('Joker')
-    expect(change).toEqual({path: ['person', 'name'], value: 'Joker'})
+    let changes = stream.putBack('Joker')
+    expect(changes).toEqual([{path: ['person', 'name'], value: 'Joker'}])
   })
 
   it("filters query data", () => {
