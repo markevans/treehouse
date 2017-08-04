@@ -23,14 +23,12 @@ describe("Using filters", () => {
         return text+text
       },
 
-      extractAttr: {
-        forward: (obj, {attr}) => {
-          return obj[attr]
+      append: {
+        forward: (string, {word}) => {
+          return string + word
         },
-        reverse: (value, {attr}) => {
-          let obj = {}
-          obj[attr] = value
-          return obj
+        reverse: (string, {word}) => {
+          return string.replace(word, '') // lazy - should use regex
         }
       }
     })
@@ -48,19 +46,17 @@ describe("Using filters", () => {
   it("works the other way", () => {
     let stream = app.at(['words', 0]).filter('upcase')
     expect(stream.get()).toEqual('GLUG')
-    stream.set('BONES')
-    expect(stream.get()).toEqual('BONES')
-    expect(app.at('words').get()).toEqual(['bones'])
+    let change = stream.putBack('BONES')
+    expect(change).toEqual({path: ['words', 0], value: 'bones'})
   })
 
   it("allows using args", () => {
-    let cursor = app.at('person')
-    cursor.set({name: 'Mark'})
-    let stream = cursor.filter('extractAttr', {attr: 'name'})
-    expect(stream.get()).toEqual('Mark')
-    stream.set('Joker')
-    expect(stream.get()).toEqual('Joker')
-    expect(cursor.get()).toEqual({name: 'Joker'})
+    let cursor = app.at('person', 'name')
+    cursor.set('Mark')
+    let stream = cursor.filter('append', {word: 'Extra'})
+    expect(stream.get()).toEqual('MarkExtra')
+    let change = stream.putBack('Joker')
+    expect(change).toEqual({path: ['person', 'name'], value: 'Joker'})
   })
 
   it("filters query data", () => {
