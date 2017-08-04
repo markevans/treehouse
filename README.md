@@ -288,51 +288,52 @@ To unwatch
 treeView.unwatch()
 ```
 
-### Setting through filters and queries
-Very occasionally, you may want an easy way of creating a 1-1 map between parts of the
-tree and something else (this is how the [treehouse router](https://github.com/markevans/treehouse-router) works, mapping between the URL
-  and parts of the tree).
-
+## Setting through filters, queries and treeViews
 Given a cursor `treehouse.at('selectedUserID')` we can both `get()` and `set(value)`.
 
 But what about something that's been filtered,
 e.g. `treehouse.at('users').filter('objectToArray')`,
 or a query, e.g. `treehouse.query('selectedUserName')`?
 
-### Setting through filters
-If a filter is two-way, e.g. to filter between
+Treehouse doesn't let you set through filters, queries and treeViews, because you're encouraged to update any
+state within actions, using just cursors onto the tree.
+
+However, you can retrieve a list of changes that need to happen by "putting back" values through filters or queries (or cursors).
+
+### Putting values back through cursors
+This simply returns the changes that need to happen, e.g.
 ```javascript
-{                                               [
-  id1: {name: 'Mark', id: 'id1'},    <-->         {name: 'Mark', id: 'id1'},
-  id2: {name: 'Doogie', id: 'id2'}                {name: 'Doogie', id: 'id2'}
-}                                               ]
+  let changes = treehouse.at('some', 'path').putBack(4)
+  changes // [{path: ['some', 'path'], value: 4}]
+```
+
+### Putting values back through filters
+If a filter can be defined two-way, e.g. to filter between
+```javascript
+"some words"  <------>  "SOME WORDS"
 ```
 then we can register both a forward and reverse filter function
 ```javascript
 treehouse.registerFilters({
-  objectToArray: {
-    forward: (object) => {
-      let array = [], key
-      for(key in object) { array.push(object[key]) }
-      return array
+  upcase: {
+    forward: (string) => {
+      return string.toUpperCase()
     },
-    reverse: (array) => {
-      return array.reduce((obj, item) => {
-        obj[item.id] = item
-        return obj
-      }, {})
+    reverse: (string) => {
+      return string.toLowerCase()
     }
   }
 })
 ```
-Then
+Then putting back through the filter calls the reverse function on the way through.
 ```javascript
-treehouse.at('users').filter('objectToArray')
+let stream = treehouse.at('words').filter('upcase')
+let changes = stream.putBack('NEW WORDS')
+changes // [{path: ['words'], value: 'new words'}]
 ```
-does what we expect, i.e. can be set with an array!
 
 ### Setting through queries
-We can add a `set` option to the query declaration
+We can add a `change` option to the query declaration, which should return an object with changes to be made
 ```javascript
 treehouse.registerQueries({
   selectedUserName: {
@@ -345,22 +346,23 @@ treehouse.registerQueries({
     get ({users, id}) {
       return users[id].name
     },
-    set (name, {users, id}) { // Second arg is object of cursor-like objects with "set"
-      let user = users.get().find(user => user.name == name)
-      id.set(user.id)
+    set (name, {users}) {
+      let user = users.find(user => user.name == name)
+      return {
+        id: user.id  // Keys should match with keys from the deps, and value is the new value it should be set to
+      }
     }
   }
 })
 ```
-Then
+Then we get changes to be made with
 ```javascript
-treehouse.query('selectedUserName').set('Robinson Crusoe')
+let changes = treehouse.query('selectedUserName').putBack('Robinson Crusoe')
+changes //  [{path: ['selectedUserID'], value: 63}]
 ```
-does what we expect, i.e. sets the selectedUserID to the one we want!
 
 ### Setting through a treeView
-A treeview simply calls `get()` or `set()` on each item and collates them into
-an object
+A treeview simply collates the changes made from each item
 ```javascript
 let treeView = treehouse.treeView((t) => {
   return {
@@ -369,21 +371,24 @@ let treeView = treehouse.treeView((t) => {
     runners: t.query('fastestRunners')
   }
 })
-```
-Just as calling `get()` returns something like
-```javascript
-treeView.get() // ==> {
-               //  thing: ...
-               //  latestUsers: ...
-               //  runners: ...
-               // }
-```
-You can call `set()` with
-```javascript
-treeView.set({
-  thing: ...
-  latestUsers: ...
+
+let changes = treeView.putBack({
+  thing: ...,
+  latestUsers: ...,
   runners: ...
 })
+
+changes  // [
+              { path: [....], value: ... },
+              ...
+            ]
 ```
-Obviously this only works if each item implements `set`, as above.
+Obviously this only works if each item is defined correctly as two-way, as above.
+
+### Applying changes
+We can apply changes to any cursor with `apply`
+```javascript
+tree.apply(changes)  // tree here is a cursor, like the one yielded in actions
+```
+Building up changes like this is how the [Treehouse Router](https://github.com/markevans/treehouse-router) works.
+It collects changes to be made when a url is changed, then this list of changes can be passed directly into the "url changed" action, and changes applied accordingly.
