@@ -69,9 +69,9 @@ describe("Filters", () => {
       beforeEach(() => {
         source = {
           get: () => { return 'the source' },
-          change: () => {}
+          putBack: () => {}
         }
-        spyOn(source, 'change').and.returnValue("change from source")
+        spyOn(source, 'putBack').and.returnValue("change from source")
         filters.register({
           upcase: {
             forward: (string) => {
@@ -88,8 +88,8 @@ describe("Filters", () => {
         let filteredStream = filters.buildStream('upcase', source)
         expect(filteredStream).toEqual(jasmine.any(FilteredStream))
         expect(filteredStream.get()).toEqual('THE SOURCE')
-        let change = filteredStream.change('SOMETHING')
-        expect(source.change).toHaveBeenCalledWith('something')
+        let change = filteredStream.putBack('SOMETHING')
+        expect(source.putBack).toHaveBeenCalledWith('something')
         expect(change).toEqual('change from source')
       })
 
