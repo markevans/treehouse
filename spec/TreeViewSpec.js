@@ -40,7 +40,7 @@ describe("TreeView", () => {
     })
   })
 
-  describe("setting data", () => {
+  describe("putting back data", () => {
 
     let treeView
 
@@ -53,9 +53,12 @@ describe("TreeView", () => {
       })
     })
 
-    it("sets multiple attributes", () => {
-      expect(treeView.set({first: '1st', second: '2nd'}))
-      expect(app.tree()).toEqual({a: '1st', b: {c: '2nd'}})
+    it("changes multiple attributes", () => {
+      let changes = treeView.putBack({first: '1st', second: '2nd'})
+      expect(changes).toEqual([
+        {path: ['a'], value: '1st'},
+        {path: ['b', 'c'], value: '2nd'}
+      ])
     })
   })
 
