@@ -36,12 +36,12 @@ describe("Using queries", () => {
             }
             return selectedUsers
           },
-          set (names, {users, selected}) {
-            let ids = [], usrs = users.get(), key
-            for (key in usrs) {
-              if (names.indexOf(usrs[key].name) > -1) { ids.push(key) }
+          change (names, {users}) {
+            let ids = [], key
+            for (key in users) {
+              if (names.indexOf(users[key].name) > -1) { ids.push(key) }
             }
-            selected.set(ids)
+            return {selected: ids}
           }
         }
       })
@@ -73,17 +73,33 @@ describe("Using queries", () => {
       expect(spy).toHaveBeenCalled()
     })
 
-    it("correctly sets", () => {
+    it("correctly back-propagates changes", () => {
       let selectedUsers = app.query('selectedUsers')
-      selectedUsers.set(['Agbo', 'Blumy'])
-      expect(app.tree()).toEqual({
-        users: {
-          a: {name: 'Agbo'},
-          b: {name: 'Blumy'},
-          c: {name: 'Celia'}
-        },
-        selectedIDs: ['a', 'b']
+      let changes = selectedUsers.putBack(['Agbo', 'Blumy'])
+      expect(changes).toEqual([{path: ['selectedIDs'], value: ['a', 'b']}])
+    })
+
+    it("back-propagates correctly with nested queries", () => {
+      app.registerQueries({
+        passThrough: {
+          deps (t) {
+            return {
+              selectedUsers: t.query('selectedUsers')
+            }
+          },
+          get ({selectedUsers}) {
+            return selectedUsers
+          },
+          change (users) {
+            return {
+              selectedUsers: users
+            }
+          }
+        }
       })
+      let users = app.query('passThrough')
+      let changes = users.putBack(['Agbo', 'Blumy'])
+      expect(changes).toEqual([{path: ['selectedIDs'], value: ['a', 'b']}])
     })
 
     it("uses the args", () => {

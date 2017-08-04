@@ -71,15 +71,15 @@ describe("Query", () => {
 
   })
 
-  describe("setting through the query", () => {
+  describe("getting changes through the query", () => {
 
     it("throws if not implemented", () => {
       expect(() => {
-        query.set()
-      }).toThrowError("Query 'currentPageName' doesn't implement set")
+        query.putBack('blah')
+      }).toThrowError("Query 'currentPageName' doesn't implement change")
     })
 
-    it("sets via the passed in setter", () => {
+    it("returns changes via the passed in change function", () => {
       query = new Query(app, 'currentPageName',
         (t) => {
           return {
@@ -89,25 +89,28 @@ describe("Query", () => {
         },
         {some: 'arg'},
         ({pages, current}) => { return pages[current] }, // getter
-        (value, {pages, current}) => {   // setter
-          current.set(pages.get().indexOf(value))
+        (value, {pages, current}) => {   // change function
+          return {
+            current: pages.indexOf(value)
+          }
         }
       )
       expect(query.get()).toEqual('one')
-      query.set('zero')
-      expect(query.get()).toEqual('zero')
-      expect(app.tree()).toEqual({pages: ['zero', 'one'], currentPage: 0})
+      let changes = query.putBack('zero')
+      expect(changes).toEqual([
+        {path: ['currentPage'], value: 0}
+      ])
     })
 
     it("yields args", () => {
-      let setter = jasmine.createSpy('setter')
+      let changer = jasmine.createSpy('changer')
       query = new Query(app, 'pass args', {},
         {some: 'arg'},
         () => {}, // getter
-        setter    // setter
+        changer   // changer
       )
-      query.set('something')
-      expect(setter).toHaveBeenCalledWith('something', {}, {some: 'arg'})
+      query.putBack('something')
+      expect(changer).toHaveBeenCalledWith('something', {}, {some: 'arg'})
     })
 
   })
