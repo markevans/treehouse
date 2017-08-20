@@ -346,7 +346,7 @@ treehouse.registerQueries({
     get ({users, id}) {
       return users[id].name
     },
-    set (name, {users}) {
+    change (name, {users}) {
       let user = users.find(user => user.name == name)
       return {
         id: user.id  // Keys should match with keys from the deps, and value is the new value it should be set to
