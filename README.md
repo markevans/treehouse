@@ -260,7 +260,7 @@ treehouse.registerFilters({
 ## TreeViews
 Create a "TreeView" by selecting the items you care about
 ```javascript
-let treeView = treehouse.treeView((t) => {
+let treeView = treehouse.pick((t) => {
   return {
     messages: t.at('path', 'to', 'messages').filter('latest'),
     unread: t.query('numUnreadMessages')
@@ -364,7 +364,7 @@ changes //  [{path: ['selectedUserID'], value: 63}]
 ### Setting through a treeView
 A treeview simply collates the changes made from each item
 ```javascript
-let treeView = treehouse.treeView((t) => {
+let treeView = treehouse.pick((t) => {
   return {
     thing: t.at('some', 'path'),
     latestUsers: t.at('users').filter('latest'),

@@ -35,7 +35,7 @@ describe("Using filters", () => {
   })
 
   it("filters tree data", () => {
-    treeView = app.treeView((t) => {
+    treeView = app.pick((t) => {
       return {
         word: t.at(['words', 0]).filter('upcase')
       }
@@ -72,7 +72,7 @@ describe("Using filters", () => {
         }
       }
     })
-    treeView = app.treeView((t) => {
+    treeView = app.pick((t) => {
       return {
         word: t.query('firstWord', {append: ' water'}).filter('upcase')
       }
@@ -81,7 +81,7 @@ describe("Using filters", () => {
   })
 
   it("enables chaining filters", () => {
-    treeView = app.treeView((t) => {
+    treeView = app.pick((t) => {
       return {
         word: t.at(['words', 0]).filter('upcase').filter('dubble')
       }

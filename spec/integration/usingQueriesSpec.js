@@ -48,7 +48,7 @@ describe("Using queries", () => {
     })
 
     it("correctly gets data", () => {
-      treeView = app.treeView((t) => {
+      treeView = app.pick((t) => {
         return {
           IDs: t.at(['selectedIDs']),
           users: t.query('selectedUsers')
@@ -61,7 +61,7 @@ describe("Using queries", () => {
     })
 
     it("correctly updates", () => {
-      treeView = app.treeView((t) => {
+      treeView = app.pick((t) => {
         return {
           users: t.query('selectedUsers')
         }
@@ -110,7 +110,7 @@ describe("Using queries", () => {
           }
         }
       })
-      treeView = app.treeView((t) => {
+      treeView = app.pick((t) => {
         return {
           theArgs: t.query('returnArgs', {a: 1})
         }
