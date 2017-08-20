@@ -14,8 +14,8 @@ describe("object reducers", () => {
     expect(newObject == object).not.toBeTruthy()
   })
 
-  it("setAttribute", () => {
-    let newObject = reducers.setAttribute(object, 'c', 3)
+  it("insert", () => {
+    let newObject = reducers.insert(object, 'c', 3)
     expect(newObject).toEqual({a: 1, b: 2, c: 3})
     expect(newObject == object).not.toBeTruthy()
   })
