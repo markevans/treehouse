@@ -1,140 +1,74 @@
-const App = require('../lib/App')
-const Cursor = require('../lib/Cursor')
 const TreeView = require('../lib/TreeView')
 
 describe("TreeView", () => {
 
-  let app
+  let app, tree, picker, source1, source2, treeView
 
   beforeEach(() => {
-    app = new App()
+    app = {}
+    tree = {}
+    source1 = { pull: null, push: null, channels: null }
+    source2 = { pull: null, push: null, channels: null }
+    picker = jasmine.createSpy().and.returnValue({ s1: source1, s2: source2 })
+    treeView = new TreeView(app, tree, picker)
   })
 
-  describe("getting data", () => {
+  describe("initializing", () => {
 
-    let treeView
-
-    beforeEach(() => {
-      app.setTree({
-        a: 'b',
-        b: {c: ['d', 'e']},
-        x: 1
-      })
-      treeView = new TreeView(app, (t) => {
-        return {
-          first: t.at(['a']),
-          second: t.at(['b', 'c', 1])
-        }
-      })
+    it("yields the tree in the picker", () => {
+      expect(treeView.sources()).toEqual({ s1: source1, s2: source2 })
+      expect(picker).toHaveBeenCalledWith(tree)
     })
+
+  })
+
+  describe("pulling data", () => {
 
     it("gets multiple attributes", () => {
-      expect(treeView.get()).toEqual({first: 'b', second: 'e'})
+      spyOn(source1, 'pull').and.returnValue('one')
+      spyOn(source2, 'pull').and.returnValue('two')
+      expect(treeView.pull()).toEqual({s1: 'one', s2: 'two'})
     })
 
-    it("allows initializing with an object", () => {
-      treeView = new TreeView(app, {
-        first: app.at(['a']),
-      })
-      expect(treeView.get()).toEqual({first: 'b'})
-    })
   })
 
-  describe("putting back data", () => {
+  describe("pushing data", () => {
 
-    let treeView
-
-    beforeEach(() => {
-      treeView = new TreeView(app, (t) => {
-        return {
-          first: t.at(['a']),
-          second: t.at(['b', 'c'])
-        }
-      })
+    it("forwards changes to its sources", () => {
+      spyOn(source1, 'push')
+      spyOn(source2, 'push')
+      treeView.push({s1: 'A', s2: 'B'})
+      expect(source1.push).toHaveBeenCalledWith('A')
+      expect(source2.push).toHaveBeenCalledWith('B')
     })
 
-    it("changes multiple attributes", () => {
-      let changes = treeView.putBack({first: '1st', second: '2nd'})
-      expect(changes).toEqual([
-        {path: ['a'], value: '1st'},
-        {path: ['b', 'c'], value: '2nd'}
-      ])
-    })
-  })
-
-  describe("watching", () => {
-    let treeView, callback
-
-    beforeEach(() => {
-      callback = jasmine.createSpy('watchCallback')
-      treeView = new TreeView(app, (t) => {
-        return {
-          first: t.at(['a']),
-          second: t.at(['b', 'c'])
-        }
-      })
+    it("doesn't touch unchanged sources", () => {
+      spyOn(source1, 'push')
+      spyOn(source2, 'push')
+      treeView.push({s1: 'A'})
+      expect(source1.push).toHaveBeenCalledWith('A')
+      expect(source2.push).not.toHaveBeenCalled()
     })
 
-    it("allows for watching the tree", () => {
-      treeView.watch(callback)
-      app.dirtyTracker.markChannelDirty('a')
-      app.dirtyTracker.cleanAllDirty()
-      expect(callback).toHaveBeenCalledWith(treeView)
+    it("throws if the source doesn't exist", () => {
+      expect(() => {
+        treeView.push({noExist: 'A'})
+      }).toThrowError("Can't push change to non-existent source 'noExist'")
     })
 
-    it("doesn't call back if the relevant branches aren't touched", () => {
-      treeView.watch(callback)
-      app.dirtyTracker.markChannelDirty('z')
-      app.dirtyTracker.cleanAllDirty()
-      expect(callback).not.toHaveBeenCalled()
-    })
-
-    it("allows unwatching", () => {
-      treeView.watch(callback)
-      treeView.unwatch()
-      app.dirtyTracker.markChannelDirty('a')
-      app.dirtyTracker.cleanAllDirty()
-      expect(callback).not.toHaveBeenCalled()
-    })
   })
 
   describe("channels", () => {
-    let treeView
-
-    it("returns all channels it cares about", () => {
-      treeView = new TreeView(app, (t) => {
-        return {
-          first: t.at(['a']),
-          second: t.at(['b', 'c'])
-        }
-      })
-      expect(treeView.channels()).toEqual(['a', 'b'])
+    it("collates its sources channels", () => {
+      spyOn(source1, 'channels').and.returnValue(new Set(['a', 'b']))
+      spyOn(source2, 'channels').and.returnValue(new Set(['c']))
+      expect(treeView.channels()).toEqual(new Set(['a', 'b', 'c']))
     })
 
     it("doesn't repeat a channel", () => {
-      treeView = new TreeView(app, (t) => {
-        return {
-          first: t.at(['a']),
-          second: t.at(['a', 'b'])
-        }
-      })
-      expect(treeView.channels()).toEqual(['a'])
-    })
-  })
-
-  describe("streams", () => {
-    let treeView
-
-    it("returns registered streams", () => {
-      treeView = new TreeView(app, (t) => {
-        return {
-          first: t.at(['a']),
-          second: t.at(['b', 'c'])
-        }
-      })
-      let streams = treeView.streams()
-      expect(streams.first).toEqual(jasmine.any(Cursor))
-      expect(streams.second).toEqual(jasmine.any(Cursor))
+      spyOn(source1, 'channels').and.returnValue(new Set(['a']))
+      spyOn(source2, 'channels').and.returnValue(new Set(['a']))
+      expect(treeView.channels()).toEqual(new Set(['a']))
     })
   })
 
