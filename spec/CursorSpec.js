@@ -58,4 +58,11 @@ describe("Cursor", () => {
     })
   })
 
+  describe("channels", () => {
+    it("returns a set with the main bough as the single element", () => {
+      const cursor = new Cursor(app, tree, ['users', 'best', 5])
+      expect(cursor.channels()).toEqual(new Set(['users']))
+    })
+  })
+
 })
