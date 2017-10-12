@@ -11,9 +11,22 @@ describe("Tree", () => {
   })
 
   describe("pull", () => {
+    it("returns the whole tree", () => {
+      tree.init({some: 'data'})
+      expect(tree.pull()).toEqual({some: 'data'})
+    })
   })
 
   describe("push", () => {
+    it("adds to the changes", () => {
+      const change1 = {path: ['blah'], value: 'schma'}
+      const change2 = {path: ['goo'], value: 'blub'}
+      expect(tree.changes()).toEqual([])
+      tree.push(change1)
+      expect(tree.changes()).toEqual([change1])
+      tree.push(change2)
+      expect(tree.changes()).toEqual([change1, change2])
+    })
   })
 
   describe("at", () => {
