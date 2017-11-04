@@ -53,14 +53,14 @@ describe("TreeView", () => {
     it("calls the callback with the source's data", () => {
       treeView.watch(callback)
       dirtyTracker.markChannelDirty('things')
-      dirtyTracker.cleanAllDirty()
+      dirtyTracker.flush()
       expect(callback).toHaveBeenCalledWith({some: 'data'})
     })
 
     it("doesn't call the callback if the channel isn't dirty", () => {
       treeView.watch(callback)
       dirtyTracker.markChannelDirty('otherChannel')
-      dirtyTracker.cleanAllDirty()
+      dirtyTracker.flush()
       expect(callback).not.toHaveBeenCalled()
     })
 
@@ -68,18 +68,18 @@ describe("TreeView", () => {
       treeView.watch(callback)
       treeView.unwatch()
       dirtyTracker.markChannelDirty('things')
-      dirtyTracker.cleanAllDirty()
+      dirtyTracker.flush()
       expect(callback).not.toHaveBeenCalled()
     })
 
     it("calls the callback with fresh data", () => {
       treeView.watch(callback)
       dirtyTracker.markChannelDirty('things')
-      dirtyTracker.cleanAllDirty()
+      dirtyTracker.flush()
       expect(callback).toHaveBeenCalledWith({some: 'data'})
       pullSpy.and.returnValue({someNew: 'DATA'})
       dirtyTracker.markChannelDirty('things')
-      dirtyTracker.cleanAllDirty()
+      dirtyTracker.flush()
       expect(callback).toHaveBeenCalledWith({someNew: 'DATA'})
     })
 

@@ -39,7 +39,7 @@ describe("DirtyTracker", () => {
   it("cleans each callback", () => {
     dirtyTracker.track(callback, new Set(['dogs']))
     dirtyTracker.markChannelDirty('dogs')
-    dirtyTracker.cleanAllDirty()
+    dirtyTracker.flush()
     expect(dirtyTracker.isDirty(callback)).toEqual(false)
     expect(callback).toHaveBeenCalled()
   })
