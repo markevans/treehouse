@@ -73,6 +73,15 @@ describe("Tree", () => {
       tree.applyChanges()
       expect(tree.changes()).toEqual([])
     })
+
+    it("calls a callback with the changes done", () => {
+      tree.push(change1)
+      tree.push(change2)
+      const callback = jasmine.createSpy('callback')
+      tree.applyChanges(callback)
+      expect(callback).toHaveBeenCalledWith([change1, change2])
+      expect(tree.changes()).toEqual([])
+    })
   })
 
   describe("at", () => {
