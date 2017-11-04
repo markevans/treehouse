@@ -21,6 +21,11 @@ describe("Register", () => {
         register.find('someOtherName')
       }).toThrowError("Can't find testThing 'someOtherName' as it hasn't been registered")
     })
+
+    it("allows registering one", () => {
+      register.register('githeads', 'thing')
+      expect(register.find('githeads')).toEqual('thing')
+    })
   })
 
 })
