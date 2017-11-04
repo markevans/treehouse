@@ -7,7 +7,7 @@ describe("Query", () => {
   beforeEach(() => {
     app = { pick: null }
     name = 'someName'
-    treeView = { pull: null, push: null }
+    treeView = { pull: null, push: null, channels: null }
     picker = t => ({
       'current': t.at(['currentPage']),
       'pages': t.at(['pages'])
@@ -94,6 +94,20 @@ describe("Query", () => {
       spec.set = jasmine.createSpy('set')
       query.push('something')
       expect(spec.set).toHaveBeenCalledWith('something', {current: 'stuff'}, args)
+    })
+
+  })
+
+  describe("channels", () => {
+
+    beforeEach(() => {
+      spyOn(app, 'pick').and.returnValue(treeView)
+      query = new Query(app, name, spec, args)
+      spyOn(treeView, 'channels').and.returnValue(new Set(['boom', 'ting']))
+    })
+
+    it("delegates to the treeview", () => {
+      expect(query.channels()).toEqual(new Set(['boom', 'ting']))
     })
 
   })
