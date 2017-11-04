@@ -28,7 +28,7 @@ describe("Using filters", () => {
     const treeView = app.pick(t => ({
       word: t.at(['words', 0]).filter('upcase')
     }))
-    expect(treeView.pull()).toEqual({word: 'GLUG'})
+    expect(treeView.get()).toEqual({word: 'GLUG'})
   })
 
   it("works the other way", () => {
@@ -60,14 +60,14 @@ describe("Using filters", () => {
     const treeView = app.pick(t => ({
       word: t.query('firstWord', {append: ' water'}).filter('upcase')
     }))
-    expect(treeView.pull()).toEqual({word: 'GLUG WATER'})
+    expect(treeView.get()).toEqual({word: 'GLUG WATER'})
   })
 
   it("enables chaining filters", () => {
     const treeView = app.pick(t => ({
       word: t.at(['words', 0]).filter('upcase').filter('dubble')
     }))
-    expect(treeView.pull()).toEqual({word: 'GLUGGLUG'})
+    expect(treeView.get()).toEqual({word: 'GLUGGLUG'})
   })
 
 })

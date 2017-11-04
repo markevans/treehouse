@@ -50,21 +50,22 @@ describe("Using queries", () => {
         IDs: t.at(['selectedIDs']),
         users: t.query('selectedUsers')
       }))
-      expect(treeView.pull()).toEqual({
+      expect(treeView.get()).toEqual({
         IDs: ['a', 'c'],
         users: ['Agbo', 'Celia']
       })
     })
 
     it("correctly updates", () => {
-      treeView = app.pick(t => ({
-        users: t.query('selectedUsers')
-      }))
-      let spy = jasmine.createSpy('watcher')
-      treeView.watch(spy)
+      let users
+      treeView = app.pick(t => t.query('selectedUsers'))
+      treeView.watch(u => {
+        users = u
+      })
       app.tree.push({path: ['selectedIDs'], value: 'b'})
       app.tree.applyChanges()
-      expect(spy).toHaveBeenCalled()
+      app.dirtyTracker.flush()
+      expect(users).toEqual(['Blumy'])
     })
 
     it("back-propagates correctly with nested queries", () => {
@@ -91,6 +92,7 @@ describe("Using queries", () => {
     it("uses the args", () => {
       app.registerQueries({
         returnArgs: {
+          pick: t => ({}),
           get: ({}, args) => {
             return args
           }
@@ -99,7 +101,7 @@ describe("Using queries", () => {
       treeView = app.pick(t => ({
         theArgs: t.query('returnArgs', {a: 1})
       }))
-      expect(treeView.pull()).toEqual({
+      expect(treeView.get()).toEqual({
         theArgs: {a: 1}
       })
     })
