@@ -5,7 +5,11 @@ describe("Cursor", () => {
 
   beforeEach(() => {
     app = {
-      tree: {pull: null, push: null}
+      tree: {
+        pull: null,
+        push: null,
+        channelsForPath: null,
+      }
     }
   })
 
@@ -60,9 +64,11 @@ describe("Cursor", () => {
   })
 
   describe("channels", () => {
-    it("returns a set with the main bough as the single element", () => {
+    it("asks the tree", () => {
       const cursor = new Cursor(app, ['users', 'best', 5])
-      expect(cursor.channels()).toEqual(new Set(['users']))
+      spyOn(app.tree, 'channelsForPath').and.returnValue(new Set(['shizzle']))
+      expect(cursor.channels()).toEqual(new Set(['shizzle']))
+      expect(app.tree.channelsForPath).toHaveBeenCalledWith(['users', 'best', 5])
     })
   })
 
