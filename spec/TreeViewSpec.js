@@ -3,6 +3,7 @@ const DirtyTracker = require('../lib/DirtyTracker')
 
 class Source {
   pull () {}
+  push () {}
   channels () {}
 }
 
@@ -85,7 +86,7 @@ describe("TreeView", () => {
 
   })
 
-  describe("getting", () => {
+  describe("pull", () => {
 
     beforeEach(() => {
       spyOn(source, 'pull').and.returnValue({some: 'data'})
@@ -94,7 +95,42 @@ describe("TreeView", () => {
     })
 
     it("just returns what's pulled from the source", () => {
+      expect(treeView.pull()).toEqual({some: 'data'})
+    })
+
+    it("aliases 'get'", () => {
       expect(treeView.get()).toEqual({some: 'data'})
+    })
+
+  })
+
+  describe("push", () => {
+
+    let spy
+
+    beforeEach(() => {
+      spy = spyOn(source, 'push')
+      picker.and.returnValue(source)
+      treeView = new TreeView(tree, picker, dirtyTracker)
+    })
+
+    it("delegates to the source", () => {
+      treeView.push('stuff')
+      expect(spy).toHaveBeenCalledWith('stuff')
+    })
+
+  })
+
+  describe("channels", () => {
+
+    beforeEach(() => {
+      spyOn(source, 'channels').and.returnValue(new Set(['a', 'b']))
+      picker.and.returnValue(source)
+      treeView = new TreeView(tree, picker, dirtyTracker)
+    })
+
+    it("delegates to the source", () => {
+      expect(treeView.channels()).toEqual(new Set(['a', 'b']))
     })
 
   })
