@@ -63,8 +63,7 @@ describe("Using queries", () => {
         users = u
       })
       app.tree.push({path: ['selectedIDs'], value: 'b'})
-      app.tree.applyChanges()
-      app.dirtyTracker.flush()
+      app.commitChanges()
       expect(users).toEqual(['Blumy'])
     })
 
