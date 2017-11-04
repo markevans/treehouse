@@ -6,7 +6,14 @@ describe("Tree", () => {
   let tree, app
 
   beforeEach(() => {
-    app = { queries: { find: null } }
+    app = {
+      dirtyTracker: {
+        markChannelDirty: jasmine.createSpy('markChannelDirty')
+      },
+      queries: {
+        find: null
+      }
+    }
     tree = new Tree(app)
   })
 
@@ -18,6 +25,13 @@ describe("Tree", () => {
   })
 
   describe("push", () => {
+    let markDirtySpy, channelsSpy
+
+    beforeEach(() => {
+      channelsSpy = spyOn(tree, 'channelsForPath')
+        .and.returnValue(new Set(['someChannel', 'someOtherChannel']))
+    })
+
     it("adds to the changes", () => {
       const change1 = {path: ['blah'], value: 'schma'}
       const change2 = {path: ['goo'], value: 'blub'}
@@ -26,6 +40,14 @@ describe("Tree", () => {
       expect(tree.changes()).toEqual([change1])
       tree.push(change2)
       expect(tree.changes()).toEqual([change1, change2])
+    })
+
+    it("tells the dirtyTracker", () => {
+      const change = {path: ['ok'], value: 'yup'}
+      tree.push(change)
+      expect(tree.channelsForPath).toHaveBeenCalledWith(['ok'])
+      expect(app.dirtyTracker.markChannelDirty).toHaveBeenCalledWith('someChannel')
+      expect(app.dirtyTracker.markChannelDirty).toHaveBeenCalledWith('someOtherChannel')
     })
   })
 
