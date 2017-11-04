@@ -111,4 +111,10 @@ describe("Tree", () => {
     })
   })
 
+  describe("channelsForPath", () => {
+    it("returns a set with the main bough as the single element", () => {
+      expect(tree.channelsForPath(['users', 'best', 5])).toEqual(new Set(['users']))
+    })
+  })
+
 })
