@@ -28,7 +28,7 @@ describe("Tree", () => {
     let change1, change2
 
     beforeEach(() => {
-      change1 = { path: ['blah'], value: 'schma', channels: new Set(['blah', 'anotherOne']) }
+      change1 = { path: ['blah'], value: 'schma', channels: new Set(['blah']) }
       change2 = { path: ['goo'], value: 'blub', channels: new Set(['goo']) }
     })
 
@@ -38,12 +38,6 @@ describe("Tree", () => {
       expect(tree.changes()).toEqual([change1])
       tree.push(change2)
       expect(tree.changes()).toEqual([change1, change2])
-    })
-
-    it("tells the dirtyTracker", () => {
-      tree.push(change1)
-      expect(app.dirtyTracker.markChannelDirty).toHaveBeenCalledWith('blah')
-      expect(app.dirtyTracker.markChannelDirty).toHaveBeenCalledWith('anotherOne')
     })
   })
 
@@ -58,8 +52,8 @@ describe("Tree", () => {
         ],
         modalIsOpen: false
       })
-      change1 = { path: ['users', 1, 'age'], value: 438 }
-      change2 = { path: ['modalIsOpen'], value: true }
+      change1 = { path: ['users', 1, 'age'], value: 438, channels: new Set(['users', 'anotherOne']) }
+      change2 = { path: ['modalIsOpen'], value: true, channels: new Set(['modalIsOpen']) }
     })
 
     it("applies each change", () => {
@@ -90,6 +84,14 @@ describe("Tree", () => {
       tree.push(change1)
       tree.applyChanges()
       expect(tree.changes()).toEqual([])
+    })
+
+    it("tells the dirtyTracker", () => {
+      tree.push(change1)
+      expect(app.dirtyTracker.markChannelDirty).not.toHaveBeenCalled()
+      tree.applyChanges()
+      expect(app.dirtyTracker.markChannelDirty).toHaveBeenCalledWith('users')
+      expect(app.dirtyTracker.markChannelDirty).toHaveBeenCalledWith('anotherOne')
     })
   })
 
