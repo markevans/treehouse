@@ -25,16 +25,14 @@ describe("Tree", () => {
   })
 
   describe("push", () => {
-    let markDirtySpy, channelsSpy
+    let change1, change2
 
     beforeEach(() => {
-      channelsSpy = spyOn(tree, 'channelsForPath')
-        .and.returnValue(new Set(['someChannel', 'someOtherChannel']))
+      change1 = { path: ['blah'], value: 'schma', channels: new Set(['blah', 'anotherOne']) }
+      change2 = { path: ['goo'], value: 'blub', channels: new Set(['goo']) }
     })
 
     it("adds to the changes", () => {
-      const change1 = {path: ['blah'], value: 'schma'}
-      const change2 = {path: ['goo'], value: 'blub'}
       expect(tree.changes()).toEqual([])
       tree.push(change1)
       expect(tree.changes()).toEqual([change1])
@@ -43,11 +41,9 @@ describe("Tree", () => {
     })
 
     it("tells the dirtyTracker", () => {
-      const change = {path: ['ok'], value: 'yup'}
-      tree.push(change)
-      expect(tree.channelsForPath).toHaveBeenCalledWith(['ok'])
-      expect(app.dirtyTracker.markChannelDirty).toHaveBeenCalledWith('someChannel')
-      expect(app.dirtyTracker.markChannelDirty).toHaveBeenCalledWith('someOtherChannel')
+      tree.push(change1)
+      expect(app.dirtyTracker.markChannelDirty).toHaveBeenCalledWith('blah')
+      expect(app.dirtyTracker.markChannelDirty).toHaveBeenCalledWith('anotherOne')
     })
   })
 
@@ -121,12 +117,6 @@ describe("Tree", () => {
       expect(query.name).toEqual('currentPage')
       expect(query.spec).toEqual(spec)
       expect(query.args).toEqual({ some: 'args' })
-    })
-  })
-
-  describe("channelsForPath", () => {
-    it("returns a set with the main bough as the single element", () => {
-      expect(tree.channelsForPath(['users', 'best', 5])).toEqual(new Set(['users']))
     })
   })
 
