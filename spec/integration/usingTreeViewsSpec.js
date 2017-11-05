@@ -37,7 +37,7 @@ describe("Using treeViews", () => {
       treeView.watch(({page, loading}) => {
         results = [page, loading]
       })
-      app.tree.push({path: ['settings', 'page'], value: 6})
+      app.tree.at('settings', 'page').push(6)
       app.commitChanges()
       expect(results).toEqual([6, false])
     })
@@ -47,7 +47,7 @@ describe("Using treeViews", () => {
       treeView.watch(({page, loading}) => {
         results = [page, loading]
       })
-      app.tree.push({path: ['other', 'path'], value: 6})
+      app.tree.at('other', 'path').push(6)
       app.commitChanges()
       expect(results).toBeUndefined()
     })

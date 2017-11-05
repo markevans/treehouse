@@ -62,7 +62,7 @@ describe("Using queries", () => {
       treeView.watch(u => {
         users = u
       })
-      app.tree.push({path: ['selectedIDs'], value: 'b'})
+      app.tree.at('selectedIDs').push('b')
       app.commitChanges()
       expect(users).toEqual(['Blumy'])
     })
@@ -85,7 +85,11 @@ describe("Using queries", () => {
       })
       let users = app.pick(t => t.query('passThrough'))
       users.push(['Agbo', 'Blumy'])
-      expect(app.tree.changes()).toEqual([{path: ['selectedIDs'], value: ['a', 'b']}])
+      expect(app.tree.changes()).toEqual([{
+        path: ['selectedIDs'],
+        value: ['a', 'b'],
+        channels: new Set(['selectedIDs'])
+      }])
     })
 
     it("uses the args", () => {

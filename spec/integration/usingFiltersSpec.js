@@ -35,7 +35,7 @@ describe("Using filters", () => {
     const source = app.tree.at(['words', 0]).filter('upcase')
     expect(source.pull()).toEqual('GLUG')
     source.push('BONES')
-    expect(app.tree.changes()).toEqual([{path: ['words', 0], value: 'bones'}])
+    expect(app.tree.changes()).toEqual([{path: ['words', 0], value: 'bones', channels: new Set(['words'])}])
   })
 
   it("allows using args", () => {
@@ -45,7 +45,7 @@ describe("Using filters", () => {
     const source = cursor.filter('append', {word: 'Extra'})
     expect(source.pull()).toEqual('MarkExtra')
     source.push('Joker')
-    expect(app.tree.changes()).toEqual([{path: ['person', 'name'], value: 'Joker'}])
+    expect(app.tree.changes()).toEqual([{path: ['person', 'name'], value: 'Joker', channels: new Set(['person'])}])
   })
 
   it("filters query data", () => {
