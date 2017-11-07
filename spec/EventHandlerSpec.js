@@ -47,4 +47,29 @@ describe("EventHandler", () => {
     expect(eventHandler.action.call).toHaveBeenCalled()
   })
 
+  describe("decorating the handler", () => {
+
+    beforeEach(() => {
+      app = {
+        pick: spy('pick')
+      }
+    })
+
+    it("allows decorating the handler", () => {
+      spec.decorate = handler => {
+        return (payload) => {
+          handler(payload * 2)
+          handler(payload * 3)
+        }
+      }
+      eventHandler = new EventHandler(app, 'myEvent', spec)
+      spyOn(eventHandler.action, 'call')
+      spyOn(eventHandler.update, 'call')
+      eventHandler.call(53)
+      expect(eventHandler.action.call.calls.allArgs()).toEqual([[106], [159]])
+      expect(eventHandler.update.call.calls.allArgs()).toEqual([[106], [159]])
+    })
+
+  })
+
 })
