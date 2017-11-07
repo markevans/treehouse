@@ -2,69 +2,33 @@ const EventHandler = require('../lib/EventHandler')
 
 describe("EventHandler", () => {
 
-  function spy (name) {
-    return jasmine.createSpy(name)
-  }
-
-  let app
+  let app, spec
 
   beforeEach(() => {
     app = {
-      pick: spy('app.pick'),
-      commitChanges: spy('commitChanges'),
-      event: spy('app.event')
+      pick: spy('pick')
+    }
+    spec = {
+      action: {someActionSpec: 'spec'},
+      update: {someUpdateSpec: 'spec'}
     }
   })
 
-  describe("updating the tree", () => {
+  it("performs the action then the update", () => {
+    eventHandler = new EventHandler(app, 'myEvent', spec)
 
-    let source, spec
+    expect(eventHandler.action.constructor.name).toEqual('Action')
+    expect(eventHandler.update.constructor.name).toEqual('Update')
 
-    beforeEach(() => {
-      source = {
-        push: spy('push'),
-        pull: spy('pull')
-      }
-      spec = {
-        update: {
-          pick: spy('spec.pick'),
-          reducer: spy('reducer')
-        }
-      }
-    })
+    const calls = []
+    spyOn(eventHandler.action, 'call').and.callFake(() => { calls.push('action') })
+    spyOn(eventHandler.update, 'call').and.callFake(() => { calls.push('update') })
 
-    it("pushes updates onto the picked source", () => {
-      source.pull.and.returnValue({someData: 'data'})
-      app.pick.and.returnValue(source)
-      spec.update.reducer.and.returnValue({someUpdate: 'update'})
+    eventHandler.call({somePayload: 'payload'})
 
-      eventHandler = new EventHandler(app, 'myEvent', spec)
-      eventHandler.call({somePayload: 'payload'})
-
-      expect(app.pick).toHaveBeenCalledWith(spec.update.pick)
-      expect(spec.update.reducer).toHaveBeenCalledWith({someData: 'data'}, {somePayload: 'payload'})
-      expect(source.push).toHaveBeenCalledWith({someUpdate: 'update'})
-      expect(app.commitChanges).toHaveBeenCalled()
-    })
-
+    expect(eventHandler.action.call).toHaveBeenCalledWith({somePayload: 'payload'})
+    expect(eventHandler.update.call).toHaveBeenCalledWith({somePayload: 'payload'})
+    expect(calls).toEqual(['action', 'update'])
   })
 
-  describe("performing an action", () => {
-
-    let spec
-
-    beforeEach(() => {
-      spec = {
-        action: spy('action')
-      }
-    })
-
-    it("performs the given action", () => {
-      eventHandler = new EventHandler(app, 'myEvent', spec)
-      eventHandler.call({somePayload: 'payload'})
-
-      expect(spec.action).toHaveBeenCalledWith({somePayload: 'payload'}, app.event)
-    })
-
-  })
 })
