@@ -29,6 +29,15 @@ describe("Using events", () => {
       })
     })
 
+    it("only calls the handler once when many handlers are initialized", () => {
+      const handler1 = app.event('increment'),
+        handler2 = app.event('increment')
+      handler1()
+      expect(app.tree.pull()).toEqual({
+        num: 4
+      })
+    })
+
   })
 
 })
