@@ -11,7 +11,8 @@ describe("EventHandler", () => {
   beforeEach(() => {
     app = {
       pick: spy('app.pick'),
-      commitChanges: spy('commitChanges')
+      commitChanges: spy('commitChanges'),
+      event: spy('app.event')
     }
   })
 
@@ -48,4 +49,22 @@ describe("EventHandler", () => {
 
   })
 
+  describe("performing an action", () => {
+
+    let spec
+
+    beforeEach(() => {
+      spec = {
+        action: spy('action')
+      }
+    })
+
+    it("performs the given action", () => {
+      eventHandler = new EventHandler(app, 'myEvent', spec)
+      eventHandler.call({somePayload: 'payload'})
+
+      expect(spec.action).toHaveBeenCalledWith({somePayload: 'payload'}, app.event)
+    })
+
+  })
 })
