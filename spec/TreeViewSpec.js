@@ -84,6 +84,13 @@ describe("TreeView", () => {
       expect(callback).toHaveBeenCalledWith({someNew: 'DATA'})
     })
 
+    it("doesn't call the callback if marked clean", () => {
+      treeView.watch(callback)
+      dirtyTracker.markChannelDirty('things')
+      treeView.markClean()
+      dirtyTracker.flush()
+      expect(callback).not.toHaveBeenCalled()
+    })
   })
 
   describe("pull", () => {
