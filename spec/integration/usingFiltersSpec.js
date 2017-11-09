@@ -2,7 +2,7 @@ const App = require('../../lib/App')
 
 describe("Using filters", () => {
 
-  let app, treeView
+  let app
 
   beforeEach(() => {
     app = new App()
@@ -11,81 +11,62 @@ describe("Using filters", () => {
     })
     app.registerFilters({
       upcase: {
-        forward: (text) => {
-          return text.toUpperCase()
-        },
-        reverse: (text) => {
-          return text.toLowerCase()
-        }
+        filter: text => text.toUpperCase(),
+        unfilter: text => text.toLowerCase()
       },
 
-      dubble: (text) => {
-        return text+text
-      },
+      dubble: text => text+text,
 
       append: {
-        forward: (string, {word}) => {
-          return string + word
-        },
-        reverse: (string, {word}) => {
-          return string.replace(word, '') // lazy - should use regex
-        }
+        filter: (string, {word}) => string + word,
+        unfilter: (string, {word}) => string.replace(word, '') // lazy - should use regex
       }
     })
   })
 
   it("filters tree data", () => {
-    treeView = app.pick((t) => {
-      return {
-        word: t.at(['words', 0]).filter('upcase')
-      }
-    })
+    const treeView = app.pick(t => ({
+      word: t.at(['words', 0]).filter('upcase')
+    }))
     expect(treeView.get()).toEqual({word: 'GLUG'})
   })
 
   it("works the other way", () => {
-    let stream = app.at(['words', 0]).filter('upcase')
-    expect(stream.get()).toEqual('GLUG')
-    let changes = stream.putBack('BONES')
-    expect(changes).toEqual([{path: ['words', 0], value: 'bones'}])
+    const source = app.tree.at(['words', 0]).filter('upcase')
+    expect(source.pull()).toEqual('GLUG')
+    source.push('BONES')
+    expect(app.tree.changes()).toEqual([{path: ['words', 0], value: 'bones', channels: new Set(['words'])}])
   })
 
   it("allows using args", () => {
-    let cursor = app.at('person', 'name')
-    cursor.set('Mark')
-    let stream = cursor.filter('append', {word: 'Extra'})
-    expect(stream.get()).toEqual('MarkExtra')
-    let changes = stream.putBack('Joker')
-    expect(changes).toEqual([{path: ['person', 'name'], value: 'Joker'}])
+    const cursor = app.tree.at('person', 'name')
+    cursor.push('Mark')
+    app.tree.applyChanges()
+    const source = cursor.filter('append', {word: 'Extra'})
+    expect(source.pull()).toEqual('MarkExtra')
+    source.push('Joker')
+    expect(app.tree.changes()).toEqual([{path: ['person', 'name'], value: 'Joker', channels: new Set(['person'])}])
   })
 
   it("filters query data", () => {
     app.registerQueries({
       firstWord: {
-        deps: (t) => {
-          return {
-            words: t.at(['words']),
-          }
-        },
-        get: ({words}, {append}) => {
-          return words[0]+append
-        }
+        pick: t => ({
+          words: t.at(['words']),
+        }),
+        get: ({words}, {append}) => words[0]+append
       }
     })
-    treeView = app.pick((t) => {
-      return {
-        word: t.query('firstWord', {append: ' water'}).filter('upcase')
-      }
-    })
+    const treeView = app.pick(t => ({
+      word: t.query('firstWord', {append: ' water'}).filter('upcase')
+    }))
     expect(treeView.get()).toEqual({word: 'GLUG WATER'})
   })
 
   it("enables chaining filters", () => {
-    treeView = app.pick((t) => {
-      return {
-        word: t.at(['words', 0]).filter('upcase').filter('dubble')
-      }
-    })
+    const treeView = app.pick(t => ({
+      word: t.at(['words', 0]).filter('upcase').filter('dubble')
+    }))
     expect(treeView.get()).toEqual({word: 'GLUGGLUG'})
   })
 

@@ -1,141 +1,145 @@
-const App = require('../lib/App')
-const Cursor = require('../lib/Cursor')
 const TreeView = require('../lib/TreeView')
+const DirtyTracker = require('../lib/DirtyTracker')
+
+class Source {
+  pull () {}
+  push () {}
+  channels () {}
+}
 
 describe("TreeView", () => {
 
-  let app
+  let treeView, tree, picker, dirtyTracker, source
 
   beforeEach(() => {
-    app = new App()
+    tree = {}
+    dirtyTracker = new DirtyTracker()
+    picker = jasmine.createSpy('picker')
+    source = new Source()
   })
 
-  describe("getting data", () => {
+  describe("resolving the source", () => {
 
-    let treeView
-
-    beforeEach(() => {
-      app.setTree({
-        a: 'b',
-        b: {c: ['d', 'e']},
-        x: 1
-      })
-      treeView = new TreeView(app, (t) => {
-        return {
-          first: t.at(['a']),
-          second: t.at(['b', 'c', 1])
-        }
-      })
+    it("picks the bundle if an object is given", () => {
+      spyOn(source, 'pull').and.returnValue('value')
+      picker.and.returnValue({ a: source })
+      treeView = new TreeView(tree, picker)
+      expect(treeView.source().constructor.name).toEqual('Bundle')
+      expect(picker).toHaveBeenCalledWith(tree)
+      expect(treeView.source().pull()).toEqual({ a: 'value' })
     })
 
-    it("gets multiple attributes", () => {
-      expect(treeView.get()).toEqual({first: 'b', second: 'e'})
+    it("picks a single source", () => {
+      picker.and.returnValue(source)
+      treeView = new TreeView(tree, picker)
+      expect(treeView.source()).toEqual(source)
+      expect(picker).toHaveBeenCalledWith(tree)
     })
 
-    it("allows initializing with an object", () => {
-      treeView = new TreeView(app, {
-        first: app.at(['a']),
-      })
-      expect(treeView.get()).toEqual({first: 'b'})
-    })
-  })
-
-  describe("putting back data", () => {
-
-    let treeView
-
-    beforeEach(() => {
-      treeView = new TreeView(app, (t) => {
-        return {
-          first: t.at(['a']),
-          second: t.at(['b', 'c'])
-        }
-      })
-    })
-
-    it("changes multiple attributes", () => {
-      let changes = treeView.putBack({first: '1st', second: '2nd'})
-      expect(changes).toEqual([
-        {path: ['a'], value: '1st'},
-        {path: ['b', 'c'], value: '2nd'}
-      ])
-    })
   })
 
   describe("watching", () => {
-    let treeView, callback
+
+    let pullSpy
 
     beforeEach(() => {
-      callback = jasmine.createSpy('watchCallback')
-      treeView = new TreeView(app, (t) => {
-        return {
-          first: t.at(['a']),
-          second: t.at(['b', 'c'])
-        }
-      })
+      callback = jasmine.createSpy('callback')
+      spyOn(source, 'channels').and.returnValue(new Set(['things']))
+      pullSpy = spyOn(source, 'pull')
+      pullSpy.and.returnValue({some: 'data'})
+      picker.and.returnValue(source)
+      treeView = new TreeView(tree, picker, dirtyTracker)
     })
 
-    it("allows for watching the tree", () => {
+    it("calls the callback with the source's data", () => {
       treeView.watch(callback)
-      app.dirtyTracker.markChannelDirty('a')
-      app.dirtyTracker.cleanAllDirty()
-      expect(callback).toHaveBeenCalledWith(treeView)
+      dirtyTracker.markChannelDirty('things')
+      dirtyTracker.flush()
+      expect(callback).toHaveBeenCalledWith({some: 'data'})
     })
 
-    it("doesn't call back if the relevant branches aren't touched", () => {
+    it("doesn't call the callback if the channel isn't dirty", () => {
       treeView.watch(callback)
-      app.dirtyTracker.markChannelDirty('z')
-      app.dirtyTracker.cleanAllDirty()
+      dirtyTracker.markChannelDirty('otherChannel')
+      dirtyTracker.flush()
       expect(callback).not.toHaveBeenCalled()
     })
 
-    it("allows unwatching", () => {
+    it("doesn't call the callback after unwatching", () => {
       treeView.watch(callback)
       treeView.unwatch()
-      app.dirtyTracker.markChannelDirty('a')
-      app.dirtyTracker.cleanAllDirty()
+      dirtyTracker.markChannelDirty('things')
+      dirtyTracker.flush()
       expect(callback).not.toHaveBeenCalled()
     })
+
+    it("calls the callback with fresh data", () => {
+      treeView.watch(callback)
+      dirtyTracker.markChannelDirty('things')
+      dirtyTracker.flush()
+      expect(callback).toHaveBeenCalledWith({some: 'data'})
+      pullSpy.and.returnValue({someNew: 'DATA'})
+      dirtyTracker.markChannelDirty('things')
+      dirtyTracker.flush()
+      expect(callback).toHaveBeenCalledWith({someNew: 'DATA'})
+    })
+
+    it("doesn't call the callback if marked clean", () => {
+      treeView.watch(callback)
+      dirtyTracker.markChannelDirty('things')
+      treeView.markClean()
+      dirtyTracker.flush()
+      expect(callback).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("pull", () => {
+
+    beforeEach(() => {
+      spyOn(source, 'pull').and.returnValue({some: 'data'})
+      picker.and.returnValue(source)
+      treeView = new TreeView(tree, picker, dirtyTracker)
+    })
+
+    it("just returns what's pulled from the source", () => {
+      expect(treeView.pull()).toEqual({some: 'data'})
+    })
+
+    it("aliases 'get'", () => {
+      expect(treeView.get()).toEqual({some: 'data'})
+    })
+
+  })
+
+  describe("push", () => {
+
+    let spy
+
+    beforeEach(() => {
+      spy = spyOn(source, 'push')
+      picker.and.returnValue(source)
+      treeView = new TreeView(tree, picker, dirtyTracker)
+    })
+
+    it("delegates to the source", () => {
+      treeView.push('stuff')
+      expect(spy).toHaveBeenCalledWith('stuff')
+    })
+
   })
 
   describe("channels", () => {
-    let treeView
 
-    it("returns all channels it cares about", () => {
-      treeView = new TreeView(app, (t) => {
-        return {
-          first: t.at(['a']),
-          second: t.at(['b', 'c'])
-        }
-      })
-      expect(treeView.channels()).toEqual(['a', 'b'])
+    beforeEach(() => {
+      spyOn(source, 'channels').and.returnValue(new Set(['a', 'b']))
+      picker.and.returnValue(source)
+      treeView = new TreeView(tree, picker, dirtyTracker)
     })
 
-    it("doesn't repeat a channel", () => {
-      treeView = new TreeView(app, (t) => {
-        return {
-          first: t.at(['a']),
-          second: t.at(['a', 'b'])
-        }
-      })
-      expect(treeView.channels()).toEqual(['a'])
+    it("delegates to the source", () => {
+      expect(treeView.channels()).toEqual(new Set(['a', 'b']))
     })
-  })
 
-  describe("streams", () => {
-    let treeView
-
-    it("returns registered streams", () => {
-      treeView = new TreeView(app, (t) => {
-        return {
-          first: t.at(['a']),
-          second: t.at(['b', 'c'])
-        }
-      })
-      let streams = treeView.streams()
-      expect(streams.first).toEqual(jasmine.any(Cursor))
-      expect(streams.second).toEqual(jasmine.any(Cursor))
-    })
   })
 
 })

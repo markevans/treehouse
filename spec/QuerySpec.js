@@ -1,117 +1,115 @@
-const App = require('../lib/App')
 const Query = require('../lib/Query')
 
 describe("Query", () => {
 
-  let app, query
+  let app, name, spec, args, picker, treeView, query
 
   beforeEach(() => {
-    app = new App()
-    app.init({
-      pages: ['zero', 'one'],
-      currentPage: 1
+    app = { pick: null }
+    name = 'someName'
+    treeView = { pull: null, push: null, channels: null }
+    picker = t => ({
+      'current': t.at(['currentPage']),
+      'pages': t.at(['pages'])
     })
-    query = new Query(app, 'currentPageName',
-      (t) => {
-        return {
-          'current': t.at(['currentPage']),
-          'pages': t.at(['pages'])
-        }
-      },
-      {},
-      ({pages, current}) => {
-        return pages[current]
-      }
-    )
+    spec = {
+      pick: picker,
+      get: ({pages, current}) => pages[current],
+      set: null,
+    }
+    args = { some: 'args' }
   })
 
-  describe("getting", () => {
+  describe('using a treeView', () => {
+    it("creates a treeView with the picker", () => {
+      spyOn(app, 'pick').and.returnValue(treeView)
+      query = new Query(app, name, spec, args)
+      expect(query.treeView()).toEqual(treeView)
+    })
+  })
 
-    describe("using the tree", () => {
+  describe("pulling", () => {
 
-      it("evaluates using parts of the tree", () => {
-        spyOn(query, 'getter').and.callThrough()
-        expect(query.get()).toEqual('one')
-        expect(query.getter).toHaveBeenCalled()
-      })
+    let spy
 
-      it("caches the result if not changed", () => {
-        expect(query.get()).toEqual('one')
-        spyOn(query, 'getter').and.callThrough()
-        expect(query.get()).toEqual('one')
-        expect(query.getter).not.toHaveBeenCalled()
-      })
-
-      it("evaluates again if anything is changed", () => {
-        expect(query.get()).toEqual('one')
-        app.at(['currentPage']).set(0)
-        expect(query.get()).toEqual('zero')
-      })
-
-      it("gets called even if not watching any paths", () => {
-        query = new Query(app, 'name', () => { return {} }, {}, () => {return 'still called'})
-        expect(query.get()).toEqual('still called')
-      })
-
+    beforeEach(() => {
+      spyOn(app, 'pick').and.returnValue(treeView)
+      query = new Query(app, name, spec, args)
+      spy = spyOn(query.treeView(), 'pull')
+      spy.and.returnValue({current: 1, pages: {1: 'one', 2: 'two'}})
     })
 
-    describe("using args", () => {
-      beforeEach(() => {
-        query = new Query(app, 'name', ()=>{}, {number: 4},
-          ({}, {number}) => {
-            return number
-          }
-        )
-      })
+    it("delegates to the treeView", () => {
+      spyOn(spec, 'get').and.callThrough()
+      expect(query.pull()).toEqual('one')
+      expect(spec.get).toHaveBeenCalled()
+    })
 
-      it("yields the args to the evaluator", () => {
-        expect(query.get()).toEqual(4)
-      })
+    it("caches the result if not changed", () => {
+      expect(query.pull()).toEqual('one')
+      spyOn(spec, 'get').and.callThrough()
+      expect(query.pull()).toEqual('one')
+      expect(spec.get).not.toHaveBeenCalled()
+    })
+
+    it("evaluates again if anything is changed", () => {
+      expect(query.pull()).toEqual('one')
+      spy.and.returnValue({current: 2, pages: {1: 'one', 2: 'two'}})
+      expect(query.pull()).toEqual('two')
+    })
+
+    it("also yields the args to the evaluator", () => {
+      spyOn(spec, 'get').and.callThrough()
+      query.pull()
+      expect(spec.get.calls.argsFor(0)[1]).toEqual({ some: 'args' })
     })
 
   })
 
-  describe("getting changes through the query", () => {
+  describe("pushing changes through the query", () => {
+
+    let treeViewPush
+
+    beforeEach(() => {
+      spyOn(app, 'pick').and.returnValue(treeView)
+      query = new Query(app, name, spec, args)
+      treeViewPush = spyOn(query.treeView(), 'push')
+      spyOn(treeView, 'pull').and.returnValue({current: 'stuff'})
+    })
 
     it("throws if not implemented", () => {
+      spec.set = undefined
       expect(() => {
-        query.putBack('blah')
-      }).toThrowError("Query 'currentPageName' doesn't implement change")
+        query.push('blah')
+      }).toThrowError("Query 'someName' doesn't implement set")
     })
 
-    it("returns changes via the passed in change function", () => {
-      query = new Query(app, 'currentPageName',
-        (t) => {
-          return {
-            'current': t.at(['currentPage']),
-            'pages': t.at(['pages'])
-          }
-        },
-        {some: 'arg'},
-        ({pages, current}) => { return pages[current] }, // getter
-        (value, {pages, current}) => {   // change function
-          return {
-            current: pages.indexOf(value)
-          }
-        }
-      )
-      expect(query.get()).toEqual('one')
-      let changes = query.putBack('zero')
-      expect(changes).toEqual([
-        {path: ['currentPage'], value: 0}
-      ])
+    it("pushes changes to the treeview", () => {
+      spec.set = (value) => ({ a: value })
+      query.push('something')
+      expect(treeViewPush).toHaveBeenCalledWith({a: 'something'})
     })
 
-    it("yields args", () => {
-      let changer = jasmine.createSpy('changer')
-      query = new Query(app, 'pass args', {},
-        {some: 'arg'},
-        () => {}, // getter
-        changer   // changer
-      )
-      query.putBack('something')
-      expect(changer).toHaveBeenCalledWith('something', {}, {some: 'arg'})
+    it("yields current state and args", () => {
+      spec.set = jasmine.createSpy('set')
+      query.push('something')
+      expect(spec.set).toHaveBeenCalledWith('something', {current: 'stuff'}, args)
     })
 
   })
+
+  describe("channels", () => {
+
+    beforeEach(() => {
+      spyOn(app, 'pick').and.returnValue(treeView)
+      query = new Query(app, name, spec, args)
+      spyOn(treeView, 'channels').and.returnValue(new Set(['boom', 'ting']))
+    })
+
+    it("delegates to the treeview", () => {
+      expect(query.channels()).toEqual(new Set(['boom', 'ting']))
+    })
+
+  })
+
 })

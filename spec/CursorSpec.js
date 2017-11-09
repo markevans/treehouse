@@ -1,111 +1,50 @@
-const App = require('../lib/App')
 const Cursor = require('../lib/Cursor')
 
 describe("Cursor", () => {
   let app
 
   beforeEach(() => {
-    app = new App()
+    app = {
+      tree: {
+        pull: null,
+        push: null
+      }
+    }
   })
 
-  describe("getting data", () => {
-    let cursor
-
-    beforeEach(() => {
-      app.init({animal: {type: 'Dog'}})
-    })
-
+  describe("pulling data", () => {
     it("gets nested data", () => {
-      let cursor = new Cursor(app, ['animal', 'type'])
-      expect(cursor.get()).toEqual('Dog')
+      spyOn(app.tree, 'pull').and.returnValue({animal: {type: 'Dog'}})
+      const cursor = new Cursor(app, ['animal', 'type'])
+      expect(cursor.pull()).toEqual('Dog')
     })
 
     it("works fine with arrays", () => {
-      app.setTree({users: ['Sam', 'Henry', 'Daisy']})
-      let cursor = new Cursor(app, ['users', 1])
-      expect(cursor.get()).toEqual('Henry')
+      spyOn(app.tree, 'pull').and.returnValue({users: ['Sam', 'Henry', 'Daisy']})
+      const cursor = new Cursor(app, ['users', 1])
+      expect(cursor.pull()).toEqual('Henry')
     })
 
     it("returns undefined if the path doesn't match anything", () => {
-      let cursor = new Cursor(app, ['doobie', 'mcgovern'])
-      expect(cursor.get()).toBeUndefined()
+      spyOn(app.tree, 'pull').and.returnValue({bligh: 'blagh'})
+      const cursor = new Cursor(app, ['doobie', 'mcgovern'])
+      expect(cursor.pull()).toBeUndefined()
     })
   })
 
-  describe("setting data", () => {
-    let cursor
-
-    beforeEach(() => {
-      app.init({animal: {type: 'Dog'}})
-      cursor = new Cursor(app, ['animal', 'type'])
-    })
+  describe("pushing data", () => {
 
     it("sets attributes", () => {
-      cursor.set('Lion')
-      expect(app.tree()).toEqual({animal: {type: 'Lion'}})
+      const cursor = new Cursor(app, ['animal', 'type'])
+      spyOn(app.tree, 'push')
+      cursor.push('Lion')
+      expect(app.tree.push).toHaveBeenCalledWith({
+        path: ['animal', 'type'],
+        value: 'Lion',
+        channels: new Set(['animal'])
+      })
     })
 
-    it("changes each object that has been changed", () => {
-      let oldData = app.tree()
-      cursor.set('Lion')
-      let newData = app.tree()
-      expect(oldData === newData).not.toBeTruthy()
-      expect(oldData.animal === newData.animal).not.toBeTruthy()
-    })
-
-    it("creates intermediate objects if they don't already exist", () => {
-      cursor = new Cursor(app, ['friends', 'reunited'])
-      cursor.set('gone forever')
-      expect(app.tree().friends.reunited).toEqual('gone forever')
-    })
-
-    it("works fine on the trunk", () => {
-      cursor = new Cursor(app, [])
-      cursor.set({ok: 'guys'})
-      expect(app.tree()).toEqual({ok: 'guys'})
-    })
-
-    it("allows setting with a function", () => {
-      cursor.update(string => string.toUpperCase())
-      expect(app.tree()).toEqual({animal: {type: 'DOG'}})
-    })
-
-    it("allows passing extra args to the reducer", () => {
-      cursor.update((string, a, b) => { return string.toUpperCase() + a + b}, "A", "B")
-      expect(app.tree()).toEqual({animal: {type: 'DOGAB'}})
-    })
-
-    it("aliases update to $", () => {
-      cursor.$(string => string.toUpperCase())
-      expect(app.tree()).toEqual({animal: {type: 'DOG'}})
-    })
-
-    it("throws an error if the function doesn't return", () => {
-      expect(() => {
-        cursor.update((oldData) => {} )
-      }).toThrowError("You tried to set the tree at path 'animal/type' with undefined")
-    })
-
-    it("warns if setting with the same object", () => {
-      cursor.set({})
-      spyOn(app, 'log')
-      cursor.update(oldData => oldData)
-      expect(app.log).toHaveBeenCalledWith("You tried to set the tree at path 'animal/type' with the same object. Remember the tree should be immutable")
-    })
-
-    it("warns if setting with the same array", () => {
-      cursor.set([])
-      spyOn(app, 'log')
-      cursor.update(oldData => oldData)
-      expect(app.log).toHaveBeenCalledWith("You tried to set the tree at path 'animal/type' with the same object. Remember the tree should be immutable")
-    })
-
-    it("doesn't warn if setting with the same primitive (immutable) object", () => {
-      cursor.set(1)
-      spyOn(app, 'log')
-      cursor.update(oldData => oldData)
-      expect(app.log).not.toHaveBeenCalled()
-    })
   })
 
   describe("at", () => {
@@ -127,34 +66,10 @@ describe("Cursor", () => {
     })
   })
 
-  describe("putBack", () => {
-    let cursor
-
-    beforeEach(() => {
-      app.init({animal: {type: 'Oliphant'}})
-      cursor = new Cursor(app, ['animal', 'type'])
-    })
-
-    it("returns the changes to be made", () => { // plural to give a uniform interface with queries, etc.
-      let changes = cursor.putBack('Donkey')
-      expect(changes).toEqual([{path: ['animal', 'type'], value: 'Donkey'}])
-    })
-  })
-
-  describe("applying multiple changes", () => {
-    let cursor
-
-    beforeEach(() => {
-      app.init({animal: {type: 'Oliphant', size: 'huge!'}})
-      cursor = new Cursor(app, ['animal'])
-    })
-
-    it("applies a list of changes", () => {
-      cursor.apply([
-        {path: ['type'], value: 'Pony'},
-        {path: ['size'], value: 'liddle'}
-      ])
-      expect(cursor.get()).toEqual({type: 'Pony', size: 'liddle'})
+  describe("channels", () => {
+    it("returns a set with the main bough as the single element", () => {
+      const cursor = new Cursor(app, ['users', 'best', 5])
+      expect(cursor.channels()).toEqual(new Set(['users']))
     })
   })
 
