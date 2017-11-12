@@ -7,9 +7,6 @@ describe("Action", () => {
   beforeEach(() => {
     app = {
       event: spy('app.event'),
-      tree: {
-        pull: spy('tree.pull')
-      }
     }
     actionFunc = spy('action')
     treeView = {
@@ -21,15 +18,15 @@ describe("Action", () => {
     action = new Action(app, 'myEvent', treeView, actionFunc)
     action.call({somePayload: 'payload'})
 
-    expect(actionFunc).toHaveBeenCalledWith({somePayload: 'payload'}, app.event, jasmine.any(Function))
+    expect(actionFunc).toHaveBeenCalledWith({somePayload: 'payload'}, jasmine.any(Function), jasmine.any(Function))
   })
 
   it("yields a getter for the tree state", () => {
-    app.tree.pull.and.returnValues(4, 8)
+    treeView.pull.and.returnValues(4, 8)
     let values = []
-    action = new Action(app, 'myEvent', treeView, (payload, event, getTree) => {
-      values.push(getTree() + 1)
-      values.push(getTree() + 0.5)
+    action = new Action(app, 'myEvent', treeView, (payload, event, getState) => {
+      values.push(getState() + 1)
+      values.push(getState() + 0.5)
     })
     action.call()
     expect(values).toEqual([5, 8.5])

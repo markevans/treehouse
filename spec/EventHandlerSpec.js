@@ -6,7 +6,8 @@ describe("EventHandler", () => {
 
   beforeEach(() => {
     app = {
-      pick: spy('app.pick')
+      pick: spy('app.pick'),
+      event: spy('app.event')
     }
     spec = {
       pick: spy('spec.pick'),
@@ -49,12 +50,6 @@ describe("EventHandler", () => {
   })
 
   describe("decorating the handler", () => {
-
-    beforeEach(() => {
-      app = {
-        pick: spy('pick')
-      }
-    })
 
     it("allows decorating the handler", () => {
       spec.decorate = handler => {

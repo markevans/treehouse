@@ -8,7 +8,7 @@ describe("Using events", () => {
     app = new App()
   })
 
-  describe("registering and triggering events", () => {
+  describe("simple updates", () => {
 
     beforeEach(() => {
       app.init({
@@ -34,6 +34,49 @@ describe("Using events", () => {
       expect(app.tree.pull()).toEqual({
         num: 4
       })
+    })
+
+  })
+
+  describe("actions", () => {
+
+    let result
+
+    beforeEach(() => {
+      app.init({
+        colours: {
+          green: '#0d0'
+        }
+      })
+      spyOn(app, 'event').and.callThrough()
+      result = null
+    })
+
+    it("triggers an action with the correct payload", () => {
+      app.registerEvent('doThings', {
+        action: (payload) => {
+          result = payload
+        }
+      })
+      app.event('doThings')('hello')
+      expect(result).toEqual('hello')
+    })
+
+    it("allows triggering other events", (done) => {
+      app.registerEvents({
+        doThings: {
+          action: (_, event) => {
+            setTimeout(() => event('otherEvent')('some payload'))
+          }
+        },
+        otherEvent: {
+          action: (payload) => {
+            expect(payload).toEqual('some payload')
+            done()
+          }
+        }
+      })
+      app.event('doThings')()
     })
 
   })
