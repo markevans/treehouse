@@ -49,6 +49,11 @@ describe("EventHandler", () => {
     expect(eventHandler.action.call).toHaveBeenCalled()
   })
 
+  it("does nothing if set to null", () => {
+    eventHandler = new EventHandler(app, 'myEvent', null)
+    eventHandler.call({thisWill: 'not throw an error'})
+  })
+
   describe("decorating the handler", () => {
 
     it("allows decorating the handler", () => {
