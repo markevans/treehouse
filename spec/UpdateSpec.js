@@ -2,34 +2,28 @@ const Update = require('../lib/Update')
 
 describe("Update", () => {
 
-  let app, source, spec
+  let app, update, treeView
 
   beforeEach(() => {
     app = {
-      pick: spy('app.pick'),
       commitChanges: spy('commitChanges'),
     }
-    source = {
-      push: spy('push'),
-      pull: spy('pull')
+    treeView = {
+      pull: spy('pull'),
+      push: spy('push')
     }
-    spec = {
-      pick: spy('spec.pick'),
-      reducer: spy('reducer')
-    }
+    updateFunc = spy('update')
   })
 
-  it("pushes updates onto the picked source", () => {
-    source.pull.and.returnValue({someData: 'data'})
-    app.pick.and.returnValue(source)
-    spec.reducer.and.returnValue({someUpdate: 'update'})
+  it("pushes updates onto the treeView", () => {
+    treeView.pull.and.returnValue({someData: 'data'})
+    updateFunc.and.returnValue({someUpdate: 'update'})
 
-    update = new Update(app, 'myEvent', spec)
+    update = new Update(app, 'myEvent', treeView, updateFunc)
     update.call({somePayload: 'payload'})
 
-    expect(app.pick).toHaveBeenCalledWith(spec.pick)
-    expect(spec.reducer).toHaveBeenCalledWith({someData: 'data'}, {somePayload: 'payload'})
-    expect(source.push).toHaveBeenCalledWith({someUpdate: 'update'})
+    expect(updateFunc).toHaveBeenCalledWith({someData: 'data'}, {somePayload: 'payload'})
+    expect(treeView.push).toHaveBeenCalledWith({someUpdate: 'update'})
     expect(app.commitChanges).toHaveBeenCalled()
   })
 

@@ -6,11 +6,12 @@ describe("EventHandler", () => {
 
   beforeEach(() => {
     app = {
-      pick: spy('pick')
+      pick: spy('app.pick')
     }
     spec = {
-      action: {someActionSpec: 'spec'},
-      update: {someUpdateSpec: 'spec'}
+      pick: spy('spec.pick'),
+      action: spy('action'),
+      update: spy('update')
     }
   })
 

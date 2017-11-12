@@ -2,7 +2,7 @@ const Action = require('../lib/Action')
 
 describe("Action", () => {
 
-  let app, actionFunc
+  let app, actionFunc, treeView
 
   beforeEach(() => {
     app = {
@@ -12,10 +12,13 @@ describe("Action", () => {
       }
     }
     actionFunc = spy('action')
+    treeView = {
+      pull: spy('pull')
+    }
   })
 
   it("performs the given action", () => {
-    action = new Action(app, 'myEvent', actionFunc)
+    action = new Action(app, 'myEvent', treeView, actionFunc)
     action.call({somePayload: 'payload'})
 
     expect(actionFunc).toHaveBeenCalledWith({somePayload: 'payload'}, app.event, jasmine.any(Function))
@@ -24,7 +27,7 @@ describe("Action", () => {
   it("yields a getter for the tree state", () => {
     app.tree.pull.and.returnValues(4, 8)
     let values = []
-    action = new Action(app, 'myEvent', (payload, event, getTree) => {
+    action = new Action(app, 'myEvent', treeView, (payload, event, getTree) => {
       values.push(getTree() + 1)
       values.push(getTree() + 0.5)
     })

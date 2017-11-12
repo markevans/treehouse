@@ -15,10 +15,8 @@ describe("Using events", () => {
         num: 3
       })
       app.registerEvent('increment', {
-        update: {
-          pick: t => t.at('num'),
-          reducer: num => num + 1
-        }
+        pick: t => t.at('num'),
+        update: num => num + 1
       })
     })
 
