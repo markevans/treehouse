@@ -58,4 +58,45 @@ describe("FilteredPipe", () => {
     })
   })
 
+  describe("creating with a factory", () => {
+
+    beforeEach(() => {
+      app = { filters: { find: spy('filters.find') }}
+      name = 'someName'
+      source = {}
+      spec = {}
+      args = {}
+    })
+
+    it("creates a named filter if given a string", () => {
+      app.filters.find.and.returnValue(spec)
+      filteredPipe = FilteredPipe.create(app, source, name, args)
+      expect(filteredPipe.app).toEqual(app)
+      expect(filteredPipe.source).toEqual(source)
+      expect(filteredPipe.name).toEqual(name)
+      expect(filteredPipe.spec).toEqual(spec)
+      expect(filteredPipe.args).toEqual(args)
+    })
+
+    it("creates an anonymous filter if given a function", () => {
+      let filter = a => a*2
+      filteredPipe = FilteredPipe.create(app, source, filter, args)
+      expect(filteredPipe.app).toEqual(app)
+      expect(filteredPipe.source).toEqual(source)
+      expect(filteredPipe.name).toEqual('anonymous')
+      expect(filteredPipe.spec).toEqual(filter)
+      expect(filteredPipe.args).toEqual(args)
+    })
+
+    it("creates an anonymous filter if given a spec object", () => {
+      filteredPipe = FilteredPipe.create(app, source, spec, args)
+      expect(filteredPipe.app).toEqual(app)
+      expect(filteredPipe.source).toEqual(source)
+      expect(filteredPipe.name).toEqual('anonymous')
+      expect(filteredPipe.spec).toEqual(spec)
+      expect(filteredPipe.args).toEqual(args)
+    })
+
+  })
+
 })
