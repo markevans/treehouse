@@ -83,21 +83,31 @@ describe("Using events", () => {
 
   describe("decorating events", () => {
 
-    let result
+    let result, spec, scope
 
     beforeEach(() => {
-      app.registerEvent('doThing', {
+      spec = {
         action: (payload) => result = payload
-      })
+      }
+      app.registerEvent('doThing', spec)
+      scope = {}
       result = null
     })
 
     it("modifies the handler", () => {
-      app.decorateEvent((event, payload) => {
-        event(payload.toUpperCase())
+      app.decorateEvent((handler, payload) => {
+        handler(payload.toUpperCase())
       })
       app.event('doThing')('payload')
       expect(result).toEqual('PAYLOAD')
+    })
+
+    it("yields useful stuff", () => {
+      app.decorateEvent((event, payload, extra) => {
+        result = extra
+      })
+      app.event('doThing', scope)('payload')
+      expect(result).toEqual({ spec, app, scope, name: 'doThing' })
     })
 
   })
