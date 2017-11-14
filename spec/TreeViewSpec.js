@@ -24,15 +24,15 @@ describe("TreeView", () => {
       spyOn(source, 'pull').and.returnValue('value')
       picker.and.returnValue({ a: source })
       treeView = new TreeView(tree, picker)
-      expect(treeView.source().constructor.name).toEqual('Bundle')
+      expect(treeView.source.constructor.name).toEqual('Bundle')
       expect(picker).toHaveBeenCalledWith(tree)
-      expect(treeView.source().pull()).toEqual({ a: 'value' })
+      expect(treeView.source.pull()).toEqual({ a: 'value' })
     })
 
     it("picks a single source", () => {
       picker.and.returnValue(source)
       treeView = new TreeView(tree, picker)
-      expect(treeView.source()).toEqual(source)
+      expect(treeView.source).toEqual(source)
       expect(picker).toHaveBeenCalledWith(tree)
     })
 

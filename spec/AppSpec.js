@@ -53,7 +53,7 @@ describe("App", () => {
   it("picks off the tree", () => {
     const treeView = app.pick(t => t.at('a'))
     expect(treeView.constructor.name).toEqual('TreeView')
-    expect(treeView.source().path).toEqual(['a'])
+    expect(treeView.source.path).toEqual(['a'])
   })
 
   it("commits changes and calls relevant callbacks", () => {
