@@ -27,6 +27,7 @@ describe("TreeView", () => {
       expect(treeView.source.constructor.name).toEqual('Bundle')
       expect(picker).toHaveBeenCalledWith(tree)
       expect(treeView.source.pull()).toEqual({ a: 'value' })
+      expect(treeView.keys).toEqual(['a'])
     })
 
     it("picks a single source", () => {
@@ -34,6 +35,7 @@ describe("TreeView", () => {
       treeView = new TreeView(tree, picker)
       expect(treeView.source).toEqual(source)
       expect(picker).toHaveBeenCalledWith(tree)
+      expect(treeView.keys).toEqual(null)
     })
 
   })
