@@ -81,4 +81,25 @@ describe("Using events", () => {
 
   })
 
+  describe("decorating events", () => {
+
+    let result
+
+    beforeEach(() => {
+      app.registerEvent('doThing', {
+        action: (payload) => result = payload
+      })
+      result = null
+    })
+
+    it("modifies the handler", () => {
+      app.decorateEvent((event, payload) => {
+        event(payload.toUpperCase())
+      })
+      app.event('doThing')('payload')
+      expect(result).toEqual('PAYLOAD')
+    })
+
+  })
+
 })
