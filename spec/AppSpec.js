@@ -38,16 +38,16 @@ describe("App", () => {
     expect(app.filters.registerMany).toHaveBeenCalledWith({f1: spec})
   })
 
-  it("registers a single event", () => {
-    spyOn(app.events, 'register')
-    app.registerEvent('e1', spec)
-    expect(app.events.register).toHaveBeenCalledWith('e1', spec)
+  it("registers a single action", () => {
+    spyOn(app.actions, 'register')
+    app.registerAction('e1', spec)
+    expect(app.actions.register).toHaveBeenCalledWith('e1', spec)
   })
 
   it("registers many filters", () => {
-    spyOn(app.events, 'registerMany')
-    app.registerEvents({e1: spec})
-    expect(app.events.registerMany).toHaveBeenCalledWith({e1: spec})
+    spyOn(app.actions, 'registerMany')
+    app.registerActions({e1: spec})
+    expect(app.actions.registerMany).toHaveBeenCalledWith({e1: spec})
   })
 
   it("picks off the tree", () => {

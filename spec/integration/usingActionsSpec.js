@@ -1,6 +1,6 @@
 const App = require('../../lib/App')
 
-describe("Using events", () => {
+describe("Using actions", () => {
 
   let app
 
@@ -14,22 +14,22 @@ describe("Using events", () => {
       app.init({
         num: 3
       })
-      app.registerEvent('increment', {
+      app.registerAction('increment', {
         pick: t => t.at('num'),
         update: num => num + 1
       })
     })
 
     it("updates the tree", () => {
-      app.event('increment')()
+      app.action('increment')()
       expect(app.tree.pull()).toEqual({
         num: 4
       })
     })
 
     it("only calls the handler once when many handlers are initialized", () => {
-      const handler1 = app.event('increment'),
-        handler2 = app.event('increment')
+      const handler1 = app.action('increment'),
+        handler2 = app.action('increment')
       handler1()
       expect(app.tree.pull()).toEqual({
         num: 4
@@ -48,40 +48,40 @@ describe("Using events", () => {
           green: '#0d0'
         }
       })
-      spyOn(app, 'event').and.callThrough()
+      spyOn(app, 'action').and.callThrough()
       result = null
     })
 
     it("triggers an action with the correct payload", () => {
-      app.registerEvent('doThings', {
+      app.registerAction('doThings', {
         action: (payload) => {
           result = payload
         }
       })
-      app.event('doThings')('hello')
+      app.action('doThings')('hello')
       expect(result).toEqual('hello')
     })
 
-    it("allows triggering other events", (done) => {
-      app.registerEvents({
+    it("allows triggering other actions", (done) => {
+      app.registerActions({
         doThings: {
-          action: (_, event) => {
-            setTimeout(() => event('otherEvent')('some payload'))
+          action: (_, action) => {
+            setTimeout(() => action('otherAction')('some payload'))
           }
         },
-        otherEvent: {
+        otherAction: {
           action: (payload) => {
             expect(payload).toEqual('some payload')
             done()
           }
         }
       })
-      app.event('doThings')()
+      app.action('doThings')()
     })
 
   })
 
-  describe("decorating events", () => {
+  describe("decorating actions", () => {
 
     let result, spec, scope
 
@@ -89,24 +89,24 @@ describe("Using events", () => {
       spec = {
         action: (payload) => result = payload
       }
-      app.registerEvent('doThing', spec)
+      app.registerAction('doThing', spec)
       scope = {}
       result = null
     })
 
     it("modifies the handler", () => {
-      app.decorateEvent((handler, payload) => {
+      app.decorateAction((handler, payload) => {
         handler(payload.toUpperCase())
       })
-      app.event('doThing')('payload')
+      app.action('doThing')('payload')
       expect(result).toEqual('PAYLOAD')
     })
 
     it("yields useful stuff", () => {
-      app.decorateEvent((event, payload, extra) => {
+      app.decorateAction((action, payload, extra) => {
         result = extra
       })
-      app.event('doThing', scope)('payload')
+      app.action('doThing', scope)('payload')
       expect(result).toEqual({ spec, app, scope, name: 'doThing' })
     })
 
