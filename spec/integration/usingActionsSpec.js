@@ -28,7 +28,7 @@ describe("Using actions", () => {
       app.registerAction('doThings', payload => {
         result = payload
       })
-      app.action('doThings', {message: 'hello'})
+      app.action('doThings')({message: 'hello'})
       expect(result).toEqual({message: 'hello'})
     })
 
@@ -36,7 +36,7 @@ describe("Using actions", () => {
       app.registerAction('addFour', (_, update) => {
         update('add', 4)
       })
-      app.action('addFour')
+      app.action('addFour')()
       expect(app.tree.pull().num).toEqual(11)
     })
 
@@ -45,18 +45,18 @@ describe("Using actions", () => {
       app.registerAction('getState', (_, __, getState) => {
         result = getState()
       })
-      app.action('getState')
+      app.action('getState')()
       expect(result).toEqual({num: 7})
     })
 
     it("does nothing when set to null", () => {
       app.registerAction('nullyMcNullFace', null)
-      app.action('nullyMcNullFace')
+      app.action('nullyMcNullFace')()
     })
 
     it("allows for a string shortcut to forward to the update", () => {
       app.registerAction('addy', 'add')
-      app.action('addy', 5)
+      app.action('addy')(5)
       expect(app.tree.pull().num).toEqual(12)
     })
 
@@ -76,7 +76,7 @@ describe("Using actions", () => {
       app.decorateAction((handler, {pay}) => {
         handler({PAY: pay.toUpperCase()})
       })
-      app.action('doThing', {pay: 'load'})
+      app.action('doThing')({pay: 'load'})
       expect(result).toEqual({PAY: 'LOAD'})
     })
 
@@ -84,7 +84,7 @@ describe("Using actions", () => {
       app.decorateAction((action, payload, extra) => {
         result = extra
       })
-      app.action('doThing', {pay: 'load'})
+      app.action('doThing')({pay: 'load'})
       expect(result).toEqual({ spec, app, name: 'doThing' })
     })
 
