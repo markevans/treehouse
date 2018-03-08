@@ -8,106 +8,77 @@ describe("Using actions", () => {
     app = new App()
   })
 
-  describe("simple updates", () => {
-
-    beforeEach(() => {
-      app.init({
-        num: 3
-      })
-      app.registerAction('increment', {
-        pick: t => t.at('num'),
-        update: num => num + 1
-      })
-    })
-
-    it("updates the tree", () => {
-      app.action('increment')()
-      expect(app.tree.pull()).toEqual({
-        num: 4
-      })
-    })
-
-    it("only calls the handler once when many handlers are initialized", () => {
-      const handler1 = app.action('increment'),
-        handler2 = app.action('increment')
-      handler1()
-      expect(app.tree.pull()).toEqual({
-        num: 4
-      })
-    })
-
-  })
-
   describe("actions", () => {
 
     let result
 
     beforeEach(() => {
       app.init({
-        colours: {
-          green: '#0d0'
-        }
+        num: 7
       })
       spyOn(app, 'action').and.callThrough()
       result = null
+      app.registerUpdate('add', {
+        pick: t => t.at('num'),
+        update: (num, toAdd) => num + toAdd
+      })
     })
 
     it("triggers an action with the correct payload", () => {
-      app.registerAction('doThings', {
-        action: (payload) => {
-          result = payload
-        }
+      app.registerAction('doThings', payload => {
+        result = payload
       })
-      app.action('doThings')('hello')
-      expect(result).toEqual('hello')
+      app.action('doThings', {message: 'hello'})
+      expect(result).toEqual({message: 'hello'})
     })
 
-    it("allows triggering other actions", (done) => {
-      app.registerActions({
-        doThings: {
-          action: (_, action) => {
-            setTimeout(() => action('otherAction')('some payload'))
-          }
-        },
-        otherAction: {
-          action: (payload) => {
-            expect(payload).toEqual('some payload')
-            done()
-          }
-        }
+    it("can call updates", () => {
+      app.registerAction('addFour', (_, update) => {
+        update('add', 4)
       })
-      app.action('doThings')()
+      app.action('addFour')
+      expect(app.tree.pull().num).toEqual(11)
     })
+
+    it("yields a getter for the state", () => {
+      let result
+      app.registerAction('getState', (_, __, getState) => {
+        result = getState()
+      })
+      app.action('getState')
+      expect(result).toEqual({num: 7})
+    })
+
+    it("does nothing when set to null")
+
+    it("allows for a string shortcut to forward to the update")
 
   })
 
   describe("decorating actions", () => {
 
-    let result, spec, scope
+    let result, spec
 
     beforeEach(() => {
-      spec = {
-        action: (payload) => result = payload
-      }
+      spec = payload => result = payload
       app.registerAction('doThing', spec)
-      scope = {}
       result = null
     })
 
     it("modifies the handler", () => {
-      app.decorateAction((handler, payload) => {
-        handler(payload.toUpperCase())
+      app.decorateAction((handler, {pay}) => {
+        handler({PAY: pay.toUpperCase()})
       })
-      app.action('doThing')('payload')
-      expect(result).toEqual('PAYLOAD')
+      app.action('doThing', {pay: 'load'})
+      expect(result).toEqual({PAY: 'LOAD'})
     })
 
     it("yields useful stuff", () => {
       app.decorateAction((action, payload, extra) => {
         result = extra
       })
-      app.action('doThing', scope)('payload')
-      expect(result).toEqual({ spec, app, scope, name: 'doThing' })
+      app.action('doThing', {pay: 'load'})
+      expect(result).toEqual({ spec, app, name: 'doThing' })
     })
 
   })
