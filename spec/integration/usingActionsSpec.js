@@ -49,9 +49,16 @@ describe("Using actions", () => {
       expect(result).toEqual({num: 7})
     })
 
-    it("does nothing when set to null")
+    it("does nothing when set to null", () => {
+      app.registerAction('nullyMcNullFace', null)
+      app.action('nullyMcNullFace')
+    })
 
-    it("allows for a string shortcut to forward to the update")
+    it("allows for a string shortcut to forward to the update", () => {
+      app.registerAction('addy', 'add')
+      app.action('addy', 5)
+      expect(app.tree.pull().num).toEqual(12)
+    })
 
   })
 
