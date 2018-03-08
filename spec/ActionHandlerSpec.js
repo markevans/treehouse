@@ -22,30 +22,6 @@ describe("ActionHandler", () => {
     app.pick.and.returnValue(treeView)
   })
 
-  describe("updating", () => {
-
-    it("pushes changes onto the treeview", () => {
-      treeView.pull.and.returnValue({someData: 'data'})
-      spec.update.and.returnValue({someUpdate: 'update'})
-
-      const actionHandler = new ActionHandler(app, 'myAction', spec)
-      actionHandler.call({somePayload: 'payload'})
-
-      expect(spec.update).toHaveBeenCalledWith({someData: 'data'}, {somePayload: 'payload'})
-      expect(treeView.push).toHaveBeenCalledWith({someUpdate: 'update'})
-      expect(app.commitChanges).toHaveBeenCalled()
-    })
-
-    it("doesn't matter if the update is missing", () => {
-      delete spec.update
-      actionHandler = new ActionHandler(app, 'myAction', spec)
-      spyOn(actionHandler.action, 'call')
-      actionHandler.call({somePayload: 'payload'})
-      expect(actionHandler.action.call).toHaveBeenCalled()
-    })
-
-  })
-
   describe("action", () => {
 
     let result

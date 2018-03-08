@@ -44,10 +44,22 @@ describe("App", () => {
     expect(app.actions.register).toHaveBeenCalledWith('e1', spec)
   })
 
-  it("registers many filters", () => {
+  it("registers many actions", () => {
     spyOn(app.actions, 'registerMany')
     app.registerActions({e1: spec})
     expect(app.actions.registerMany).toHaveBeenCalledWith({e1: spec})
+  })
+
+  it("registers a single update", () => {
+    spyOn(app.updates, 'register')
+    app.registerUpdate('u1', spec)
+    expect(app.updates.register).toHaveBeenCalledWith('u1', spec)
+  })
+
+  it("registers many updates", () => {
+    spyOn(app.updates, 'registerMany')
+    app.registerUpdates({u1: spec})
+    expect(app.updates.registerMany).toHaveBeenCalledWith({u1: spec})
   })
 
   it("picks off the tree", () => {
