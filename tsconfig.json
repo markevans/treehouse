@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "strict": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
     "sourceMap": true,
     "declaration": true,
     "declarationDir": "./dist",
