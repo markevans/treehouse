@@ -11,5 +11,6 @@ export default {
       file: pkg.module,
       format: 'es'
     }
-  ]
+  ],
+  external: ['react']
 }
