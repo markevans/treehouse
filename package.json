@@ -2,20 +2,12 @@
   "name": "treehouse",
   "version": "1.0.0",
   "description": "State management for javascript apps",
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
-  "dependencies": {},
-  "devDependencies": {
-    "rollup-plugin-typescript": "^1.0.0",
-    "tslib": "^1.9.3",
-    "typescript": "^3.2.2"
+  "author": "Mark Evans",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/markevans/treehouse/issues"
   },
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "build": "rollup -c",
-    "watch": "rollup -cw",
-    "test": "jest"
-  },
+  "homepage": "https://github.com/markevans/treehouse#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/markevans/treehouse.git"
@@ -30,10 +22,29 @@
     "immutable",
     "tree"
   ],
-  "author": "Mark Evans",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/markevans/treehouse/issues"
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "^23.3.11",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "typescript": "^3.2.2"
   },
-  "homepage": "https://github.com/markevans/treehouse#readme"
+  "peerDependencies": {},
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "test": "jest"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testRegex": "^.+\\.test\\.ts$"
+  }
 }

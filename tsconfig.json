@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": true,
-    "strict": true,
     "alwaysStrict": true,
-    "noUnusedLocals": true,
-    "sourceMap": true,
     "declaration": true,
     "declarationDir": "./dist",
-    "module": "es6",
+    "forceConsistentCasingInFileNames": true,
+    "module": "commonjs",
     "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
     "outDir": "./dist",
+    "sourceMap": true,
+    "strict": true,
     "target": "es5"
   },
   "include": [
