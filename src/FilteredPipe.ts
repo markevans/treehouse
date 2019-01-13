@@ -1,43 +1,40 @@
-export default class FilteredPipe {
+import { Data, FilterSpec, Pipe, WatchCallback } from './types'
 
-  constructor (source, spec, args) {
+export default class FilteredPipe implements Pipe<Data>, Filterable {
+
+  source: Pipe
+  args: any
+  filterFn: (data: Data, args: any) => Data
+  unfilterFn?: (data: Data, args: any) => Data
+
+  constructor (source: Pipe, spec: FilterSpec, args: any) {
     this.source = source
-    this.spec = spec
     this.args = args
+
+    this.filterFn = typeof(spec) === 'function' ? spec : spec.filter
+    this.unfilterFn = spec.unfilter
   }
 
-  filterFn () {
-    if (!this._filterFn) {
-      this._filterFn = typeof(this.spec) === 'function' ? this.spec : this.spec.filter
-    }
-    return this._filterFn
+  pull (): Data {
+    return this.filterFn(this.source.pull(), this.args)
   }
 
-  unfilterFn () {
-    if (!this.spec.unfilter) {
+  push (value: Data): void {
+    if (!this.unfilterFn) {
       throw new Error(`You need to implement 'unfilter' on a filter to be able to set through it`)
-    } else {
-      return this.spec.unfilter
     }
+    return this.source.push(this.unfilterFn(value, this.args))
   }
 
-  pull () {
-    return this.filterFn()(this.source.pull(), this.args)
-  }
-
-  push (value) {
-    return this.source.push(this.unfilterFn()(value, this.args))
-  }
-
-  watch (callback) {
+  watch (callback: WatchCallback): void {
     this.source.watch(callback)
   }
 
-  unwatch () {
+  unwatch (): void {
     this.source.unwatch()
   }
 
-  filter (spec, args) {
-    return new this.constructor(this, spec, args)
+  filter (spec: FilterSpec, args: any): Pipe {
+    return new FilteredPipe(this, spec, args)
   }
 }

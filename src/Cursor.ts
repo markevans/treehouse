@@ -1,7 +1,8 @@
 import FilteredPipe from './FilteredPipe'
+import { Data, Filterable, Pipe } from './types'
 import getIn from './utils/getIn'
 
-export default class Cursor {
+export default class Cursor implements Pipe<Data>, Filterable {
   constructor (db, path) {
     this.db = db
     this.path = path

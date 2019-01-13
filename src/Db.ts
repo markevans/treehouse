@@ -2,11 +2,12 @@ import Cursor from './Cursor'
 import DbView from './DbView'
 import DirtyTracker from './DirtyTracker'
 import Query from './Query'
+import { Queryable } from './types'
 import mapObject from './utils/mapObject'
 import getIn from './utils/getIn'
 import setIn from './utils/setIn'
 
-export default class Db {
+export default class Db implements Queryable {
 
   constructor () {
     this.dirtyTracker = new DirtyTracker()
@@ -75,7 +76,7 @@ export default class Db {
     return new Query(this, spec, args)
   }
 
-  view (picker, ...args) {
+  view (picker, ...args): DbView {
     const src = typeof(picker) === 'function'
       ? picker(this, ...args)
       : picker

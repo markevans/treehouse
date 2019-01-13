@@ -1,12 +1,15 @@
+import App from './App'
+import { EventName, EventPayload, EventSpec } from './types'
+
 export default (
-  eventName,
-  payload,
+  eventName: EventName,
+  payload: EventPayload,
   {
     state,
     action,
     update,
-  },
-  app
+  }: EventSpec,
+  app: App
 ) => {
   let dbView, currentState, actionReturnValue, changes
   if (state && (action || update)) {

@@ -34,8 +34,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run build",
-    "test": "jest"
+    "prepare": "yarn run build",
+    "test": "jest",
+    "watch": "tsc --watch"
   },
   "jest": {
     "transform": {
