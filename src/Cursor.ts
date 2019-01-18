@@ -1,34 +1,41 @@
+import Db from './Db'
 import FilteredPipe from './FilteredPipe'
-import { Data, Filterable, Pipe } from './types'
+import { Data, Filterable, FilterSpec, Path, Pipe, WatchablePipe, WatchCallback } from './types'
 import getIn from './utils/getIn'
 
-export default class Cursor implements Pipe<Data>, Filterable {
-  constructor (db, path) {
+export default class Cursor implements WatchablePipe<Data>, Filterable {
+
+  db: Db
+  path: Path
+  watchCallback?: WatchCallback
+
+  constructor (db: Db, path: Path) {
     this.db = db
     this.path = path
-    this.watchCallback = null
   }
 
-  pull () {
-    return getIn(this.db.pull(), this.path)
+  pull (): Data {
+    return getIn(this.db.pullData(), this.path)
   }
 
-  push (value) {
-    this.db.push({ path: this.path, value })
+  push (value: Data): void {
+    this.db.pushUpdate({ path: this.path, value })
   }
 
-  watch (callback) {
+  watch (callback: WatchCallback): void {
     this.unwatch()
     this.watchCallback = callback
-    this.db.watch(this.path, this.watchCallback)
+    this.db.watchPath(this.path, this.watchCallback)
   }
 
-  unwatch () {
-    this.db.unwatch(this.path, this.watchCallback)
-    this.watchCallback = null
+  unwatch (): void {
+    if (this.watchCallback) {
+      this.db.unwatchPath(this.path, this.watchCallback)
+      this.watchCallback = undefined
+    }
   }
 
-  filter (spec, args) {
+  filter (spec: FilterSpec, args: any): Pipe<Data> {
     return new FilteredPipe(this, spec, args)
   }
 }

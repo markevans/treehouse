@@ -1,14 +1,12 @@
-import { BunchOfPipes, BunchOfData, Pipe, WatchCallback } from './types'
+import { BunchOfPipes, BunchOfData, WatchablePipe, WatchCallback } from './types'
 import mapObject from  './utils/mapObject'
 
-export default class DbView implements Pipe<BunchOfData> {
+export default class DbView implements WatchablePipe<BunchOfData> {
 
   private sources: BunchOfPipes
-  private watchCallback: ?WatchCallback
 
   constructor (sources: BunchOfPipes) {
     this.sources = sources
-    this.watchCallback = null
   }
 
   watch (callback: WatchCallback): void {

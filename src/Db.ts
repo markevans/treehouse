@@ -2,40 +2,47 @@ import Cursor from './Cursor'
 import DbView from './DbView'
 import DirtyTracker from './DirtyTracker'
 import Query from './Query'
-import { Queryable } from './types'
+import { BunchOfData, Channel, Data, DbChange, DbUpdate, Path, QuerySpec, Queryable, StatePicker, WatchablePipe, WatchCallback } from './types'
 import mapObject from './utils/mapObject'
 import getIn from './utils/getIn'
 import setIn from './utils/setIn'
 
 export default class Db implements Queryable {
 
+  dirtyTracker: DirtyTracker
+  data: BunchOfData | null
+  snapshotID: number
+  updates: Array<DbUpdate>
+
   constructor () {
     this.dirtyTracker = new DirtyTracker()
     this.data = null
+    this.snapshotID = 0
     this.updates = []
   }
 
-  snapshotID = 0
-
-  init (data) {
+  init (data: BunchOfData): void {
     this.data = data
   }
 
-  push (update) {
+  pushUpdate (update: DbUpdate): void {
     this.updates.push(update)
   }
 
-  pull () {
-    return this.data;
+  pullData (): BunchOfData | null {
+    return this.data
   }
 
-  applyUpdate = ({ path, value }) => {
+  private applyUpdate = ({ path, value }: DbUpdate) => {
+    if (this.data === null) {
+      throw new Error("Can't update the db state as it's not been initialised")
+    }
     const [bough, ...subbranches] = path
     this.data[bough] = setIn(this.data[bough], subbranches, value)
     this.dirtyTracker.markChannelDirty(this.channelForPath(path))
   }
 
-  applyUpdates () {
+  private applyUpdates (): Array<DbChange> {
     const changes = this.updates.map(({path, value}) => ({
       path,
       from: getIn(this.data, path),
@@ -46,37 +53,34 @@ export default class Db implements Queryable {
     return changes
   }
 
-  commitUpdates () {
+  commitUpdates (): Array<DbChange> {
     const changes = this.applyUpdates()
     this.snapshotID++
     this.dirtyTracker.flush()
     return changes
   }
 
-  watch (path, callback) {
+  watchPath (path: Path, callback: WatchCallback): void {
     this.dirtyTracker.track(callback, this.channelForPath(path))
   }
 
-  unwatch (path, callback) {
+  unwatchPath (path: Path, callback: WatchCallback): void {
     this.dirtyTracker.untrack(callback, this.channelForPath(path))
   }
 
-  channelForPath(path) {
+  channelForPath(path: Path): Channel {
     return path[0]
   }
 
-  at (...path) {
-    if (Array.isArray(path[0])) {
-      path = path[0]
-    }
+  at (path: Path): WatchablePipe<Data> {
     return new Cursor(this, path)
   }
 
-  query (spec, args) {
+  query (spec: QuerySpec, args: any): WatchablePipe<Data> {
     return new Query(this, spec, args)
   }
 
-  view (picker, ...args): DbView {
+  view (picker: StatePicker, ...args: Array<any>): WatchablePipe<Data> | WatchablePipe<BunchOfData> {
     const src = typeof(picker) === 'function'
       ? picker(this, ...args)
       : picker
@@ -89,7 +93,7 @@ export default class Db implements Queryable {
     } else if (Array.isArray(src)) {
       return new Cursor(this, src)
     } else {
-      return src
+      return src as WatchablePipe<Data>
     }
   }
 

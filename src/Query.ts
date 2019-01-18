@@ -1,8 +1,7 @@
 import shallowEquals from './utils/shallowEquals'
 import Db from './Db'
-import DbView from './DbView'
 import FilteredPipe from './FilteredPipe'
-import { Data, Filterable, FilterSpec, Path, Pipe, QuerySpec, WatchCallback } from './types'
+import { BunchOfData, Data, Filterable, FilterSpec, Path, WatchablePipe, QuerySpec, WatchCallback } from './types'
 
 const normalizeSpec = (spec: QuerySpec | Path): QuerySpec =>
   Array.isArray(spec)
@@ -15,14 +14,14 @@ const normalizeSpec = (spec: QuerySpec | Path): QuerySpec =>
     :
       spec
 
-export default class Query implements Pipe<Data>, Filterable {
+export default class Query implements WatchablePipe<Data>, Filterable {
 
   args: any
   db: Db
   spec: QuerySpec
   result: Data
   state: Data
-  dbView: DbView
+  dbView: WatchablePipe<Data> | WatchablePipe<BunchOfData>
 
   constructor (db: Db, spec: QuerySpec | Path, args: any) {
     this.db = db
@@ -40,12 +39,12 @@ export default class Query implements Pipe<Data>, Filterable {
     return this.result
   }
 
-  push (value: Data): void {
+  push (value: any): void {
     if (!this.spec.set) {
       throw new Error(`Query doesn't implement set`)
     }
 
-    const changes = this.spec.set(value, this.dbView.pull(), this.args)
+    const changes = this.spec.set(value, this.dbView.pull(), this.args) as any
 
     this.dbView.push(changes)
   }
@@ -58,7 +57,7 @@ export default class Query implements Pipe<Data>, Filterable {
     this.dbView.unwatch()
   }
 
-  filter (spec: FilterSpec, args: any): Pipe<Data> {
+  filter (spec: FilterSpec, args: any): WatchablePipe<Data> {
     return new FilteredPipe(this, spec, args)
   }
 }

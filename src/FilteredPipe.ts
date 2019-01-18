@@ -1,13 +1,13 @@
-import { Data, FilterSpec, Pipe, WatchCallback } from './types'
+import { Data, Filterable, FilterSpec, WatchablePipe, WatchCallback } from './types'
 
-export default class FilteredPipe implements Pipe<Data>, Filterable {
+export default class FilteredPipe implements WatchablePipe<Data>, Filterable {
 
-  source: Pipe
+  source: WatchablePipe<Data>
   args: any
   filterFn: (data: Data, args: any) => Data
   unfilterFn?: (data: Data, args: any) => Data
 
-  constructor (source: Pipe, spec: FilterSpec, args: any) {
+  constructor (source: WatchablePipe<Data>, spec: FilterSpec, args: any) {
     this.source = source
     this.args = args
 
@@ -34,7 +34,7 @@ export default class FilteredPipe implements Pipe<Data>, Filterable {
     this.source.unwatch()
   }
 
-  filter (spec: FilterSpec, args: any): Pipe {
+  filter (spec: FilterSpec, args: any): WatchablePipe<Data> {
     return new FilteredPipe(this, spec, args)
   }
 }
