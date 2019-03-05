@@ -1,7 +1,7 @@
-import { BunchOfPipes, BunchOfData, WatchablePipe, WatchCallback } from './types'
+import { BunchOfPipes, BunchOfData, Pipe, WatchCallback } from './types'
 import mapObject from  './utils/mapObject'
 
-export default class DbView implements WatchablePipe<BunchOfData> {
+export default class DbView implements Pipe<BunchOfData> {
 
   private sources: BunchOfPipes
 

@@ -2,8 +2,15 @@ import buildAdapter from './buildAdapter'
 import handleEvent from './handleEvent'
 import Db from './Db'
 import mapObject from './utils/mapObject'
+import { AdapterSpec, BunchOfData, DbChange, EventName, EventPayload, EventSpec, EventSpecs, Middleware, Pipe, Plugin, RegisterEventCallback, StatePicker } from './types'
 
 export default class App {
+
+  adapters: { [name: string]: any }
+  db: Db
+  eventSpecs: { [name: string]: EventSpec }
+  _currentlyDispatchingEvent: EventName | null
+  _registerEventCallbacks: RegisterEventCallback[]
 
   constructor () {
     this.adapters = {}
@@ -13,23 +20,23 @@ export default class App {
     this._currentlyDispatchingEvent = null
   }
 
-  init(state) {
+  init(state: BunchOfData) {
     this.db.init(state)
   }
 
-  dbView (picker, ...args) {
+  dbView (picker: StatePicker, ...args: any[]): Pipe<BunchOfData> {
     return this.db.view(picker, ...args)
   }
 
-  dbSnapshotID () {
+  dbSnapshotID (): number {
     return this.db.snapshotID
   }
 
-  commitUpdates () {
+  commitUpdates (): DbChange[] {
     return this.db.commitUpdates()
   }
 
-  dispatch = (eventName, payload) => {
+  dispatch = (eventName: EventName, payload: EventPayload): void => {
     if (this.eventSpecs[eventName]) {
       if (this._currentlyDispatchingEvent) {
         throw new Error(`You can't call dispatch(${eventName}) synchronously while already performing an action(${this._currentlyDispatchingEvent})`)
@@ -41,33 +48,28 @@ export default class App {
         this._currentlyDispatchingEvent = null
       }
     } else {
-      console.warn(`Event '${eventName}' not registered`)
+      //console.warn(`Event '${eventName}' not registered`)
     }
   }
 
-  getState(eventName, payload) {
-    const spec = this.eventSpecs[eventName]
-    return spec.state ? this.dbView(spec.state, payload).pull() : null
-  }
-
-  _handleEvent = (eventName, payload, spec) => {
+  _handleEvent = (eventName: EventName, payload: EventPayload, spec: EventSpec) => {
     return handleEvent(eventName, payload, spec, this)
   }
 
-  registerEvents ({defaults, events}) {
+  registerEvents ({defaults, events}: EventSpecs) {
     mapObject(events, (name, spec) => this._registerEvent(name, {...defaults, ...spec}))
   }
 
-  _registerEvent (name, spec) {
+  _registerEvent (name: EventName, spec: EventSpec) {
     this.eventSpecs[name] = spec
     this._registerEventCallbacks.forEach(callback => callback(name, spec))
   }
 
-  onRegisterEvent (callback) {
+  onRegisterEvent (callback: RegisterEventCallback) {
     this._registerEventCallbacks.push(callback)
   }
 
-  registerAdapter (name, spec, component) {
+  registerAdapter <TProps>(name: string, spec: AdapterSpec<TProps>, component: any) {
     this.adapters[name] = buildAdapter(
       name,
       spec,
@@ -76,13 +78,13 @@ export default class App {
     )
   }
 
-  usePlugin (plugin, args) {
+  usePlugin (plugin: Plugin, args: any) {
     return plugin(this, args)
   }
 
-  useMiddleware (middleware, args) {
+  useMiddleware (middleware: Middleware, args: any) {
     const nextHandleEvent = this._handleEvent,
-      nextLayerDispatch = (eventName, payload) =>
+      nextLayerDispatch = (eventName: EventName, payload: EventPayload) =>
         nextHandleEvent(eventName, payload, this.eventSpecs[eventName])
     this._handleEvent = middleware(nextLayerDispatch, this, args)
     return nextLayerDispatch

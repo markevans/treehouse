@@ -1,31 +1,38 @@
-import React from 'react'
+import * as React from 'react'
+import { ComponentSpec } from './types'
 import mapArrayToObject from './utils/mapArrayToObject'
 import mapObject from './utils/mapObject'
 
-export default ({
+interface PropsWithAdapters {
+  __adapters__: any,
+  [key: string]: any
+}
+
+export default <TProps>({
   name,
   events = [],
   handlers = {},
   render: _render_,
-}) =>
-  class Component extends React.PureComponent {
+}: ComponentSpec<TProps>) =>
+  class Component extends React.PureComponent<TProps & PropsWithAdapters> {
 
     static displayName = name
 
-    constructor (props) {
+    eventHandlers: { [name: string]: (...args: any[]) => void }
+
+    constructor (props: TProps & PropsWithAdapters) {
       super(props)
-      this.adapters = props.__adapters__
       const eventCallbacks = mapArrayToObject(events, (eventName) =>
-        props[eventName] || (() => console.warn(`Prop '${eventName}' not defined`))
+        props[eventName] || (() => {/*console.warn(`Prop '${eventName}' not defined`)*/})
       )
       this.eventHandlers = mapObject(handlers, (_name, handler) =>
         typeof(handler) === 'string'
         ? () => eventCallbacks[handler]()
-        : (...args) => handler(eventCallbacks, ...args)
+        : (...args: any[]) => handler(eventCallbacks, ...args)
       )
     }
 
     render () {
-      return _render_(this.props, this.eventHandlers, this.adapters)
+      return _render_(this.props, this.eventHandlers, this.props.__adapters__)
     }
   }

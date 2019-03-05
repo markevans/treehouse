@@ -2,8 +2,7 @@ import Cursor from './Cursor'
 import DbView from './DbView'
 import DirtyTracker from './DirtyTracker'
 import Query from './Query'
-import { BunchOfData, Channel, Data, DbChange, DbUpdate, Path, QuerySpec, Queryable, StatePicker, WatchablePipe, WatchCallback } from './types'
-import mapObject from './utils/mapObject'
+import { BunchOfData, Channel, Data, DbChange, DbUpdate, Path, QuerySpec, Queryable, StatePicker, Pipe, WatchCallback } from './types'
 import getIn from './utils/getIn'
 import setIn from './utils/setIn'
 
@@ -72,29 +71,17 @@ export default class Db implements Queryable {
     return path[0]
   }
 
-  at (path: Path): WatchablePipe<Data> {
+  at (path: Path): Pipe<Data> {
     return new Cursor(this, path)
   }
 
-  query (spec: QuerySpec, args: any): WatchablePipe<Data> {
+  query (spec: QuerySpec, args: any): Pipe<Data> {
     return new Query(this, spec, args)
   }
 
-  view (picker: StatePicker, ...args: Array<any>): WatchablePipe<Data> | WatchablePipe<BunchOfData> {
-    const src = typeof(picker) === 'function'
-      ? picker(this, ...args)
-      : picker
-    if (src.constructor === Object) {
-      return new DbView(
-        mapObject(src, (k, s) =>
-          Array.isArray(s) ? new Cursor(this, s) : s
-        )
-      )
-    } else if (Array.isArray(src)) {
-      return new Cursor(this, src)
-    } else {
-      return src as WatchablePipe<Data>
-    }
+  view (picker: StatePicker, ...args: Array<any>): Pipe<BunchOfData> {
+    const sources =  picker(this, ...args)
+    return new DbView(sources)
   }
 
 }

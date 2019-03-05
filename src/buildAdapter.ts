@@ -1,32 +1,57 @@
-import React from 'react'
+import * as React from 'react'
 import mapObject from './utils/mapObject'
+import App from './App'
+import { AdapterScope, AdapterSpec, BunchOfData, Dispatch, EventPayload, Pipe } from './types'
 
-const buildEventHandlers = (events, dispatch, props, scope) => {
+const buildEventHandlers = <TProps>(
+  events: AdapterSpec<TProps>['events'],
+  dispatch: Dispatch,
+  props: TProps,
+  scope: AdapterScope
+) => {
   if (!events) return null
   const eventHandlers = typeof(events) === 'function'
     ? events(dispatch, props, scope)
     : events
   return mapObject(eventHandlers, (name, handler) =>
     typeof(handler) === 'string'
-      ? payload => dispatch(handler, payload)
+      ? (payload: EventPayload) => dispatch(handler, payload)
       : handler
   )
 }
 
-export default (name, {
-  addToScope,
-  propsFromDb,
-  events,
-}, Component, app) => {
-  class Adapter extends React.PureComponent {
+type State = {
+  snapshotID: null | number
+}
 
+export default <TProps>(
+  name: string,
+  {
+    addToScope,
+    propsFromDb,
+    events,
+  }: AdapterSpec<TProps>,
+  Component: React.ElementType,
+  app: App
+): React.ComponentType<TProps> => {
+  class Adapter extends React.PureComponent<TProps, State> {
+
+    static contextTypes: {
+      treehouseScope: any
+    }
+    static childContextTypes: {
+      treehouseScope: any
+    }
     static displayName = `Adapter(${name})`
 
-    dbView = null
-    state = { snapshotID: null }
+    dbView: Pipe<BunchOfData> | null = null
+    eventHandlers: { [name: string]: (...args: any[]) => void } | null
+    getChildContext?: () => { treehouseScope: any }
+    scope: { [name: string]: any }
+    state: State = { snapshotID: null }
 
-    constructor (...args) {
-      super(...args)
+    constructor (props: TProps) {
+      super(props)
       this.scope = Object.assign(
         {},
         this.context && this.context.treehouseScope,

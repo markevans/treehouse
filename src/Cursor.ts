@@ -1,9 +1,9 @@
 import Db from './Db'
 import FilteredPipe from './FilteredPipe'
-import { Data, Filterable, FilterSpec, Path, Pipe, WatchablePipe, WatchCallback } from './types'
+import { Data, Filterable, FilterSpec, Path, Pipe, WatchCallback } from './types'
 import getIn from './utils/getIn'
 
-export default class Cursor implements WatchablePipe<Data>, Filterable {
+export default class Cursor implements Pipe<Data>, Filterable {
 
   db: Db
   path: Path
