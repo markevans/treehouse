@@ -1,0 +1,57 @@
+{
+  "name": "treehouse",
+  "version": "1.0.0",
+  "description": "State management for javascript apps",
+  "author": "Mark Evans",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/markevans/treehouse/issues"
+  },
+  "homepage": "https://github.com/markevans/treehouse#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markevans/treehouse.git"
+  },
+  "keywords": [
+    "single",
+    "page",
+    "app",
+    "spa",
+    "javascript",
+    "state",
+    "immutable",
+    "tree"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.11",
+    "@types/react": "^16.8.6",
+    "jest": "^23.6.0",
+    "react": "^16.8.3",
+    "ts-jest": "^23.10.5",
+    "typescript": "^3.2.2"
+  },
+  "peerDependencies": {
+    "@types/react": "^16.8.6",
+    "react": "^16.8.3"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "yarn run build",
+    "test": "jest",
+    "watch": "tsc --watch"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testRegex": "^.+\\.test\\.ts$"
+  }
+}
