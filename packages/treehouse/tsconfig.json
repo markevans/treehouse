@@ -1,19 +1,9 @@
 {
+  "extends": "../../tsconfig-common",
   "compilerOptions": {
-    "declaration": true,
-    "declarationDir": "./dist",
-    "forceConsistentCasingInFileNames": true,
-    "module": "commonjs",
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "outDir": "./dist",
-    "sourceMap": true,
-    "strict": true,
-    "lib": ["es2015"],
-    "target": "es5"
+    "declarationDir": "dist",
+    "outDir": "dist"
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": ["node_modules"]
+  "include": [ "src/**/*" ],
+  "exclude": [ "dist", "node_modules" ]
 }
