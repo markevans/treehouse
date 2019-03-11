@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 export type EventName = string
 export type EventPayload = any
 export interface Dispatch {
@@ -14,7 +12,6 @@ export interface Queryable {
 }
 
 export type Path = Array<string>
-export interface Obj { [key: string] : any }
 
 export type DataLeaf = boolean | string | number | undefined | null
 export interface DataCollection { [key: string]: Data }
@@ -37,32 +34,6 @@ export interface StatePicker {
 
 export type BunchOfData = { [name: string]: Data }
 export type BunchOfPipes = { [name: string]: Pipe<Data> }
-
-export interface AdapterScope { [key: string] : any }
-export interface AdapterSpec<TProps> {
-  addToScope: (props: TProps) => AdapterScope,
-  propsFromDb: StatePicker,
-  events: (
-    dispatch: Dispatch,
-    props: TProps,
-    scope: AdapterScope
-  ) => { [name: string]: (arg: any) => void }
-}
-
-export type ComponentEventHandler = (
-  eventCallbacks: { [name: string]: (...args: any[]) => void }
-) => void
-
-export interface ComponentSpec<TProps> {
-  name: string,
-  events: string[],
-  handlers: { [name: string]: string | ComponentEventHandler },
-  render: (
-    props: TProps,
-    eventHandlers: { [name: string]: (...args: any[]) => void },
-    adapters: { [name: string]: React.Component },
-  ) => React.ReactNode,
-}
 
 export interface EventSpec {
   state: StatePicker,

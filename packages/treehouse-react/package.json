@@ -1,0 +1,26 @@
+{
+  "name": "treehouse-react",
+  "version": "1.0.0",
+  "description": "React bindings for treehouse",
+  "main": "dist/index.js",
+  "repository": "https://github.com/markevans/treehouse",
+  "author": "Mark Evans",
+  "license": "ISC",
+  "private": false,
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "yarn run build",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "@types/react": "^16.8.6",
+    "react": "^16.8.3",
+    "treehouse": "^1.0.0",
+    "typescript": "^3.2.2"
+  },
+  "peerDependencies": {
+    "@types/react": "^16.8.6",
+    "react": "^16.8.3"
+  }
+}

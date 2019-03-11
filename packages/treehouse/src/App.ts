@@ -1,19 +1,16 @@
-import buildAdapter from './buildAdapter'
 import defaultHandleEvent from './handleEvent'
 import Db from './Db'
 import mapObject from './utils/mapObject'
-import { AdapterSpec, BunchOfData, DbChange, EventName, EventPayload, EventSpec, EventSpecs, Middleware, Pipe, Plugin, RegisterEventCallback, StatePicker } from './types'
+import { BunchOfData, DbChange, EventName, EventPayload, EventSpec, EventSpecs, Middleware, Pipe, Plugin, RegisterEventCallback, StatePicker } from './types'
 
 export default class App {
 
-  adapters: { [name: string]: any }
   db: Db
   eventSpecs: { [name: string]: EventSpec }
   private currentlyDispatchingEvent: EventName | null
   private registerEventCallbacks: RegisterEventCallback[]
 
   constructor () {
-    this.adapters = {}
     this.db = new Db()
     this.eventSpecs = {}
     this.registerEventCallbacks = []
@@ -72,15 +69,6 @@ export default class App {
 
   onRegisterEvent (callback: RegisterEventCallback) {
     this.registerEventCallbacks.push(callback)
-  }
-
-  registerAdapter <TProps>(name: string, spec: AdapterSpec<TProps>, component: any) {
-    this.adapters[name] = buildAdapter(
-      name,
-      spec,
-      component,
-      this
-    )
   }
 
   usePlugin (plugin: Plugin, args: any) {

@@ -1,4 +1,4 @@
-import { Obj } from '../types'
+type Obj = { [key: string]: any }
 
 export default (
   array: Array<string>,

@@ -1,7 +1,12 @@
 import * as React from 'react'
 import mapObject from './utils/mapObject'
-import App from './App'
-import { AdapterScope, AdapterSpec, BunchOfData, Dispatch, EventPayload, Pipe } from './types'
+import { AdapterLookup, AdapterScope, AdapterSpec } from './types'
+
+type App = import('treehouse').App
+type BunchOfData = import('treehouse').BunchOfData
+type Dispatch = import('treehouse').Dispatch
+type EventPayload = import('treehouse').EventPayload
+type Pipe<T> = import('treehouse').Pipe<T>
 
 const buildEventHandlers = <TProps>(
   events: AdapterSpec<TProps>['events'],
@@ -32,7 +37,8 @@ export default <TProps>(
     events,
   }: AdapterSpec<TProps>,
   Component: React.ElementType,
-  app: App
+  app: App,
+  adapters: AdapterLookup,
 ): React.ComponentType<TProps> => {
   class Adapter extends React.PureComponent<TProps, State> {
 
@@ -84,7 +90,7 @@ export default <TProps>(
       return React.createElement(Component, {
         ...propsFromDb,
         ...this.eventHandlers,
-        __adapters__: app.adapters,
+        __adapters__: adapters,
         ...this.props,
       })
     }
