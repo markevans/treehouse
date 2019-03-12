@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "lib": ["es2015", "DOM"]
+  },
+  "extends": "../../tsconfig-common",
+  "compilerOptions": {
+    "declarationDir": "lib",
+    "outDir": "lib"
+  },
+  "include": [ "src/**/*" ],
+  "exclude": [ "lib", "node_modules" ]
+}

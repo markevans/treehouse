@@ -1,3 +1,5 @@
+import App from './App'
+
 export type EventName = string
 export type EventPayload = any
 export interface Dispatch {
@@ -35,7 +37,10 @@ export interface StatePicker {
 export type BunchOfData = { [name: string]: Data }
 export type BunchOfPipes = { [name: string]: Pipe<Data> }
 
+export type Tag = string
+
 export interface EventSpec {
+  tags: Tag[],
   state: StatePicker,
   action: (payload: EventPayload, dispatch: Dispatch, state: BunchOfData) => any,
   update: (data: BunchOfData, payload: EventPayload) => BunchOfData
@@ -71,9 +76,16 @@ export type RegisterEventCallback = (name: EventName, spec: EventSpec) => void
 
 export type WatchCallback = () => void
 
+export interface EventHandler {
+  (eventName: EventName, payload: EventPayload): {
+    changes?: DbChange[],
+    actionReturnValue?: any
+  }
+}
+
 export interface Middleware {
-  (next: Dispatch, app: any, args: any):
-    (eventName: EventName, payload: EventPayload, eventSpec: EventSpec) => any
+  (next: EventHandler, app: App, args: any):
+    (eventName: EventName, payload: EventPayload, eventSpec: EventSpec) => ReturnType<EventHandler>
 }
 
 export interface Plugin {

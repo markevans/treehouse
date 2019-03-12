@@ -1,5 +1,5 @@
 import App from './App'
-import { DbChange, EventName, EventPayload, EventSpec } from './types'
+import { EventName, EventPayload, EventSpec, EventHandler } from './types'
 
 export default (
   eventName: EventName,
@@ -10,10 +10,7 @@ export default (
     update,
   }: EventSpec,
   app: App
-) : {
-  changes?: DbChange[],
-  actionReturnValue: any
-} => {
+) : ReturnType<EventHandler> => {
   let dbView, currentState, actionReturnValue, changes
   if (state && (action || update)) {
     dbView = app.dbView(state, payload)
