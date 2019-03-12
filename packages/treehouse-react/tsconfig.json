@@ -1,9 +1,9 @@
 {
   "extends": "../../tsconfig-common",
   "compilerOptions": {
-    "declarationDir": "dist",
-    "outDir": "dist"
+    "declarationDir": "lib",
+    "outDir": "lib"
   },
   "include": [ "src/**/*" ],
-  "exclude": [ "dist", "node_modules" ]
+  "exclude": [ "lib", "node_modules" ]
 }
