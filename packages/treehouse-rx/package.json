@@ -24,7 +24,9 @@
     "url": "git+https://github.com/markevans/treehouse.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1",
+    "build": "tsc",
+    "prepare": "yarn run build",
+    "test": "jest",
     "watch": "tsc --watch"
   },
   "bugs": {
