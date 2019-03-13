@@ -9,7 +9,7 @@ const middleware: Middleware = next => (eventName, payload, spec) => {
   let ret
   try {
     ret = next(eventName, payload)
-    if (shouldLog && ret.changes) {
+    if (shouldLog && ret && ret.changes) {
       console.log('%cUPDATES', 'color: #770; font-weight: bold')
       ret.changes.forEach(({path, from, to}) =>
         console.log(`%c\tdb.${path.join('.')}`, 'font-weight: bold', from, '→', to)
