@@ -1,0 +1,39 @@
+{
+  "name": "treehouse-rx",
+  "version": "0.0.0",
+  "description": "ReactiveX extensions for Treehouse JS",
+  "keywords": [
+    "treehouse",
+    "reactive",
+    "streams",
+    "rxjs"
+  ],
+  "author": "Mark Evans <markevans3000@gmail.com>",
+  "homepage": "https://github.com/markevans/treehouse#readme",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markevans/treehouse.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "watch": "tsc --watch"
+  },
+  "bugs": {
+    "url": "https://github.com/markevans/treehouse/issues"
+  },
+  "devDependencies": {
+    "treehouse": "^1.0.0"
+  },
+  "dependencies": {
+    "rxjs": "^6.4.0"
+  }
+}
