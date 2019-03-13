@@ -77,10 +77,11 @@ export type RegisterEventCallback = (name: EventName, spec: EventSpec) => void
 export type WatchCallback = () => void
 
 export interface EventHandler {
-  (eventName: EventName, payload: EventPayload): {
-    changes?: DbChange[],
-    actionReturnValue?: any
-  }
+  (eventName: EventName, payload: EventPayload):
+    null | {
+      changes?: DbChange[],
+      actionReturnValue?: any
+    }
 }
 
 export interface Middleware {

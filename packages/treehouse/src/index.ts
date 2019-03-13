@@ -11,6 +11,7 @@ export {
 
   BunchOfData,
   Dispatch,
+  EventName,
   EventPayload,
   Pipe,
   StatePicker,
