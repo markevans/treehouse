@@ -19,6 +19,8 @@ export type DataLeaf = boolean | string | number | undefined | null
 export interface DataCollection { [key: string]: Data }
 export type Data = DataLeaf | DataCollection
 
+export type WatchCallback = () => void
+
 export interface Pipe<T> {
   pull: () => T,
   push: (data: T) => void,
@@ -42,7 +44,7 @@ export type Tag = string
 export interface EventSpec {
   tags: Tag[],
   state: StatePicker,
-  action: (payload: EventPayload, dispatch: Dispatch, state: BunchOfData) => any,
+  action: (payload: EventPayload, dispatch: Dispatch, state?: BunchOfData) => any,
   update: (data: BunchOfData, payload: EventPayload) => BunchOfData
 }
 
@@ -73,8 +75,6 @@ export type DbUpdate = {
 }
 
 export type RegisterEventCallback = (name: EventName, spec: EventSpec) => void
-
-export type WatchCallback = () => void
 
 export interface EventHandler {
   (eventName: EventName, payload: EventPayload):

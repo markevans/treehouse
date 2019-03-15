@@ -17,9 +17,6 @@ export default (
     currentState = dbView.pull()
   }
   if (action) {
-    if (!currentState) {
-      throw new Error(`'action' needs the state to be specified`)
-    }
     actionReturnValue = action(payload, app.dispatch, currentState)
   }
   if (update) {

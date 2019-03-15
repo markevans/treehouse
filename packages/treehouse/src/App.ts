@@ -49,6 +49,10 @@ export default class App {
     }
   }
 
+  dispatcher = (eventName: EventName) => {
+    return (payload: EventPayload) => this.dispatch(eventName, payload)
+  }
+
   getState(eventName: EventName, payload: EventPayload): BunchOfData | null {
     const spec = this.eventSpecs[eventName]
     return spec.state ? this.dbView(spec.state, payload).pull() : null
@@ -59,10 +63,10 @@ export default class App {
   }
 
   registerEvents ({defaults, events}: EventSpecs) {
-    mapObject(events, (name, spec) => this._registerEvent(name, {...defaults, ...spec}))
+    mapObject(events, (name, spec) => this.registerEvent(name, {...defaults, ...spec}))
   }
 
-  _registerEvent (name: EventName, spec: EventSpec) {
+  registerEvent (name: EventName, spec: EventSpec) {
     this.eventSpecs[name] = spec
     this.registerEventCallbacks.forEach(callback => callback(name, spec))
   }

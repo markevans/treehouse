@@ -9,6 +9,7 @@ export {
   Middleware,
   Plugin,
 
+  Data,
   BunchOfData,
   Dispatch,
   EventName,
